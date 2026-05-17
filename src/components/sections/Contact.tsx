@@ -12,7 +12,6 @@ export function Contact() {
           </a>
         </div>
         <div className="bh-contact-side">
-          <div className="row"><strong>Studio</strong><span>Ahmedabad, IN</span></div>
           <div className="row"><strong>Hours</strong><span>Mon – Fri · 10–7 IST</span></div>
           <div className="row"><strong>Availability</strong><span>Q3 2026</span></div>
           <div className="row"><strong>For</strong><span>Founders &amp; PMs</span></div>

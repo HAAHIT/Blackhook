@@ -27,7 +27,7 @@ export function Team() {
             <p className="bh-member-bio">{m.bio}</p>
             <div className="bh-member-foot">
               <span>{m.foot[0]}</span>
-              <a href="#">{m.foot[1]} <ArrowOut size={10} /></a>
+              <a href={m.linkedin} target="_blank" rel="noopener noreferrer">{m.foot[1]} <ArrowOut size={10} /></a>
             </div>
           </article>
         ))}

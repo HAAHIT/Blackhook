@@ -57,6 +57,7 @@ export interface TeamMember {
   role: string;
   bio: string;
   foot: [string, string];
+  linkedin: string;
 }
 
 export interface Quote {

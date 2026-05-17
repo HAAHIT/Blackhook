@@ -5,15 +5,17 @@ export const TEAM: TeamMember[] = [
     initial: 'S',
     name: 'Suraj Ingle',
     role: 'Founding designer & engineer',
-    bio: 'NID Ahmedabad. Designs systems and ships them. Eight years across product design and front-end engineering — the rare person who can both spec a component and write its production code.',
-    foot: ['NID Ahmedabad · 2017', '@surajingle'],
+    bio: 'Designs systems and ships them. Eight years across product design and front-end engineering — the rare person who can both spec a component and write its production code.',
+    foot: ['Designer & Engineer', 'LinkedIn'],
+    linkedin: 'https://www.linkedin.com/in/suraj-ingle-4b89a3165/',
   },
   {
     initial: 'H',
     name: 'Hitesh Agrawal',
     role: 'Founding product & strategy',
     bio: 'Product manager and business strategist. Built and scaled software with both Fortune 500 enterprises and zero-to-one startups. Translates a fuzzy ambition into something a team can actually ship.',
-    foot: ['Ex-enterprise · Ex-startup', '@hiteshagrawal'],
+    foot: ['Product & Strategy', 'LinkedIn'],
+    linkedin: 'https://www.linkedin.com/in/hitesh-agrawal-5a02a416b/',
   },
 ];
 

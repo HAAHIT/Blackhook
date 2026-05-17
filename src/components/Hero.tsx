@@ -54,7 +54,7 @@ export function Hero({ hookOpts, theme }: HeroProps) {
       <div className="bh-hero-copy">
         <div className="bh-eyebrow">
           <span className="dot" />
-          Studio · Est. Ahmedabad
+          BlackHook Studio
         </div>
         <h1>
           We build <span className="ital">software</span>{' '}
