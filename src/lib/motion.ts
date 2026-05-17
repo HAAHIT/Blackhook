@@ -1,7 +1,6 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
-import { HookScene } from './hook3d';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -213,7 +212,7 @@ function setupHookScroll() {
   const stage = document.querySelector<HTMLElement>('.bh-hook-stage');
   if (!stage) return;
   gsap.to(stage, { yPercent: -16, ease: 'none', scrollTrigger: { trigger: '.bh-hero', start: 'top top', end: 'bottom top', scrub: 0.6 } });
-  ScrollTrigger.create({ trigger: document.body, start: 'top top', end: 'bottom bottom', onUpdate: (s) => HookScene.setScroll(s.progress) });
+  ScrollTrigger.create({ trigger: document.body, start: 'top top', end: 'bottom bottom', onUpdate: (s) => window.dispatchEvent(new CustomEvent('bh:scroll', { detail: s.progress })) });
 }
 
 function setupNav() {

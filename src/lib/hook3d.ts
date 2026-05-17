@@ -200,10 +200,13 @@ class HookSceneManager {
       this.camera.updateProjectionMatrix();
     };
 
+    const onScroll = (e: Event) => { this.rot.scrollY = (e as CustomEvent<number>).detail * Math.PI * 1.2; };
+
     canvas.addEventListener('pointerdown', onDown);
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointermove', onMove);
     window.addEventListener('resize', onResize);
+    window.addEventListener('bh:scroll', onScroll);
 
     const tick = () => {
       this.raf = requestAnimationFrame(tick);

@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { HookScene } from '@/lib/hook3d';
 import { ShaderBG } from '@/lib/shader-bg';
 import { ArrowRight } from '@/icons';
 import type { HookOptions, Theme } from '@/types';
@@ -14,16 +13,21 @@ export function Hero({ hookOpts, theme }: HeroProps) {
   const heroRef = useRef<HTMLElement>(null);
   const hookMounted = useRef(false);
   const shaderMounted = useRef(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const hookRef = useRef<any>(null);
 
-  // Mount 3D hook once (poll until HookScene is ready)
+  // Lazy-load Three.js after first paint to keep it off the critical path
   useEffect(() => {
     let cancelled = false;
-    const tryMount = () => {
+    const mount = async () => {
       if (cancelled || hookMounted.current || !stageRef.current) return;
+      const { HookScene } = await import('@/lib/hook3d');
+      if (cancelled || !stageRef.current) return;
       HookScene.mount(stageRef.current, hookOpts);
       hookMounted.current = true;
+      hookRef.current = HookScene;
     };
-    tryMount();
+    mount();
     return () => { cancelled = true; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -43,10 +47,10 @@ export function Hero({ hookOpts, theme }: HeroProps) {
 
   // Sync 3D hook tweaks
   useEffect(() => {
-    if (!hookMounted.current) return;
-    HookScene.setStyle(hookOpts.style);
-    HookScene.setColor(hookOpts.color);
-    HookScene.setSpeed(hookOpts.speed);
+    if (!hookRef.current) return;
+    hookRef.current.setStyle(hookOpts.style);
+    hookRef.current.setColor(hookOpts.color);
+    hookRef.current.setSpeed(hookOpts.speed);
   }, [hookOpts.style, hookOpts.color, hookOpts.speed]);
 
   return (
