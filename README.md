@@ -1,25 +1,66 @@
-# CODING AGENTS: READ THIS FIRST
+# BlackHook Studio
 
-This is a **handoff bundle** from Claude Design (claude.ai/design).
+Website for BlackHook — a small, senior software design & engineering studio based in Ahmedabad.
 
-A user mocked up designs in HTML/CSS/JS using an AI design tool, then exported this bundle so a coding agent can implement the designs for real.
+Built with Vite + React + TypeScript. Features a Three.js 3D hook, WebGL shader background, GSAP scroll animations, Lenis smooth scroll, and a custom cursor.
 
-## What you should do — IMPORTANT
+## Getting started
 
-**Read the chat transcripts first.** There are 1 chat transcript(s) in `chats/`. The transcripts show the full back-and-forth between the user and the design assistant — they tell you **what the user actually wants** and **where they landed** after iterating. Don't skip them. The final HTML files are the output, but the chat is where the intent lives.
+**Prerequisites:** Node.js 18+
 
-**Read `project/BlackHook.html` in full.** The user had this file open when they triggered the handoff, so it's almost certainly the primary design they want built. Read it top to bottom — don't skim. Then **follow its imports**: open every file it pulls in (shared components, CSS, scripts) so you understand how the pieces fit together before you start implementing.
+```bash
+# Install dependencies
+npm install
 
-**If anything is ambiguous, ask the user to confirm before you start implementing.** It's much cheaper to clarify scope up front than to build the wrong thing.
+# Start dev server
+npm run dev
+```
 
-## About the design files
+Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-The design medium is **HTML/CSS/JS** — these are prototypes, not production code. Your job is to **recreate them pixel-perfectly** in whatever technology makes sense for the target codebase (React, Vue, native, whatever fits). Match the visual output; don't copy the prototype's internal structure unless it happens to fit.
+## Other commands
 
-**Don't render these files in a browser or take screenshots unless the user asks you to.** Everything you need — dimensions, colors, layout rules — is spelled out in the source. Read the HTML and CSS directly; a screenshot won't tell you anything they don't.
+```bash
+# Type-check and build for production
+npm run build
 
-## Bundle contents
+# Preview the production build locally
+npm run preview
 
-- `README.md` — this file
-- `chats/` — conversation transcripts (read these!)
-- `project/` — the `BlackHook` project files (HTML prototypes, assets, components)
+# Lint
+npm run lint
+```
+
+## Project structure
+
+```
+src/
+├── App.tsx                  # Root component, manages global state & tweaks
+├── main.tsx                 # React entry point
+├── types.ts                 # Shared TypeScript types
+├── icons.tsx                # SVG icon components
+├── components/
+│   ├── Nav.tsx
+│   ├── Hero.tsx             # 3D hook + shader background
+│   ├── Footer.tsx
+│   └── sections/
+│       ├── Services.tsx
+│       ├── Work.tsx         # Case studies with slide-in detail panel
+│       ├── Approach.tsx
+│       ├── Team.tsx
+│       ├── Testimonials.tsx # Marquee
+│       └── Contact.tsx
+├── data/                    # Content (services, work, team, quotes)
+├── hooks/
+│   └── useTweaks.ts         # Dev tweaks panel state (persisted to localStorage)
+├── lib/
+│   ├── hook3d.ts            # Three.js 3D hook scene
+│   ├── shader-bg.ts         # WebGL noise shader background
+│   └── motion.ts            # GSAP animations, Lenis scroll, custom cursor
+└── styles/
+    └── globals.css
+```
+
+## Dev tweaks panel
+
+A floating panel in the bottom-right corner (desktop only) lets you adjust the 3D hook style, colours, animation speeds, film grain, custom cursor, and smooth scroll in real time. Settings persist across page reloads via `localStorage`.
