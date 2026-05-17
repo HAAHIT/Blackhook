@@ -16,7 +16,6 @@ const DEFAULTS = {
   hookStyle: 'wireframe' as const,
   hookColor: '#f4f0e8',
   hookSpeed: 0.35,
-  shader: true,
   marqueeSpeed: 1,
   grain: true,
   customCursor: true,

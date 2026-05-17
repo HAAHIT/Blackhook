@@ -12,7 +12,6 @@ export interface TweakValues {
   hookStyle: HookStyle;
   hookColor: string;
   hookSpeed: number;
-  shader: boolean;
   marqueeSpeed: number;
   grain: boolean;
   customCursor: boolean;

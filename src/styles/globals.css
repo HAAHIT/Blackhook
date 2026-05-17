@@ -208,7 +208,7 @@ a { color: inherit; text-decoration: none; }
 .bh-case-cta { display: inline-flex; align-items: center; gap: 6px; color: var(--fg); transition: gap 0.35s cubic-bezier(0.7, 0, 0.2, 1); }
 .bh-case:hover .bh-case-cta { gap: 10px; }
 .bh-case .visual { position: relative; flex: 1; margin: -8px -8px 24px; border-radius: 12px; overflow: hidden; background: linear-gradient(135deg, #18171a, #0d0d0e); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; }
-.bh-case .visual::after { content: 'PLACEHOLDER'; position: absolute; top: 12px; left: 12px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.16em; color: var(--fg-3); }
+.bh-case .visual::after { content: ''; position: absolute; top: 12px; left: 12px; font-family: var(--mono); font-size: 9px; letter-spacing: 0.16em; color: var(--fg-3); }
 .bh-case .visual .mock { max-width: 70%; max-height: 70%; }
 .bh-case .meta { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--fg-3); margin-bottom: 12px; }
 .bh-case h3 { font-family: var(--serif); font-weight: 400; font-size: 28px; line-height: 1.15; margin: 0 0 14px; }

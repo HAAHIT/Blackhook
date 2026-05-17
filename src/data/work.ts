@@ -37,7 +37,7 @@ export const WORK: CaseStudy[] = [
       ['11s', 'mean exception-to-alert time'],
       ['72%', 'reduction in dispatcher screen-switches'],
     ],
-    long: 'Forge ran their entire dispatch off a daisy-chain of spreadsheets and chat windows. We shadowed dispatchers for two weeks, then built a single command surface — map, table, status stream — wired into their existing telematics. It now monitors 2,100 trucks live with sub-15s exception detection.',
+    long: 'Forge ran their entire dispatch off a daisy-chain of spreadsheets and chat windows. We shadowed dispatchers for two weeks, then built a single command surface — map, table, status stream — wired into their existing telematics. It now monitors 2,100 trucks live with an 11s mean exception-to-alert time.',
   },
   {
     id: '03',

@@ -33,6 +33,7 @@ class HookSceneManager {
   private pointer: PointerState = { x: 0, y: 0, down: false, lx: 0, ly: 0 };
   private rot: RotState = { x: 0, y: 0, vx: 0, vy: 0, autoY: 0, scrollY: 0 };
   private opts: HookOptions = { style: 'wireframe', speed: 0.35, color: '#f4f0e8' };
+  private scrollHandler: ((e: Event) => void) | null = null;
 
   private buildHook(opts: HookOptions): THREE.Group {
     const group = new THREE.Group();
@@ -200,13 +201,13 @@ class HookSceneManager {
       this.camera.updateProjectionMatrix();
     };
 
-    const onScroll = (e: Event) => { this.rot.scrollY = (e as CustomEvent<number>).detail * Math.PI * 1.2; };
+    this.scrollHandler = (e: Event) => { this.rot.scrollY = (e as CustomEvent<number>).detail * Math.PI * 1.2; };
 
     canvas.addEventListener('pointerdown', onDown);
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointermove', onMove);
     window.addEventListener('resize', onResize);
-    window.addEventListener('bh:scroll', onScroll);
+    window.addEventListener('bh:scroll', this.scrollHandler);
 
     const tick = () => {
       this.raf = requestAnimationFrame(tick);
@@ -245,6 +246,7 @@ class HookSceneManager {
 
   destroy() {
     if (this.raf !== null) cancelAnimationFrame(this.raf);
+    if (this.scrollHandler) { window.removeEventListener('bh:scroll', this.scrollHandler); this.scrollHandler = null; }
     this.renderer?.dispose();
     this.renderer?.domElement.remove();
     this.renderer = null;

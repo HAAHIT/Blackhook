@@ -8,7 +8,6 @@ const FRAG = `
   uniform vec2 u_res;
   uniform float u_time;
   uniform vec2 u_mouse;
-  uniform float u_scroll;
   uniform vec3 u_bg;
   uniform vec3 u_fg;
 
@@ -110,30 +109,28 @@ export const ShaderBG = {
       u_res: gl.getUniformLocation(program, 'u_res'),
       u_time: gl.getUniformLocation(program, 'u_time'),
       u_mouse: gl.getUniformLocation(program, 'u_mouse'),
-      u_scroll: gl.getUniformLocation(program, 'u_scroll'),
       u_bg: gl.getUniformLocation(program, 'u_bg'),
       u_fg: gl.getUniformLocation(program, 'u_fg'),
     };
     state.start = performance.now();
 
+    let canvasRect: DOMRect | null = null;
     const resize = () => {
       if (!state.canvas) return;
       const dpr = Math.min(window.devicePixelRatio, 1.5);
       state.canvas.width = state.canvas.clientWidth * dpr;
       state.canvas.height = state.canvas.clientHeight * dpr;
+      canvasRect = state.canvas.getBoundingClientRect();
       gl.viewport(0, 0, state.canvas.width, state.canvas.height);
     };
     new ResizeObserver(resize).observe(canvas);
     resize();
 
     window.addEventListener('pointermove', (e) => {
-      const r = canvas.getBoundingClientRect();
+      const r = canvasRect ?? canvas.getBoundingClientRect();
       state.mouse.tx = (e.clientX - r.left) * (canvas.width / r.width);
       state.mouse.ty = (r.height - (e.clientY - r.top)) * (canvas.height / r.height);
     });
-    window.addEventListener('scroll', () => {
-      state.mouse.x = Math.min(1, window.scrollY / 800);
-    }, { passive: true });
 
     new IntersectionObserver((entries) => {
       entries.forEach((e) => { state.visible = e.isIntersecting; });
@@ -149,7 +146,6 @@ export const ShaderBG = {
       gl.uniform2f(u['u_res']!, state.canvas!.width, state.canvas!.height);
       gl.uniform1f(u['u_time']!, t);
       gl.uniform2f(u['u_mouse']!, state.mouse.x, state.mouse.y);
-      gl.uniform1f(u['u_scroll']!, Math.min(1, window.scrollY / 800));
       gl.uniform3f(u['u_bg']!, ...state.colors.bg);
       gl.uniform3f(u['u_fg']!, ...state.colors.fg);
       gl.drawArrays(gl.TRIANGLES, 0, 6);

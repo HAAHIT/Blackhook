@@ -30,6 +30,7 @@ const state = {
 function setupLenis() {
   state.lenis?.destroy();
   state.lenis = null;
+  if (lenisRaf !== null) { cancelAnimationFrame(lenisRaf); lenisRaf = null; }
   if (!state.smooth) return;
 
   const lenis = new Lenis({
@@ -46,8 +47,8 @@ function setupLenis() {
     ScrollTrigger.update();
   });
 
-  const raf = (t: number) => { lenis.raf(t); requestAnimationFrame(raf); };
-  requestAnimationFrame(raf);
+  const tick = (t: number) => { lenis.raf(t); lenisRaf = requestAnimationFrame(tick); };
+  lenisRaf = requestAnimationFrame(tick);
 }
 
 function setupCursor() {
@@ -251,6 +252,7 @@ function setupPageEnter() {
   gsap.to(overlay, { yPercent: -100, duration: 1.1, delay: 0.8, ease: 'expo.inOut', onComplete: () => overlay.remove() });
 }
 
+let lenisRaf: number | null = null;
 let started = false;
 
 export const BHMotion = {
