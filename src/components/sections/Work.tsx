@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { WORK } from '@/data/work';
 import type { CaseStudy } from '@/types';
 

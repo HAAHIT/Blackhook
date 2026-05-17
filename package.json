@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --max-warnings 0"
+    "lint": "eslint ."
   },
   "dependencies": {
     "gsap": "^3.12.5",
@@ -17,16 +17,18 @@
     "three": "^0.160.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/node": "^25.8.0",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
     "@types/three": "^0.160.0",
-    "@typescript-eslint/eslint-plugin": "^7.18.0",
-    "@typescript-eslint/parser": "^7.18.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
     "@vitejs/plugin-react": "^6.0.2",
-    "eslint": "^8.57.0",
-    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint": "^9.0.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.9",
+    "globals": "^17.6.0",
     "typescript": "^5.5.3",
     "vite": "^8.0.0"
   }
