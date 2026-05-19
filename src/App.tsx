@@ -27,7 +27,11 @@ export function App() {
   const motionStarted = useRef(false);
 
   useEffect(() => {
-    document.documentElement.dataset['theme'] = tweaks.theme;
+    const root = document.documentElement;
+    root.dataset['themeSwitching'] = '';
+    root.dataset['theme'] = tweaks.theme;
+    const t = setTimeout(() => delete root.dataset['themeSwitching'], 700);
+    return () => clearTimeout(t);
   }, [tweaks.theme]);
 
   useEffect(() => {

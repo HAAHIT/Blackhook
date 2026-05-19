@@ -37,9 +37,15 @@ html[data-theme='light'] .bh-scroll-cue { background: linear-gradient(to top, rg
 html[data-theme='light'] .bh-case-detail-bg { background: rgba(244, 240, 232, 0.6); }
 html[data-theme='light'] .bh-case-detail-visual { background: linear-gradient(135deg, #ebe7df, #d8d2c4); }
 
-html, body, .bh-nav, .bh-section, .bh-service, .bh-case, .bh-member,
-.btn-primary, .btn-ghost, .bh-nav-cta, .bh-cta-big, .bh-eyebrow, .bh-status,
-.bh-quote .qmark, .bh-quote .text {
+/* Only pay the non-composited color/bg-color paint cost during an explicit theme switch */
+html[data-theme-switching], html[data-theme-switching] body,
+html[data-theme-switching] .bh-nav, html[data-theme-switching] .bh-section,
+html[data-theme-switching] .bh-service, html[data-theme-switching] .bh-case,
+html[data-theme-switching] .bh-member, html[data-theme-switching] .btn-primary,
+html[data-theme-switching] .btn-ghost, html[data-theme-switching] .bh-nav-cta,
+html[data-theme-switching] .bh-cta-big, html[data-theme-switching] .bh-eyebrow,
+html[data-theme-switching] .bh-status, html[data-theme-switching] .bh-quote .qmark,
+html[data-theme-switching] .bh-quote .text {
   transition: background-color 0.6s ease, color 0.5s ease, border-color 0.5s ease;
 }
 
