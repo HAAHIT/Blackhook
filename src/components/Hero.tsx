@@ -12,7 +12,6 @@ export function Hero({ hookOpts, theme }: HeroProps) {
   const stageRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
   const hookMounted = useRef(false);
-  const shaderMounted = useRef(false);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const hookRef = useRef<any>(null);
 
@@ -32,11 +31,9 @@ export function Hero({ hookOpts, theme }: HeroProps) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Mount shader background once
   useEffect(() => {
-    if (shaderMounted.current || !heroRef.current) return;
+    if (!heroRef.current) return;
     ShaderBG.init(heroRef.current);
-    shaderMounted.current = true;
   }, []);
 
   // Sync shader colors with theme

@@ -1,4 +1,20 @@
-import * as THREE from 'three';
+import {
+  AmbientLight,
+  Color,
+  DirectionalLight,
+  EdgesGeometry,
+  ExtrudeGeometry,
+  Group,
+  LineBasicMaterial,
+  LineSegments,
+  Mesh,
+  MeshPhysicalMaterial,
+  PerspectiveCamera,
+  PointLight,
+  Scene,
+  Shape,
+  WebGLRenderer,
+} from 'three';
 import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
 import type { HookOptions, HookStyle } from '@/types';
 
@@ -24,10 +40,10 @@ interface RotState {
 }
 
 class HookSceneManager {
-  private renderer: THREE.WebGLRenderer | null = null;
-  private scene: THREE.Scene | null = null;
-  private camera: THREE.PerspectiveCamera | null = null;
-  private hookGroup: THREE.Group | null = null;
+  private renderer: WebGLRenderer | null = null;
+  private scene: Scene | null = null;
+  private camera: PerspectiveCamera | null = null;
+  private hookGroup: Group | null = null;
   private raf: number | null = null;
   private container: HTMLElement | null = null;
   private pointer: PointerState = { x: 0, y: 0, down: false, lx: 0, ly: 0 };
@@ -35,11 +51,11 @@ class HookSceneManager {
   private opts: HookOptions = { style: 'wireframe', speed: 0.35, color: '#f4f0e8' };
   private scrollHandler: ((e: Event) => void) | null = null;
 
-  private buildHook(opts: HookOptions): THREE.Group {
-    const group = new THREE.Group();
+  private buildHook(opts: HookOptions): Group {
+    const group = new Group();
     const loader = new SVGLoader();
     const data = loader.parse(HOOK_SVG);
-    const shapes: THREE.Shape[] = [];
+    const shapes: Shape[] = [];
     data.paths.forEach((p) => p.toShapes(true).forEach((s) => shapes.push(s)));
 
     const cx = 869 / 2;
@@ -56,19 +72,19 @@ class HookSceneManager {
     };
 
     shapes.forEach((shape) => {
-      const geom = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+      const geom = new ExtrudeGeometry(shape, extrudeSettings);
       geom.translate(-cx, -cy, -extrudeSettings.depth / 2);
       geom.scale(scale, -scale, scale);
 
-      const matSolid = new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color(opts.color),
+      const matSolid = new MeshPhysicalMaterial({
+        color: new Color(opts.color),
         metalness: 0.15,
         roughness: 0.55,
         clearcoat: 0.4,
         clearcoatRoughness: 0.5,
       });
-      const matGlass = new THREE.MeshPhysicalMaterial({
-        color: new THREE.Color(opts.color),
+      const matGlass = new MeshPhysicalMaterial({
+        color: new Color(opts.color),
         metalness: 0.1,
         roughness: 0.08,
         transmission: 0.85,
@@ -80,18 +96,18 @@ class HookSceneManager {
         opacity: 0.55,
       });
 
-      const mesh = new THREE.Mesh(geom, opts.style === 'glass' ? matGlass : matSolid);
+      const mesh = new Mesh(geom, opts.style === 'glass' ? matGlass : matSolid);
       mesh.visible = opts.style !== 'wireframe';
       mesh.userData['kind'] = 'solid';
       group.add(mesh);
 
-      const edgeGeom = new THREE.EdgesGeometry(geom, 18);
-      const edgeMat = new THREE.LineBasicMaterial({
-        color: new THREE.Color(opts.color),
+      const edgeGeom = new EdgesGeometry(geom, 18);
+      const edgeMat = new LineBasicMaterial({
+        color: new Color(opts.color),
         transparent: true,
         opacity: opts.style === 'wireframe' ? 0.95 : 0.85,
       });
-      const edges = new THREE.LineSegments(edgeGeom, edgeMat);
+      const edges = new LineSegments(edgeGeom, edgeMat);
       edges.userData['kind'] = 'edges';
       edges.visible = opts.style !== 'glass';
       group.add(edges);
@@ -103,10 +119,10 @@ class HookSceneManager {
   private applyStyle(opts: HookOptions) {
     if (!this.hookGroup) return;
     this.hookGroup.traverse((obj) => {
-      if (!(obj instanceof THREE.Mesh || obj instanceof THREE.LineSegments)) return;
-      if (obj.userData['kind'] === 'solid' && obj instanceof THREE.Mesh) {
+      if (!(obj instanceof Mesh || obj instanceof LineSegments)) return;
+      if (obj.userData['kind'] === 'solid' && obj instanceof Mesh) {
         obj.visible = opts.style !== 'wireframe';
-        const mat = obj.material as THREE.MeshPhysicalMaterial;
+        const mat = obj.material as MeshPhysicalMaterial;
         if (opts.style === 'glass') {
           mat.transmission = 0.85;
           mat.opacity = 0.55;
@@ -120,9 +136,9 @@ class HookSceneManager {
         }
         mat.color.set(opts.color);
         mat.needsUpdate = true;
-      } else if (obj.userData['kind'] === 'edges' && obj instanceof THREE.LineSegments) {
+      } else if (obj.userData['kind'] === 'edges' && obj instanceof LineSegments) {
         obj.visible = opts.style !== 'glass';
-        const mat = obj.material as THREE.LineBasicMaterial;
+        const mat = obj.material as LineBasicMaterial;
         mat.color.set(opts.color);
         mat.opacity = opts.style === 'wireframe' ? 0.95 : 0.85;
       }
@@ -136,24 +152,24 @@ class HookSceneManager {
     const w = el.clientWidth;
     const h = el.clientHeight;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    const renderer = new WebGLRenderer({ antialias: true, alpha: true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(w, h);
     renderer.setClearColor(0x000000, 0);
     el.appendChild(renderer.domElement);
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(35, w / h, 0.1, 100);
+    const scene = new Scene();
+    const camera = new PerspectiveCamera(35, w / h, 0.1, 100);
     camera.position.set(0, 0, 8);
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
-    const key = new THREE.DirectionalLight(0xffffff, 1.2);
+    scene.add(new AmbientLight(0xffffff, 0.55));
+    const key = new DirectionalLight(0xffffff, 1.2);
     key.position.set(3, 4, 5);
     scene.add(key);
-    const rim = new THREE.DirectionalLight(0xa9bfff, 0.6);
+    const rim = new DirectionalLight(0xa9bfff, 0.6);
     rim.position.set(-4, -2, -3);
     scene.add(rim);
-    const accent = new THREE.PointLight(0xfff1d2, 0.9, 20);
+    const accent = new PointLight(0xfff1d2, 0.9, 20);
     accent.position.set(-2, 3, 4);
     scene.add(accent);
 

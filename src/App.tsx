@@ -78,6 +78,7 @@ export function App() {
 
       <Footer />
 
+      {import.meta.env.DEV && (
       <div className="bh-tweaks" aria-label="Dev tweaks">
         <div className="bh-tweaks-title">Tweaks</div>
 
@@ -128,6 +129,7 @@ export function App() {
           Smooth scroll
         </label>
       </div>
+      )}
     </>
   );
 }
