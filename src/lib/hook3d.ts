@@ -184,8 +184,12 @@ class HookSceneManager {
     this.hookGroup = hook;
 
     const canvas = renderer.domElement;
-    canvas.style.touchAction = 'none';
-    canvas.style.cursor = 'grab';
+    const isTouch = window.matchMedia('(pointer: coarse)').matches;
+
+    if (!isTouch) {
+      canvas.style.cursor = 'grab';
+    }
+    canvas.style.touchAction = isTouch ? 'auto' : 'none';
 
     const onDown = (e: PointerEvent) => {
       this.pointer.down = true;
@@ -219,9 +223,11 @@ class HookSceneManager {
 
     this.scrollHandler = (e: Event) => { this.rot.scrollY = (e as CustomEvent<number>).detail * Math.PI * 1.2; };
 
-    canvas.addEventListener('pointerdown', onDown);
-    window.addEventListener('pointerup', onUp);
-    window.addEventListener('pointermove', onMove);
+    if (!isTouch) {
+      canvas.addEventListener('pointerdown', onDown);
+      window.addEventListener('pointerup', onUp);
+      window.addEventListener('pointermove', onMove);
+    }
     window.addEventListener('resize', onResize);
     window.addEventListener('bh:scroll', this.scrollHandler);
 
