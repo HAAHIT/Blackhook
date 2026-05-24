@@ -24,7 +24,7 @@ export function Nav() {
         <a href="#team">Team</a>
         <a href="#contact">Contact</a>
       </nav>
-      <a href="#contact" className="bh-nav-cta magnetic" data-magnetic="0.3">
+      <a href="https://wa.me/919309803663" target="_blank" rel="noopener noreferrer" className="bh-nav-cta magnetic" data-magnetic="0.3">
         Start a project <ArrowOut size={11} />
       </a>
     </header>

@@ -67,7 +67,7 @@ export function Hero({ hookOpts, theme }: HeroProps) {
           obsessive attention to the final 5%.
         </p>
         <div className="bh-hero-ctas">
-          <a href="#contact" className="btn-primary magnetic" data-magnetic="0.25">
+          <a href="https://wa.me/919309803663" target="_blank" rel="noopener noreferrer" className="btn-primary magnetic" data-magnetic="0.25">
             Start a project <ArrowRight size={12} />
           </a>
           <a href="#work" className="btn-ghost magnetic" data-magnetic="0.2">

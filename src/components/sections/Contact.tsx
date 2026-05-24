@@ -7,8 +7,8 @@ export function Contact() {
         <div>
           <div className="bh-section-tag" style={{ marginBottom: 32 }}>Contact</div>
           <h2>Have something <em>worth building?</em></h2>
-          <a href="mailto:hello@blackhook.studio" className="bh-cta-big magnetic" data-magnetic="0.18">
-            hello@blackhook.studio <ArrowOut size={14} />
+          <a href="https://wa.me/919309803663" target="_blank" rel="noopener noreferrer" className="bh-cta-big magnetic" data-magnetic="0.18">
+            Chat on WhatsApp <ArrowOut size={14} />
           </a>
         </div>
         <div className="bh-contact-side">
