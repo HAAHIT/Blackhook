@@ -29,12 +29,6 @@ export function Footer() {
             <span className="d" /> Booking Q3 2026
           </span>
         </div>
-        <div className="bh-footer-links">
-          <a href="#" rel="noopener noreferrer">Twitter / X</a>
-          <a href="#" rel="noopener noreferrer">LinkedIn</a>
-          <a href="#" rel="noopener noreferrer">Dribbble</a>
-          <a href="#" rel="noopener noreferrer">Read.cv</a>
-        </div>
       </div>
     </footer>
   );
