@@ -6,6 +6,7 @@ export interface Project {
   repo: string;
   live?: string;
   year: string;
+  current?: boolean;
 }
 
 export interface Experience {
@@ -23,12 +24,33 @@ export interface SkillGroup {
 
 export const PROJECTS: Project[] = [
   {
-    name: 'HisaabKitaab',
+    name: 'SoloBooks',
     tagline: 'MSME bookkeeping, reimagined',
-    desc: 'A cognitive translator between simple business actions and double-entry accounting — fast billing, party ledgers (udhar khata) and AI-powered purchase-bill OCR, built for Indian MSMEs.',
+    desc: 'A cognitive translator between simple business actions and double-entry accounting — fast billing, party ledgers (udhar khata) and AI-powered purchase-bill OCR, built for Indian MSMEs. (Formerly HisaabKitaab.)',
     tags: ['Next.js 16', 'TypeScript', 'Gemini OCR', 'PWA'],
     repo: 'https://github.com/HAAHIT/HisaabKitaab',
-    year: '2025',
+    year: '2025 — Now',
+    current: true,
+  },
+  {
+    name: 'Edible Oil B2B Portal',
+    tagline: 'Commodity pricing & orders',
+    desc: 'A B2B portal for the edible-oil trade — real-time SKU pricing, multi-user logins and order booking. The MVP behind a paying pilot that covered full development cost before launch.',
+    tags: ['Next.js 14', 'HeroUI', 'TypeScript'],
+    repo: 'https://github.com/suraj-ingle/edible-oil-portal',
+    live: 'https://edible-oil-b2b-portal.vercel.app',
+    year: '2025 — Now',
+    current: true,
+  },
+  {
+    name: 'CareOps Central',
+    tagline: 'Mission control for home care',
+    desc: 'The operations platform behind a healthcare-at-home business — patient and partner management, visit scheduling, billing and partner payouts, all in one surface.',
+    tags: ['Next.js', 'Firebase', 'ShadCN'],
+    repo: 'https://github.com/suraj-ingle/hitesh-care-ops',
+    live: 'https://care-ops-central.vercel.app',
+    year: '2025 — Now',
+    current: true,
   },
   {
     name: 'Recall',
@@ -39,27 +61,9 @@ export const PROJECTS: Project[] = [
     year: '2025',
   },
   {
-    name: 'Edible Oil B2B Portal',
-    tagline: 'Commodity pricing & orders',
-    desc: 'A B2B portal for the edible-oil trade — real-time SKU pricing, multi-user logins and order booking. The MVP behind a paying pilot that covered full development cost pre-launch.',
-    tags: ['Next.js 14', 'HeroUI', 'TypeScript'],
-    repo: 'https://github.com/suraj-ingle/edible-oil-portal',
-    live: 'https://edible-oil-b2b-portal.vercel.app',
-    year: '2025',
-  },
-  {
-    name: 'CareOps Central',
-    tagline: 'Mission control for home care',
-    desc: 'The operations platform behind a healthcare-at-home business — patient and partner management, visit scheduling, billing and partner payouts, all in one surface.',
-    tags: ['Next.js', 'Firebase', 'ShadCN'],
-    repo: 'https://github.com/suraj-ingle/hitesh-care-ops',
-    live: 'https://care-ops-central.vercel.app',
-    year: '2025',
-  },
-  {
     name: 'BlackHook Studio',
-    tagline: 'This very corner of the web',
-    desc: "The studio's digital home — a WebGL hook, a hand-written shader background and a tuned motion system. The page you'd land on one click away from here.",
+    tagline: 'A studio site, built from scratch',
+    desc: 'The studio brand site — a WebGL hook, a hand-written shader background and a tuned motion system. A playground for craft on the web.',
     tags: ['React', 'Vite', 'Three.js', 'GSAP'],
     repo: 'https://github.com/HAAHIT/Blackhook',
     live: 'https://blackhook.in',
@@ -89,7 +93,7 @@ export const EXPERIENCE: Experience[] = [
     role: 'Co-Founder & Product Manager',
     org: 'BlackHook Services',
     place: 'Dhule, IN',
-    desc: 'Building a commodity-industry SaaS (paying pilot secured before MVP) and a healthcare-at-home services business at ₹3L+ MRR. Sole PM across both — product, ops, hiring funnels and scaling playbooks, with AI tooling for 3× velocity.',
+    desc: 'Building SoloBooks and a commodity-industry SaaS (paying pilot secured before MVP), plus a healthcare-at-home services business at ₹3L+ MRR. Sole PM across all three — product, ops, hiring funnels and scaling playbooks, with AI tooling for 3× velocity.',
   },
   {
     range: '2022 — 2024',
@@ -110,7 +114,7 @@ export const EXPERIENCE: Experience[] = [
     role: 'B.E. Electronics & Telecommunication',
     org: 'Savitribai Phule Pune University',
     place: 'CGPA 9.23 / 10',
-    desc: 'Top of class fundamentals in signals, systems and networks — the engineering grounding under the product work. Top 2.5% in CAT & XAT, with interview calls from 15 IIMs and XLRI.',
+    desc: 'The engineering grounding under the product work — signals, systems and networks. Top 2.5% in CAT & XAT, with interview calls from 15 IIMs and XLRI.',
   },
 ];
 

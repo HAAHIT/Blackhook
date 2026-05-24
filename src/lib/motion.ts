@@ -177,7 +177,7 @@ function setupHeadings() {
 }
 
 function setupBlocks() {
-  document.querySelectorAll<HTMLElement>('.bh-service, .bh-case, .bh-step, .bh-member, .bh-contact-side .row, .bh-cta-big, .bh-now-card, .bh-proj, .bh-skill-group').forEach((b) => {
+  document.querySelectorAll<HTMLElement>('.bh-service, .bh-case, .bh-step, .bh-member, .bh-contact-side .row, .bh-cta-big').forEach((b) => {
     gsap.set(b, { y: 40, opacity: 0 });
     ScrollTrigger.create({ trigger: b, start: 'top 88%', once: true, onEnter: () => gsap.to(b, { y: 0, opacity: 1, duration: 1.0, ease: 'expo.out' }) });
   });
