@@ -20,7 +20,13 @@ export function Team() {
             <div className="bh-member-head">
               <div className="bh-member-portrait">{m.initial}</div>
               <div>
-                <h3>{m.name}</h3>
+                <h3>
+                  {m.name === 'Hitesh Agrawal' ? (
+                    <a href="/hitesh" className="bh-member-link">{m.name}</a>
+                  ) : (
+                    m.name
+                  )}
+                </h3>
                 <div className="role">{m.role}</div>
               </div>
             </div>
