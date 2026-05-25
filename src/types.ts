@@ -48,6 +48,8 @@ export interface CaseStudy {
   stack: string[];
   outcomes: [string, string][];
   long: string;
+  live?: string;
+  repo?: string;
 }
 
 export interface TeamMember {

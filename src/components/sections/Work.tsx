@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { WORK } from '@/data/work';
+import { ArrowOut, GithubMark } from '@/icons';
 import type { CaseStudy } from '@/types';
 
 function CaseDetail({ c, onClose }: { c: CaseStudy; onClose: () => void }) {
@@ -51,6 +52,21 @@ function CaseDetail({ c, onClose }: { c: CaseStudy; onClose: () => void }) {
           </div>
         </div>
 
+        {(c.live || c.repo) && (
+          <div style={{ display: 'flex', gap: 14, marginTop: 8 }}>
+            {c.live && (
+              <a href={c.live} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontFamily: 'var(--mono)', fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase', color: c.accent, borderBottom: `1px solid ${c.accent}`, paddingBottom: 2 }}>
+                Live site <ArrowOut size={11} />
+              </a>
+            )}
+            {c.repo && (
+              <a href={c.repo} target="_blank" rel="noopener noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontFamily: 'var(--mono)', fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--fg-2)', borderBottom: '1px solid var(--line)' }}>
+                <GithubMark size={14} /> GitHub
+              </a>
+            )}
+          </div>
+        )}
+
         <div className="bh-case-outcomes-grid">
           {c.outcomes.map(([v, l]) => (
             <div key={l} className="bh-case-outcome">
@@ -75,7 +91,7 @@ export function Work() {
           <h2>Things we've <em>shipped.</em></h2>
         </div>
         <p style={{ maxWidth: 380, color: 'var(--fg-2)', fontSize: 15, lineHeight: 1.55, margin: 0 }}>
-          Three clients, three very different problems. Same standard on every one.
+          Products, tools and platforms — from 0→1 ventures to internal ops. Same standard on every one.
         </p>
       </div>
 
@@ -89,7 +105,7 @@ export function Work() {
             onClick={() => setOpen(c)}
           >
             <div className="meta">
-              <span>{c.id} / 03</span>
+              <span>{c.id} / {String(WORK.length).padStart(2, '0')}</span>
               <span>{c.year}</span>
             </div>
             <div className="visual" />
