@@ -1,22 +1,22 @@
 /* =========================================================
    Hitesh Agrawal — Portfolio
-   Cool gray, editorial, readable. Fully self-contained: shares
-   no tokens or classes with the BlackHook studio site.
+   Warm, editorial, readable. Fully self-contained: shares no
+   tokens or classes with the BlackHook studio site.
    ========================================================= */
 
 :root {
-  --pf-bg: #f2f4f7;
-  --pf-bg-card: #ffffff;
-  --pf-bg-sunk: #e8eaef;
-  --pf-bg-featured: #f0f4ff;
-  --pf-ink: #111827;
-  --pf-ink-2: #4b5563;
-  --pf-ink-3: #9ca3af;
-  --pf-accent: #2563eb;
-  --pf-accent-ink: #1d4ed8;
-  --pf-accent-soft: #eff6ff;
-  --pf-line: rgba(17, 24, 39, 0.09);
-  --pf-line-2: rgba(17, 24, 39, 0.18);
+  --pf-bg: #f5efe6;
+  --pf-bg-card: #fbf8f2;
+  --pf-bg-sunk: #efe7da;
+  --pf-bg-featured: #fdf5ee;
+  --pf-ink: #2a2521;
+  --pf-ink-2: #685e52;
+  --pf-ink-3: #a89c8a;
+  --pf-accent: #bf5a30;
+  --pf-accent-ink: #a44a25;
+  --pf-accent-soft: #f0ddd0;
+  --pf-line: rgba(42, 37, 33, 0.12);
+  --pf-line-2: rgba(42, 37, 33, 0.22);
   --pf-serif: 'Fraunces', Georgia, 'Times New Roman', serif;
   --pf-sans: 'Geist', system-ui, -apple-system, sans-serif;
   --pf-mono: 'Geist Mono', ui-monospace, monospace;
@@ -39,7 +39,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-::selection { background: var(--pf-accent); color: #fff; }
+::selection { background: var(--pf-accent); color: var(--pf-bg); }
 
 a { color: inherit; text-decoration: none; }
 
@@ -54,7 +54,7 @@ img, svg { display: block; }
 .pf-nav {
   position: sticky; top: 0; z-index: 50;
   background: color-mix(in srgb, var(--pf-bg) 88%, transparent);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(10px);
   border-bottom: 1px solid transparent;
   transition: border-color 0.3s ease, background 0.3s ease;
 }
@@ -67,17 +67,17 @@ img, svg { display: block; }
 .pf-nav-links a::after { content: ''; position: absolute; left: 0; right: 0; bottom: -2px; height: 1.5px; background: var(--pf-accent); transform: scaleX(0); transform-origin: left; transition: transform 0.35s cubic-bezier(0.65, 0, 0.2, 1); }
 .pf-nav-links a:hover { color: var(--pf-ink); }
 .pf-nav-links a:hover::after { transform: scaleX(1); }
-.pf-nav-studio { display: inline-flex; align-items: center; gap: 7px; font-family: var(--pf-mono); font-size: 12px; color: var(--pf-ink-2); border: 1px solid var(--pf-line-2); border-radius: 100px; padding: 8px 15px; transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease; }
-.pf-nav-studio:hover { color: var(--pf-ink); border-color: var(--pf-ink-2); background: rgba(0,0,0,0.03); }
+.pf-nav-studio { display: inline-flex; align-items: center; gap: 7px; font-family: var(--pf-mono); font-size: 12px; color: var(--pf-ink-2); border: 1px solid var(--pf-line-2); border-radius: 100px; padding: 8px 15px; transition: border-color 0.25s ease, color 0.25s ease; }
+.pf-nav-studio:hover { color: var(--pf-ink); border-color: var(--pf-ink); }
 
 /* ===== Buttons ===== */
-.pf-btn { display: inline-flex; align-items: center; gap: 9px; font-family: var(--pf-mono); font-size: 13px; letter-spacing: 0.02em; padding: 13px 22px; border-radius: 4px; cursor: pointer; transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease; }
+.pf-btn { display: inline-flex; align-items: center; gap: 9px; font-family: var(--pf-mono); font-size: 13px; letter-spacing: 0.02em; padding: 13px 22px; border-radius: 4px; cursor: pointer; transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.25s ease; }
 .pf-btn svg { transition: transform 0.35s cubic-bezier(0.65, 0, 0.2, 1); }
-.pf-btn-primary { background: var(--pf-accent); color: #fff; box-shadow: 0 2px 12px -4px rgba(37, 99, 235, 0.4); }
-.pf-btn-primary:hover { background: var(--pf-accent-ink); box-shadow: 0 4px 20px -4px rgba(37, 99, 235, 0.5); }
+.pf-btn-primary { background: var(--pf-accent); color: #fff; }
+.pf-btn-primary:hover { background: var(--pf-accent-ink); }
 .pf-btn-primary:hover svg { transform: translateX(4px); }
 .pf-btn-ghost { background: transparent; color: var(--pf-ink); border: 1px solid var(--pf-line-2); }
-.pf-btn-ghost:hover { border-color: var(--pf-ink-2); background: rgba(0,0,0,0.03); }
+.pf-btn-ghost:hover { border-color: var(--pf-ink); background: var(--pf-bg-card); }
 
 /* ===== Eyebrow / labels ===== */
 .pf-eyebrow { display: inline-flex; align-items: center; gap: 10px; font-family: var(--pf-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--pf-accent-ink); }
@@ -104,8 +104,8 @@ img, svg { display: block; }
 
 /* ===== Now ===== */
 .pf-now-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
-.pf-now-card { padding: 30px 26px; background: var(--pf-bg-card); border: 1px solid var(--pf-line); border-radius: 8px; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; }
-.pf-now-card:hover { transform: translateY(-3px); border-color: var(--pf-line-2); box-shadow: 0 12px 32px -16px rgba(17,24,39,0.18); }
+.pf-now-card { padding: 30px 26px; background: var(--pf-bg-card); border: 1px solid var(--pf-line); border-radius: 8px; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.pf-now-card:hover { transform: translateY(-3px); box-shadow: 0 14px 36px -22px rgba(42, 37, 33, 0.45); }
 .pf-now-k { font-family: var(--pf-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--pf-accent-ink); margin-bottom: 14px; }
 .pf-now-card p { margin: 0; font-size: 15px; line-height: 1.65; color: var(--pf-ink-2); }
 
@@ -121,7 +121,7 @@ img, svg { display: block; }
 
 /* ===== Projects — shared ===== */
 .pf-proj { display: flex; flex-direction: column; padding: 28px 28px 26px; background: var(--pf-bg-card); border: 1px solid var(--pf-line); border-radius: 8px; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; }
-.pf-proj:hover { transform: translateY(-3px); border-color: var(--pf-line-2); box-shadow: 0 14px 36px -18px rgba(17,24,39,0.2); }
+.pf-proj:hover { transform: translateY(-3px); border-color: var(--pf-line-2); box-shadow: 0 16px 40px -24px rgba(42, 37, 33, 0.5); }
 .pf-proj-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
 .pf-proj-year { font-family: var(--pf-mono); font-size: 11.5px; letter-spacing: 0.04em; color: var(--pf-ink-3); }
 .pf-proj-links { display: flex; gap: 14px; }
@@ -133,29 +133,29 @@ img, svg { display: block; }
 .pf-proj-tags { display: flex; flex-wrap: wrap; gap: 7px; }
 .pf-proj-tags span { font-family: var(--pf-mono); font-size: 10.5px; letter-spacing: 0.03em; color: var(--pf-ink-2); background: var(--pf-bg-sunk); border-radius: 100px; padding: 4px 11px; }
 
-/* ===== Featured project card (Recall/smriti) ===== */
+/* ===== Featured project card (smriti) ===== */
 .pf-proj--featured {
   margin-bottom: 18px;
   background: var(--pf-bg-featured);
-  border-color: rgba(37, 99, 235, 0.22);
-  box-shadow: 0 2px 20px -8px rgba(37, 99, 235, 0.15);
+  border-color: rgba(191, 90, 48, 0.28);
+  box-shadow: 0 2px 20px -8px rgba(191, 90, 48, 0.15);
 }
 .pf-proj--featured:hover {
   transform: translateY(-4px);
-  border-color: rgba(37, 99, 235, 0.45);
-  box-shadow: 0 12px 40px -12px rgba(37, 99, 235, 0.25);
+  border-color: rgba(191, 90, 48, 0.5);
+  box-shadow: 0 12px 40px -12px rgba(191, 90, 48, 0.28);
 }
 .pf-proj--featured .pf-proj-name { font-size: 34px; }
 .pf-proj--featured .pf-proj-tagline { font-size: 17px; }
 .pf-proj--featured .pf-proj-desc { font-size: 15.5px; line-height: 1.7; max-width: 78ch; }
-.pf-proj--featured .pf-proj-tags span { background: rgba(37, 99, 235, 0.08); color: var(--pf-accent-ink); border: 1px solid rgba(37, 99, 235, 0.18); border-radius: 100px; }
+.pf-proj--featured .pf-proj-tags span { background: var(--pf-accent-soft); color: var(--pf-accent-ink); border: 1px solid rgba(191, 90, 48, 0.2); border-radius: 100px; }
 .pf-proj-featured-badges { display: flex; gap: 8px; }
 
 /* ===== Badges ===== */
 .pf-badge { font-family: var(--pf-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 100px; padding: 4px 10px; }
 .pf-badge:not(.pf-badge-ai):not(.pf-badge-featured) { color: var(--pf-accent-ink); background: var(--pf-accent-soft); }
-.pf-badge-ai { color: var(--pf-accent-ink); background: var(--pf-accent-soft); border: 1px solid rgba(37, 99, 235, 0.25); }
-.pf-badge-featured { color: var(--pf-ink-2); background: rgba(17,24,39,0.06); border: 1px solid var(--pf-line-2); }
+.pf-badge-ai { color: var(--pf-accent-ink); background: var(--pf-accent-soft); border: 1px solid rgba(191, 90, 48, 0.3); }
+.pf-badge-featured { color: var(--pf-ink-2); background: rgba(42, 37, 33, 0.06); border: 1px solid var(--pf-line-2); }
 
 /* ===== Project grid (non-featured) ===== */
 .pf-proj-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
@@ -164,8 +164,7 @@ img, svg { display: block; }
 .pf-skills { display: grid; grid-template-columns: repeat(2, 1fr); gap: 36px 56px; }
 .pf-skill-label { font-family: var(--pf-mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--pf-accent-ink); padding-bottom: 14px; margin-bottom: 18px; border-bottom: 1px solid var(--pf-line); }
 .pf-skill-items { display: flex; flex-wrap: wrap; gap: 9px; }
-.pf-skill-items span { font-family: var(--pf-mono); font-size: 12.5px; color: var(--pf-ink-2); background: var(--pf-bg-card); border: 1px solid var(--pf-line); border-radius: 6px; padding: 7px 13px; transition: border-color 0.2s ease, color 0.2s ease; }
-.pf-skill-items span:hover { border-color: rgba(37,99,235,0.4); color: var(--pf-accent-ink); }
+.pf-skill-items span { font-family: var(--pf-mono); font-size: 12.5px; color: var(--pf-ink); background: var(--pf-bg-card); border: 1px solid var(--pf-line); border-radius: 6px; padding: 7px 13px; }
 
 /* ===== Contact ===== */
 .pf-contact { padding: 90px 0 80px; border-top: 1px solid var(--pf-line); }
@@ -175,7 +174,7 @@ img, svg { display: block; }
 .pf-contact-rows { display: flex; flex-direction: column; gap: 0; }
 .pf-contact-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--pf-line); font-family: var(--pf-mono); font-size: 13.5px; }
 .pf-contact-row span { color: var(--pf-ink-3); }
-.pf-contact-row a { color: var(--pf-ink); background-image: linear-gradient(var(--pf-accent), var(--pf-accent)); background-repeat: no-repeat; background-position: 0 100%; background-size: 0% 1.5px; transition: background-size 0.35s cubic-bezier(0.65, 0, 0.2, 1), color 0.25s ease; }
+.pf-contact-row a { color: var(--pf-ink); background-image: linear-gradient(var(--pf-accent), var(--pf-accent)); background-repeat: no-repeat; background-position: 0 100%; background-size: 0% 1.5px; transition: background-size 0.35s cubic-bezier(0.65, 0, 0.2, 1); }
 .pf-contact-row a:hover { background-size: 100% 1.5px; color: var(--pf-accent-ink); }
 
 /* ===== Footer ===== */
