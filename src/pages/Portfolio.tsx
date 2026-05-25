@@ -90,6 +90,14 @@ export function Portfolio() {
             </div>
             <div className="pf-now-grid">
               <article className="pf-now-card pf-reveal">
+                <div className="pf-now-k">smriti</div>
+                <p>
+                  An AI memory layer — a browser extension that archives conversations
+                  from Claude, ChatGPT and Gemini, a local SQLite search index, and an
+                  MCP server that hands your history back to Claude in context.
+                </p>
+              </article>
+              <article className="pf-now-card pf-reveal">
                 <div className="pf-now-k">SoloBooks</div>
                 <p>
                   Bookkeeping for Indian MSMEs that speaks plain business, not

@@ -25,7 +25,7 @@ export interface SkillGroup {
 
 export const PROJECTS: Project[] = [
   {
-    name: 'Recall',
+    name: 'smriti',
     tagline: 'AI memory layer across Claude, ChatGPT & Gemini',
     desc: 'A cross-platform AI memory product — a browser extension that archives conversations from Claude, ChatGPT and Gemini into a local SQLite index, plus an MCP server that pipes your history back into Claude\'s context window on demand. Three distribution layers (extension, CLI helper, MCP protocol), one clear user job: never lose a conversation. Designed, built and shipped solo using AI-assisted development. The product that ate its own dog food.',
     tags: ['TypeScript', 'WXT', 'SQLite', 'MCP', 'AI Tooling'],
