@@ -96,38 +96,38 @@ export function Portfolio() {
               <p>Three things in flight at once — all started from customer discovery, not a deck.</p>
             </div>
             <div className="pf-now-grid">
-              <article className="pf-now-card pf-reveal">
-                <div className="pf-now-k">smriti</div>
+              <a href="https://github.com/HAAHIT/smriti" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal">
+                <div className="pf-now-k">smriti <ArrowOut size={10} /></div>
                 <p>
                   An AI memory layer — a browser extension that archives conversations
                   from Claude, ChatGPT and Gemini, a local SQLite search index, and an
                   MCP server that hands your history back to Claude in context.
                 </p>
-              </article>
-              <article className="pf-now-card pf-reveal">
-                <div className="pf-now-k">SoloBooks</div>
+              </a>
+              <a href="https://solobooks.in" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal">
+                <div className="pf-now-k">SoloBooks <ArrowOut size={10} /></div>
                 <p>
                   Bookkeeping for Indian MSMEs that speaks plain business, not
                   accounting jargon — fast billing, party ledgers and AI purchase-bill
                   OCR under the hood.
                 </p>
-              </article>
-              <article className="pf-now-card pf-reveal">
-                <div className="pf-now-k">Commodity SaaS</div>
+              </a>
+              <a href="https://murlioils.com" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal">
+                <div className="pf-now-k">Commodity SaaS <ArrowOut size={10} /></div>
                 <p>
                   A pricing and order-management platform for the oil and cement trade.
                   Validated through discovery, then secured a paying pilot that covered
                   the full build before launch.
                 </p>
-              </article>
-              <article className="pf-now-card pf-reveal">
-                <div className="pf-now-k">Healthcare at home</div>
+              </a>
+              <a href="https://care-ops-central.vercel.app" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal">
+                <div className="pf-now-k">Healthcare at home <ArrowOut size={10} /></div>
                 <p>
                   An Urban-Company-style services business — nursing, physiotherapy and
                   elder care. 300+ visits and ₹3L+ MRR at 30% margin in the first
                   quarter, on an ops platform I built and run.
                 </p>
-              </article>
+              </a>
             </div>
           </div>
         </section>
