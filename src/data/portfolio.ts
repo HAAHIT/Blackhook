@@ -7,6 +7,7 @@ export interface Project {
   live?: string;
   year: string;
   current?: boolean;
+  featured?: boolean;
 }
 
 export interface Experience {
@@ -23,6 +24,15 @@ export interface SkillGroup {
 }
 
 export const PROJECTS: Project[] = [
+  {
+    name: 'Recall',
+    tagline: 'AI memory layer across Claude, ChatGPT & Gemini',
+    desc: 'A cross-platform AI memory product — a browser extension that archives conversations from Claude, ChatGPT and Gemini into a local SQLite index, plus an MCP server that pipes your history back into Claude\'s context window on demand. Three distribution layers (extension, CLI helper, MCP protocol), one clear user job: never lose a conversation. Designed, built and shipped solo using AI-assisted development. The product that ate its own dog food.',
+    tags: ['TypeScript', 'WXT', 'SQLite', 'MCP', 'AI Tooling'],
+    repo: 'https://github.com/HAAHIT/smriti',
+    year: '2025',
+    featured: true,
+  },
   {
     name: 'SoloBooks',
     tagline: 'MSME bookkeeping, reimagined',
@@ -51,14 +61,6 @@ export const PROJECTS: Project[] = [
     live: 'https://care-ops-central.vercel.app',
     year: '2025 — Now',
     current: true,
-  },
-  {
-    name: 'Recall',
-    tagline: 'A memory layer for your AI chats',
-    desc: 'Local-first archive, search and recall across Claude, ChatGPT, Gemini and Claude Code. A browser extension, a local SQLite helper and an MCP server that hands your history back to Claude.',
-    tags: ['TypeScript', 'WXT', 'SQLite', 'MCP'],
-    repo: 'https://github.com/HAAHIT/smriti',
-    year: '2025',
   },
   {
     name: 'BlackHook Studio',

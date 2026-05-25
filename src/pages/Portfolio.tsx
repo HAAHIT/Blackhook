@@ -148,8 +148,34 @@ export function Portfolio() {
               <h2>Things I&apos;ve <em>shipped</em></h2>
               <p>A selection of repos — products, tools and experiments, most built with AI in the loop.</p>
             </div>
+            {PROJECTS.filter((p) => p.featured).map((p) => (
+              <article key={p.name} className="pf-proj pf-proj--featured pf-reveal">
+                <div className="pf-proj-top">
+                  <div className="pf-proj-featured-badges">
+                    <span className="pf-badge pf-badge-ai">AI Product</span>
+                    <span className="pf-badge pf-badge-featured">Featured</span>
+                  </div>
+                  <div className="pf-proj-links">
+                    <a href={p.repo} target="_blank" rel="noopener noreferrer" aria-label={`${p.name} on GitHub`}>
+                      <GithubMark size={16} />
+                    </a>
+                    {p.live && (
+                      <a href={p.live} target="_blank" rel="noopener noreferrer" aria-label={`${p.name} live`}>
+                        <ArrowOut size={14} />
+                      </a>
+                    )}
+                  </div>
+                </div>
+                <h3 className="pf-proj-name">{p.name}</h3>
+                <div className="pf-proj-tagline">{p.tagline}</div>
+                <p className="pf-proj-desc">{p.desc}</p>
+                <div className="pf-proj-tags">
+                  {p.tags.map((t) => <span key={t}>{t}</span>)}
+                </div>
+              </article>
+            ))}
             <div className="pf-proj-grid">
-              {PROJECTS.map((p) => (
+              {PROJECTS.filter((p) => !p.featured).map((p) => (
                 <article key={p.name} className="pf-proj pf-reveal">
                   <div className="pf-proj-top">
                     {p.current ? <span className="pf-badge">Current</span> : <span className="pf-proj-year">{p.year}</span>}
