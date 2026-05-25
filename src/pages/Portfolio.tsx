@@ -52,26 +52,33 @@ export function Portfolio() {
       <main>
         <section className="pf-hero" id="top">
           <div className="pf-wrap">
-            <div className="pf-eyebrow pf-reveal">
-              <span className="dot" />
-              Hitesh Agrawal — Product &amp; Strategy
-            </div>
-            <h1 className="pf-reveal">
-              I turn fuzzy <em>ambition</em> into shipped product.
-            </h1>
-            <p className="pf-hero-sub pf-reveal">
-              Product manager and 0-to-1 builder. I&apos;ve scaled an enterprise
-              platform to 28&nbsp;Cr+ users and bootstrapped ventures from a blank
-              page to paying customers. This is my corner of the web — what I&apos;m
-              building, where I&apos;ve been, and the things I&apos;ve shipped.
-            </p>
-            <div className="pf-hero-ctas pf-reveal">
-              <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-primary">
-                Start a conversation <ArrowRight size={13} />
-              </a>
-              <a href="/Hitesh-Agrawal-Resume.pdf" target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-ghost">
-                Read résumé
-              </a>
+            <div className="pf-hero-layout">
+              <div className="pf-hero-copy">
+                <div className="pf-eyebrow pf-reveal">
+                  <span className="dot" />
+                  Hitesh Agrawal — Product &amp; Strategy
+                </div>
+                <h1 className="pf-reveal">
+                  I turn fuzzy <em>ambition</em> into shipped product.
+                </h1>
+                <p className="pf-hero-sub pf-reveal">
+                  Product manager and 0-to-1 builder. I&apos;ve scaled an enterprise
+                  platform to 28&nbsp;Cr+ users and bootstrapped ventures from a blank
+                  page to paying customers. This is my corner of the web — what I&apos;m
+                  building, where I&apos;ve been, and the things I&apos;ve shipped.
+                </p>
+                <div className="pf-hero-ctas pf-reveal">
+                  <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-primary">
+                    Start a conversation <ArrowRight size={13} />
+                  </a>
+                  <a href="/Hitesh-Agrawal-Resume.pdf" target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-ghost">
+                    Read résumé
+                  </a>
+                </div>
+              </div>
+              <div className="pf-hero-photo pf-reveal">
+                <img src="/hitesh.jpg" alt="Hitesh Agrawal" />
+              </div>
             </div>
             <div className="pf-facts pf-reveal">
               <div className="pf-fact"><strong>28&nbsp;Cr+</strong><span>Users scaled at Jio</span></div>
