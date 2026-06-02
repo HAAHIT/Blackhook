@@ -38,7 +38,7 @@ export function Portfolio() {
     <>
       <header className="pf-nav">
         <div className="pf-nav-inner">
-          <a href="#top" className="pf-logo">Hitesh<b>.</b></a>
+          <a href="#top" className="pf-logo">Hitesh Agrawal<b>.</b></a>
           <nav className="pf-nav-links">
             <a href="#now">Now</a>
             <a href="#path">Path</a>
