@@ -47,6 +47,20 @@ img, svg { display: block; }
 
 .pf-wrap { max-width: var(--pf-max); margin: 0 auto; padding: 0 28px; }
 
+/* ===== Cursor ===== */
+.pf-cursor { position: fixed; inset: 0; pointer-events: none; z-index: 9999; transition: opacity 0.3s ease; }
+.pf-cursor:not(.on), .pf-cursor.hide { opacity: 0; }
+.pf-cursor-ring { position: absolute; top: 0; left: 0; width: 38px; height: 38px; border: 1px solid rgba(42,37,33,0.3); border-radius: 50%; will-change: transform; transition: width 0.35s cubic-bezier(0.65,0,0.2,1), height 0.35s cubic-bezier(0.65,0,0.2,1), border-color 0.35s ease; }
+.pf-cursor-dot { position: absolute; top: -4px; left: -4px; width: 8px; height: 8px; background: var(--pf-accent); border-radius: 50%; will-change: transform; transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease; }
+.pf-cursor.link .pf-cursor-ring { width: 56px; height: 56px; border-color: var(--pf-accent); }
+.pf-cursor.link .pf-cursor-dot { transform: translate(-50%, -50%) scale(0) !important; opacity: 0; }
+.pf-cursor.press .pf-cursor-ring { width: 28px; height: 28px; }
+@media (pointer: coarse) { .pf-cursor { display: none; } }
+
+/* ===== Split-word animation ===== */
+.pf-word { display: inline-block; overflow: hidden; vertical-align: bottom; line-height: 1.12; }
+.pf-word-i { display: inline-block; }
+
 /* ===== Reveal animation base ===== */
 .pf-reveal { will-change: transform, opacity; }
 
@@ -71,7 +85,8 @@ img, svg { display: block; }
 .pf-nav-studio:hover { color: var(--pf-ink); border-color: var(--pf-ink); }
 
 /* ===== Buttons ===== */
-.pf-btn { display: inline-flex; align-items: center; gap: 9px; font-family: var(--pf-mono); font-size: 13px; letter-spacing: 0.02em; padding: 13px 22px; border-radius: 4px; cursor: pointer; transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.25s ease; }
+.pf-btn { display: inline-flex; align-items: center; gap: 9px; font-family: var(--pf-mono); font-size: 13px; letter-spacing: 0.02em; padding: 13px 22px; border-radius: 4px; cursor: pointer; transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease; will-change: transform; }
+.pf-magnetic { display: inline-flex; }
 .pf-btn svg { transition: transform 0.35s cubic-bezier(0.65, 0, 0.2, 1); }
 .pf-btn-primary { background: var(--pf-accent); color: #fff; }
 .pf-btn-primary:hover { background: var(--pf-accent-ink); }
@@ -108,7 +123,7 @@ img, svg { display: block; }
 
 /* ===== Now ===== */
 .pf-now-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
-.pf-now-card { display: block; padding: 30px 26px; background: var(--pf-bg-card); border: 1px solid var(--pf-line); border-radius: 8px; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; }
+.pf-now-card { display: block; padding: 30px 26px; background: var(--pf-bg-card); border: 1px solid var(--pf-line); border-radius: 8px; transition: box-shadow 0.3s ease, border-color 0.3s ease; transform-style: preserve-3d; will-change: transform; }
 .pf-now-card:hover { transform: translateY(-3px); border-color: var(--pf-line-2); box-shadow: 0 14px 36px -22px rgba(42, 37, 33, 0.45); }
 .pf-now-k { display: flex; align-items: center; gap: 7px; font-family: var(--pf-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--pf-accent-ink); margin-bottom: 14px; transition: gap 0.25s ease; }
 .pf-now-card:hover .pf-now-k { gap: 10px; }
@@ -125,7 +140,7 @@ img, svg { display: block; }
 .pf-xp-desc { font-size: 16px; line-height: 1.7; color: var(--pf-ink-2); margin: 0; max-width: 70ch; }
 
 /* ===== Projects — shared ===== */
-.pf-proj { display: flex; flex-direction: column; padding: 28px 28px 26px; background: var(--pf-bg-card); border: 1px solid var(--pf-line); border-radius: 8px; transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; }
+.pf-proj { display: flex; flex-direction: column; padding: 28px 28px 26px; background: var(--pf-bg-card); border: 1px solid var(--pf-line); border-radius: 8px; transition: box-shadow 0.3s ease, border-color 0.3s ease; transform-style: preserve-3d; will-change: transform; }
 .pf-proj:hover { transform: translateY(-3px); border-color: var(--pf-line-2); box-shadow: 0 16px 40px -24px rgba(42, 37, 33, 0.5); }
 .pf-proj-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
 .pf-proj-year { font-family: var(--pf-mono); font-size: 11.5px; letter-spacing: 0.04em; color: var(--pf-ink-3); }

@@ -1,41 +1,25 @@
 import { useEffect } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowOut, ArrowRight, GithubMark } from '@/icons';
 import { PROJECTS, EXPERIENCE, SKILLS } from '@/data/portfolio';
+import { initPortfolioMotion, destroyPortfolioMotion } from '@/lib/portfolio-motion';
 
 const WHATSAPP = 'https://wa.me/919309803663';
 const EMAIL = 'agrawalhitesh4444@gmail.com';
 const LINKEDIN = 'https://www.linkedin.com/in/hitesh-agrawal-5a02a416b/';
 
-gsap.registerPlugin(ScrollTrigger);
-
 export function Portfolio() {
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      gsap.from('.pf-hero .pf-reveal', {
-        y: 22, opacity: 0, duration: 0.9, ease: 'power3.out', stagger: 0.08, delay: 0.05,
-      });
-      gsap.utils.toArray<HTMLElement>('.pf-section .pf-reveal, .pf-contact .pf-reveal').forEach((el) => {
-        gsap.from(el, {
-          y: 26, opacity: 0, duration: 0.8, ease: 'power3.out',
-          scrollTrigger: { trigger: el, start: 'top 88%', once: true },
-        });
-      });
-
-      const nav = document.querySelector('.pf-nav');
-      ScrollTrigger.create({
-        start: 'top -40', end: 'max',
-        onUpdate: (self) => nav?.classList.toggle('scrolled', self.scroll() > 40),
-      });
-    });
-
-    requestAnimationFrame(() => ScrollTrigger.refresh());
-    return () => ctx.revert();
+    initPortfolioMotion();
+    return () => destroyPortfolioMotion();
   }, []);
 
   return (
     <>
+      <div className="pf-cursor" aria-hidden="true">
+        <div className="pf-cursor-ring" />
+        <div className="pf-cursor-dot" />
+      </div>
+
       <header className="pf-nav">
         <div className="pf-nav-inner">
           <a href="#top" className="pf-logo">Hitesh Agrawal<b>.</b></a>
@@ -68,10 +52,10 @@ export function Portfolio() {
                   building, where I&apos;ve been, and the things I&apos;ve shipped.
                 </p>
                 <div className="pf-hero-ctas pf-reveal">
-                  <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-primary">
+                  <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-primary pf-magnetic">
                     Start a conversation <ArrowRight size={13} />
                   </a>
-                  <a href="/Hitesh-Agrawal-Resume.pdf" target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-ghost">
+                  <a href="/Hitesh-Agrawal-Resume.pdf" target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-ghost pf-magnetic">
                     Read résumé
                   </a>
                 </div>
@@ -80,9 +64,9 @@ export function Portfolio() {
                 <img src="/hitesh.jpg" alt="Hitesh Agrawal" />
               </div>
             </div>
-            <div className="pf-facts pf-reveal">
-              <div className="pf-fact"><strong>28&nbsp;Cr+</strong><span>Users scaled at Jio</span></div>
-              <div className="pf-fact"><strong>22</strong><span>Enterprise partners</span></div>
+            <div className="pf-facts">
+              <div className="pf-fact"><strong data-pf-counter="28" data-pf-suffix="Cr+">28Cr+</strong><span>Users scaled at Jio</span></div>
+              <div className="pf-fact"><strong data-pf-counter="22" data-pf-suffix="">22</strong><span>Enterprise partners</span></div>
               <div className="pf-fact"><strong>3+ yrs</strong><span>Scale &amp; 0→1</span></div>
             </div>
           </div>
@@ -246,7 +230,7 @@ export function Portfolio() {
               <div className="pf-reveal">
                 <div className="pf-section-tag">Contact</div>
                 <h2>Have something <em>worth building?</em></h2>
-                <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-primary">
+                <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-primary pf-magnetic">
                   Chat on WhatsApp <ArrowRight size={13} />
                 </a>
               </div>
