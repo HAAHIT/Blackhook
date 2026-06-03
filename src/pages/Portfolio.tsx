@@ -260,6 +260,24 @@ export function Portfolio() {
         </section>
       </main>
 
+      <div className="pf-wordmark pf-reveal" aria-hidden="true">
+        <svg viewBox="0 0 1600 220" preserveAspectRatio="xMidYMid meet">
+          <text
+            x="800" y="182"
+            textAnchor="middle"
+            fontFamily="Fraunces, Georgia, serif"
+            fontSize="220"
+            fontWeight="500"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+          >
+            <tspan>Hitesh</tspan>
+            <tspan fontStyle="italic" dx="18">Agrawal</tspan>
+          </text>
+        </svg>
+      </div>
+
       <footer className="pf-footer">
         <div className="pf-footer-inner">
           <span>Hitesh Agrawal · © 2026</span>
