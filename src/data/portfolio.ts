@@ -34,6 +34,15 @@ export const PROJECTS: Project[] = [
     featured: true,
   },
   {
+    name: 'bolodb',
+    tagline: 'Ask your data. Trust the answer.',
+    desc: 'A text-to-SQL product for non-technical users — type a question in plain language, get back the right query and a trustworthy answer, no SQL required. Built to close the gap between business owners and the data sitting in their own databases.',
+    tags: ['Text-to-SQL', 'AI Tooling', 'Product'],
+    repo: 'https://github.com/HAAHIT/bolodb',
+    year: '2026 — Now',
+    current: true,
+  },
+  {
     name: 'SoloBooks',
     tagline: 'MSME bookkeeping, reimagined',
     desc: 'A cognitive translator between simple business actions and double-entry accounting — fast billing, party ledgers (udhar khata) and AI-powered purchase-bill OCR, built for Indian MSMEs. (Formerly HisaabKitaab.)',
