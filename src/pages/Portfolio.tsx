@@ -77,9 +77,17 @@ export function Portfolio() {
             <div className="pf-section-head pf-reveal">
               <div className="pf-section-tag">Now</div>
               <h2>What I&apos;m <em>building today</em></h2>
-              <p>Three things in flight at once — all started from customer discovery, not a deck.</p>
+              <p>Five things in flight at once — all started from customer discovery, not a deck.</p>
             </div>
             <div className="pf-now-grid">
+              <a href="https://github.com/HAAHIT/bolodb" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal">
+                <div className="pf-now-k">bolodb <ArrowOut size={10} /></div>
+                <p>
+                  Ask your data, trust the answer — a text-to-SQL product for
+                  non-technical users. Type a question in plain language, get back
+                  the right query and an answer you can rely on.
+                </p>
+              </a>
               <a href="https://github.com/HAAHIT/smriti" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal">
                 <div className="pf-now-k">smriti <ArrowOut size={10} /></div>
                 <p>
