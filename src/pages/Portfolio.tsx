@@ -257,9 +257,8 @@ export function Portfolio() {
           <text
             x="800" y="182"
             textAnchor="middle"
-            fontFamily="Fraunces, Georgia, serif"
+            fontFamily="Instrument Serif, Times New Roman, serif"
             fontSize="220"
-            fontWeight="500"
             fill="none"
             stroke="currentColor"
             strokeWidth="1"
