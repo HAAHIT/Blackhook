@@ -1,37 +1,38 @@
 import { useEffect } from 'react';
-import { ArrowOut, ArrowRight, GithubMark } from '@/icons';
+import { ArrowOut, ArrowRight } from '@/icons';
 import { PROJECTS, EXPERIENCE, SKILLS } from '@/data/portfolio';
 import { initPortfolioV2Motion, destroyPortfolioV2Motion } from '@/lib/portfolio-v2-motion';
 
 const WHATSAPP = 'https://wa.me/919309803663';
 const EMAIL = 'agrawalhitesh4444@gmail.com';
 const LINKEDIN = 'https://www.linkedin.com/in/hitesh-agrawal-5a02a416b/';
+const GITHUB = 'https://github.com/HAAHIT';
+
+const EXP_TAGS: Record<string, string[]> = {
+  'BlackHook Services': ['Product', '0→1', 'Ops'],
+  'Jio Platforms Limited': ['Scale', 'Loyalty', 'B2B'],
+  FindUtsav: ['0→1', 'Mobile'],
+  'Savitribai Phule Pune University': ['B.E. ECE', 'CAT / XAT'],
+};
 
 const NOW_BUILDING = [
   {
     name: 'bolodb',
+    label: 'AI · Text-to-SQL',
     href: 'https://github.com/HAAHIT/bolodb',
-    desc: 'Ask your data, trust the answer — a text-to-SQL product for non-technical users. Type a question in plain language, get back the right query and an answer you can rely on.',
+    desc: 'Ask your data, trust the answer — a text-to-SQL product for non-technical users.',
   },
   {
     name: 'smriti',
+    label: 'AI · Memory',
     href: 'https://github.com/HAAHIT/smriti',
-    desc: 'An AI memory layer — a browser extension that archives conversations from Claude, ChatGPT and Gemini, a local SQLite search index, and an MCP server that hands your history back to Claude in context.',
+    desc: 'An AI memory layer across Claude, ChatGPT and Gemini, with a local search index and MCP server.',
   },
   {
     name: 'SoloBooks',
+    label: 'SaaS · MSME',
     href: 'https://solobooks.in',
-    desc: 'Bookkeeping for Indian MSMEs that speaks plain business, not accounting jargon — fast billing, party ledgers and AI purchase-bill OCR under the hood.',
-  },
-  {
-    name: 'Commodity SaaS',
-    href: 'https://murlioils.com',
-    desc: 'A pricing and order-management platform for the oil and cement trade. Validated through discovery, then secured a paying pilot that covered the full build before launch.',
-  },
-  {
-    name: 'Healthcare at home',
-    href: 'https://care-ops-central.vercel.app',
-    desc: 'An Urban-Company-style services business — nursing, physiotherapy and elder care. 300+ visits and ₹3L+ MRR at 30% margin in the first quarter, on an ops platform I built and run.',
+    desc: 'Bookkeeping for Indian MSMEs in plain business language — fast billing and AI bill OCR.',
   },
 ];
 
@@ -40,6 +41,9 @@ export function PortfolioV2() {
     initPortfolioV2Motion();
     return () => destroyPortfolioV2Motion();
   }, []);
+
+  const featured = PROJECTS.filter((p) => p.featured || p.current).slice(0, 6);
+  const allSkills = SKILLS.flatMap((g) => g.items).slice(0, 12);
 
   return (
     <>
@@ -51,113 +55,102 @@ export function PortfolioV2() {
             <a href="#journey">Journey</a>
             <a href="#work">Work</a>
             <a href="#now">Now</a>
-            <a href="#contact">Contact</a>
           </nav>
           <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pv-nav-cta pv-magnetic">
-            Say hello <ArrowRight size={12} />
+            Book a call <ArrowOut size={12} />
           </a>
         </div>
       </header>
 
       <main>
+        {/* ---------- Hero ---------- */}
         <section className="pv-hero" id="top">
+          <span className="pv-hero-vert">Product &amp; Strategy</span>
           <div className="pv-wrap">
             <div className="pv-hero-grid">
-              <div className="pv-hero-copy">
-                <div className="pv-eyebrow pv-reveal">
-                  <span className="pv-dot" />
-                  Open to new projects
+              <div className="pv-hero-left">
+                <div className="pv-hero-stats pv-reveal">
+                  <div className="pv-hstat">
+                    <strong data-pv-counter="28" data-pv-suffix="Cr+">28Cr+</strong>
+                    <span>Users scaled</span>
+                  </div>
+                  <div className="pv-hstat">
+                    <strong data-pv-counter="22" data-pv-suffix="">22</strong>
+                    <span>Enterprise partners</span>
+                  </div>
                 </div>
-                <h1 className="pv-reveal">
-                  Hey, I&apos;m Hitesh —<br />
-                  I build <span className="pv-highlight">0&nbsp;to&nbsp;1</span><br />
-                  products that ship.
-                </h1>
-                <p className="pv-hero-sub pv-reveal">
-                  Product manager and builder. I&apos;ve scaled an enterprise platform
-                  to 28&nbsp;Cr+ users and bootstrapped ventures from a blank page to
-                  paying customers.
-                </p>
-                <div className="pv-hero-ctas pv-reveal">
-                  <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pv-btn pv-btn-primary pv-magnetic">
-                    Start a conversation <ArrowRight size={13} />
-                  </a>
-                  <a href="/Hitesh-Agrawal-Resume.pdf" target="_blank" rel="noopener noreferrer" className="pv-btn pv-btn-ghost pv-magnetic">
-                    Read résumé
-                  </a>
-                </div>
+                <h1 className="pv-hello pv-reveal">Hello</h1>
+                <p className="pv-hero-tagline pv-reveal">— I&apos;m Hitesh, a product &amp; 0→1 builder.</p>
+                <a href="#about" className="pv-scroll pv-reveal">
+                  Scroll down <span className="pv-scroll-arrow">↓</span>
+                </a>
               </div>
               <div className="pv-hero-photo pv-reveal">
                 <img src="/hitesh.jpg" alt="Hitesh Agrawal" />
-                <div className="pv-hero-tag">
-                  <strong>3+ yrs</strong>
-                  <span>Scale &amp; 0→1</span>
-                </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="pv-section" id="about">
+        {/* ---------- About ---------- */}
+        <section className="pv-section pv-about" id="about">
           <div className="pv-wrap">
+            <div className="pv-label pv-reveal"><span className="pv-bullet" />About Me</div>
             <div className="pv-about-grid">
-              <div className="pv-reveal">
-                <div className="pv-section-tag">About</div>
-                <h2>A bit <span className="pv-highlight">about me</span></h2>
-                <p className="pv-about-text">
-                  I&apos;m a product manager and 0-to-1 builder based in India. I spent
-                  three years scaling Reliance&apos;s loyalty platform to hundreds of
-                  millions of users, and now run BlackHook — building AI products and
-                  bootstrapped ventures from a blank page to paying customers.
-                </p>
-                <div className="pv-skills">
-                  {SKILLS.map((g) => (
-                    <div key={g.label} className="pv-skill-group">
-                      <div className="pv-skill-label">{g.label}</div>
-                      <div className="pv-skill-items">
-                        {g.items.map((i) => (
-                          <span key={i}>{i}</span>
-                        ))}
-                      </div>
-                    </div>
+              <div className="pv-about-copy pv-reveal">
+                <h2>
+                  I turn fuzzy <em>ambition</em> into shipped product. I&apos;ve scaled an
+                  enterprise platform to 28&nbsp;Cr+ users and bootstrapped ventures from a
+                  blank page to paying customers.
+                </h2>
+                <div className="pv-tools">
+                  {allSkills.map((s) => (
+                    <span key={s}>{s}</span>
                   ))}
                 </div>
               </div>
-              <div className="pv-stats pv-reveal">
-                <div className="pv-stat">
-                  <strong data-pv-counter="28" data-pv-suffix="Cr+">28Cr+</strong>
-                  <span>Users scaled at Jio</span>
+              <div className="pv-about-side pv-reveal">
+                <div className="pv-statcard">
+                  <div className="pv-statcard-badge" aria-hidden="true">✦</div>
+                  <strong>3×</strong>
+                  <p>Delivery velocity with AI tooling — running three ventures as sole PM, at once.</p>
                 </div>
-                <div className="pv-stat">
-                  <strong data-pv-counter="22" data-pv-suffix="">22</strong>
-                  <span>Enterprise partners</span>
-                </div>
-                <div className="pv-stat pv-stat--dark">
-                  <strong>3+</strong>
-                  <span>Years across scale &amp; 0→1</span>
-                </div>
+                <ul className="pv-about-points">
+                  <li>
+                    <span className="pv-point-k">Jio · Product Manager</span>
+                    Migrated 28&nbsp;Cr+ customers with zero downtime. Sole Star Performer.
+                  </li>
+                  <li>
+                    <span className="pv-point-k">BlackHook · Co-Founder</span>
+                    Three ventures from 0→1, a paying pilot secured before MVP.
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="pv-section" id="journey">
+        {/* ---------- Journey ---------- */}
+        <section className="pv-section pv-journey" id="journey">
           <div className="pv-wrap">
-            <div className="pv-section-head pv-reveal">
-              <div className="pv-section-tag">Journey</div>
-              <h2>Where I&apos;ve <span className="pv-highlight">been</span></h2>
-            </div>
+            <div className="pv-label pv-reveal"><span className="pv-bullet" />Experience</div>
+            <h2 className="pv-h2 pv-reveal">Explore my design <em>journey</em></h2>
             <div className="pv-journey-list">
               {EXPERIENCE.map((x) => (
                 <article key={x.org} className="pv-journey-item pv-reveal">
-                  <div className="pv-journey-range">{x.range}</div>
-                  <div className="pv-journey-body">
-                    <h3>{x.role}</h3>
-                    <div className="pv-journey-meta">
-                      <span className="pv-journey-org">{x.org}</span>
-                      <span className="pv-journey-place">{x.place}</span>
-                    </div>
-                    <p>{x.desc}</p>
+                  <div className="pv-journey-head">
+                    <h3>{x.org}</h3>
+                    <span className="pv-journey-range">{x.range}</span>
+                  </div>
+                  <div className="pv-journey-role">
+                    <span>{x.role}</span>
+                    <span className="pv-journey-place">{x.place}</span>
+                  </div>
+                  <p className="pv-journey-desc">{x.desc}</p>
+                  <div className="pv-journey-tags">
+                    {(EXP_TAGS[x.org] ?? []).map((t) => (
+                      <span key={t}>{t}</span>
+                    ))}
                   </div>
                 </article>
               ))}
@@ -165,105 +158,106 @@ export function PortfolioV2() {
           </div>
         </section>
 
+        {/* ---------- Promo banner ---------- */}
         <section className="pv-promo">
           <div className="pv-wrap">
             <div className="pv-promo-inner pv-reveal">
-              <h2>Got something worth building? <span className="pv-highlight">Let&apos;s talk.</span></h2>
+              <div>
+                <div className="pv-label pv-label--light"><span className="pv-bullet" />Let&apos;s work together</div>
+                <h2>Have something worth building? Let&apos;s make it real.</h2>
+              </div>
               <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pv-btn pv-btn-light pv-magnetic">
-                Chat on WhatsApp <ArrowRight size={13} />
+                Start a conversation <ArrowRight size={13} />
               </a>
             </div>
           </div>
         </section>
 
-        <section className="pv-section" id="work">
+        {/* ---------- Latest Works ---------- */}
+        <section className="pv-section pv-work" id="work">
           <div className="pv-wrap">
-            <div className="pv-section-head pv-reveal">
-              <div className="pv-section-tag">Work</div>
-              <h2>Things I&apos;ve <span className="pv-highlight">shipped</span></h2>
-              <p>A selection of repos — products, tools and experiments, most built with AI in the loop.</p>
+            <div className="pv-work-head">
+              <div className="pv-label pv-reveal pv-center"><span className="pv-bullet" />Portfolio</div>
+              <h2 className="pv-h2 pv-center pv-reveal">Latest works</h2>
             </div>
             <div className="pv-work-grid">
-              {PROJECTS.map((p, i) => (
-                <article key={p.name} className={`pv-work-card pv-cover-${(i % 4) + 1} pv-reveal`}>
+              {featured.map((p, i) => (
+                <a
+                  key={p.name}
+                  href={p.live ?? p.repo}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`pv-work-card pv-tone-${(i % 4) + 1} pv-reveal`}
+                >
                   <div className="pv-work-cover">
-                    <span>{p.name.slice(0, 2).toUpperCase()}</span>
+                    <span className="pv-art-sphere" />
+                    <span className="pv-art-base" />
                     {p.featured && <div className="pv-work-badge">Featured</div>}
-                    {p.current && !p.featured && <div className="pv-work-badge pv-work-badge--alt">Current</div>}
                   </div>
                   <div className="pv-work-body">
-                    <div className="pv-work-top">
-                      <h3>{p.name}</h3>
-                      <div className="pv-work-links">
-                        <a href={p.repo} target="_blank" rel="noopener noreferrer" aria-label={`${p.name} on GitHub`}>
-                          <GithubMark size={15} />
-                        </a>
-                        {p.live && (
-                          <a href={p.live} target="_blank" rel="noopener noreferrer" aria-label={`${p.name} live`}>
-                            <ArrowOut size={13} />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                    <div className="pv-work-tagline">{p.tagline}</div>
-                    <div className="pv-work-tags">
-                      {p.tags.map((t) => <span key={t}>{t}</span>)}
-                    </div>
+                    <h3>{p.name}</h3>
+                    <span className="pv-work-arrow"><ArrowOut size={14} /></span>
                   </div>
-                </article>
+                  <div className="pv-work-tagline">{p.tagline}</div>
+                </a>
+              ))}
+            </div>
+            <div className="pv-work-more pv-reveal">
+              <a href={GITHUB} target="_blank" rel="noopener noreferrer" className="pv-btn pv-btn-ghost pv-magnetic">
+                View all on GitHub <ArrowOut size={13} />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* ---------- Now building ---------- */}
+        <section className="pv-section pv-now" id="now">
+          <div className="pv-wrap">
+            <div className="pv-label pv-reveal"><span className="pv-bullet" />Now</div>
+            <h2 className="pv-h2 pv-reveal">What I&apos;m <em>building today</em></h2>
+            <div className="pv-now-grid">
+              {NOW_BUILDING.map((n, i) => (
+                <a key={n.name} href={n.href} target="_blank" rel="noopener noreferrer" className={`pv-now-card pv-tone-${i + 1} pv-reveal`}>
+                  <div className="pv-now-cover">
+                    <span className="pv-art-sphere" />
+                    <span className="pv-art-base" />
+                  </div>
+                  <div className="pv-now-tag">{n.label}</div>
+                  <h3>{n.name}</h3>
+                  <p>{n.desc}</p>
+                  <span className="pv-now-link">Open <ArrowOut size={12} /></span>
+                </a>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="pv-section" id="now">
-          <div className="pv-wrap">
-            <div className="pv-section-head pv-reveal">
-              <div className="pv-section-tag">Now</div>
-              <h2>What I&apos;m <span className="pv-highlight">building today</span></h2>
-              <p>Five things in flight at once — all started from customer discovery, not a deck.</p>
-            </div>
-            <div className="pv-now-list">
-              {NOW_BUILDING.map((n) => (
-                <a key={n.name} href={n.href} target="_blank" rel="noopener noreferrer" className="pv-now-row pv-reveal">
-                  <div className="pv-now-name">{n.name}</div>
-                  <p className="pv-now-desc">{n.desc}</p>
-                  <ArrowOut size={16} />
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="pv-cta" id="contact">
-          <div className="pv-wrap">
-            <div className="pv-cta-inner pv-reveal">
-              <div className="pv-section-tag">Contact</div>
-              <h2>Let&apos;s create<br /><span className="pv-highlight">something great.</span></h2>
-              <div className="pv-cta-actions">
-                <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pv-btn pv-btn-primary pv-magnetic">
-                  Chat on WhatsApp <ArrowRight size={13} />
-                </a>
-                <a href={`mailto:${EMAIL}`} className="pv-btn pv-btn-ghost pv-magnetic">
-                  {EMAIL}
-                </a>
-              </div>
+        {/* ---------- Final CTA ---------- */}
+        <section className="pv-cta">
+          <div className="pv-wrap pv-cta-inner pv-reveal">
+            <h2>Got a vision?<br />Let&apos;s bring it <em>to life.</em></h2>
+            <div className="pv-cta-actions">
+              <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pv-btn pv-btn-primary pv-magnetic">
+                Book a call <ArrowRight size={13} />
+              </a>
+              <a href={`mailto:${EMAIL}`} className="pv-cta-mail">{EMAIL}</a>
             </div>
           </div>
         </section>
       </main>
 
+      {/* ---------- Footer ---------- */}
       <footer className="pv-footer">
-        <div className="pv-wrap pv-footer-inner">
-          <a href="#top" className="pv-logo pv-logo--light">Hitesh<span>.</span></a>
-          <div className="pv-footer-links">
-            <a href={LINKEDIN} target="_blank" rel="noopener noreferrer">LinkedIn</a>
-            <a href="https://github.com/HAAHIT" target="_blank" rel="noopener noreferrer">GitHub</a>
-            <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
-          </div>
-          <div className="pv-footer-meta">
-            <span>Hitesh Agrawal · © 2026</span>
-            <a href="/" className="pv-footer-back">BlackHook Studio <ArrowOut size={11} /></a>
+        <div className="pv-wrap">
+          <a href={`mailto:${EMAIL}`} className="pv-footer-mail">{EMAIL}</a>
+          <div className="pv-footer-row">
+            <a href="#top" className="pv-logo pv-logo--light">Hitesh<span>.</span></a>
+            <div className="pv-footer-links">
+              <a href={LINKEDIN} target="_blank" rel="noopener noreferrer">LinkedIn</a>
+              <a href={GITHUB} target="_blank" rel="noopener noreferrer">GitHub</a>
+              <a href="/">BlackHook Studio ↗</a>
+            </div>
+            <span className="pv-footer-copy">© 2026 Hitesh Agrawal</span>
           </div>
         </div>
       </footer>
