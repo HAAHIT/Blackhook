@@ -41,17 +41,19 @@ function setupMagnetic() {
 
 function setupHeroEntrance() {
   const tl = gsap.timeline({ delay: 0.1 });
-  const eyebrow = document.querySelector<HTMLElement>('.pv-hero .pv-eyebrow');
-  const h1 = document.querySelector<HTMLElement>('.pv-hero h1');
-  const sub = document.querySelector<HTMLElement>('.pv-hero-sub');
-  const ctas = document.querySelector<HTMLElement>('.pv-hero-ctas');
-  const photo = document.querySelector<HTMLElement>('.pv-hero-photo');
+  const rail = document.querySelector<HTMLElement>('.pv-hero-rail');
+  const stats = document.querySelectorAll<HTMLElement>('.pv-hstat');
+  const h1 = document.querySelector<HTMLElement>('.pv-hello');
+  const tagline = document.querySelector<HTMLElement>('.pv-hero-tagline');
+  const scroll = document.querySelector<HTMLElement>('.pv-scroll');
+  const portrait = document.querySelector<HTMLElement>('.pv-hero-portrait');
 
-  if (eyebrow) { gsap.set(eyebrow, { y: 14, opacity: 0 }); tl.to(eyebrow, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }, 0); }
-  if (h1) { gsap.set(h1, { y: 30, opacity: 0 }); tl.to(h1, { y: 0, opacity: 1, duration: 0.9, ease: 'expo.out' }, 0.1); }
-  if (sub) { gsap.set(sub, { y: 22, opacity: 0 }); tl.to(sub, { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out' }, 0.35); }
-  if (ctas) { gsap.set(Array.from(ctas.children), { y: 16, opacity: 0 }); tl.to(ctas.children, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out', stagger: 0.1 }, 0.5); }
-  if (photo) { gsap.set(photo, { scale: 0.92, opacity: 0 }); tl.to(photo, { scale: 1, opacity: 1, duration: 1.1, ease: 'expo.out' }, 0.15); }
+  if (portrait) { gsap.set(portrait, { clipPath: 'inset(0 0 100% 0)' }); tl.to(portrait, { clipPath: 'inset(0 0 0% 0)', duration: 1.2, ease: 'expo.out' }, 0); }
+  if (stats.length) { gsap.set(stats, { y: 14, opacity: 0 }); tl.to(stats, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out', stagger: 0.08 }, 0.15); }
+  if (h1) { gsap.set(h1, { y: 40, opacity: 0 }); tl.to(h1, { y: 0, opacity: 1, duration: 1.05, ease: 'expo.out' }, 0.25); }
+  if (tagline) { gsap.set(tagline, { y: 20, opacity: 0 }); tl.to(tagline, { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out' }, 0.5); }
+  if (rail) { gsap.set(rail, { opacity: 0 }); tl.to(rail, { opacity: 1, duration: 1.0, ease: 'power2.out' }, 0.4); }
+  if (scroll) { gsap.set(scroll, { opacity: 0 }); tl.to(scroll, { opacity: 1, duration: 0.8, ease: 'power2.out' }, 0.7); }
 }
 
 function setupReveals() {

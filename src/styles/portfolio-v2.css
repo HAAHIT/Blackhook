@@ -137,56 +137,71 @@ a { color: inherit; text-decoration: none; }
 
 /* ---------- Hero ---------- */
 
-.pv-hero {
-  position: relative;
-  padding: 150px 0 90px;
+.pv-hero { position: relative; }
+
+.pv-hero-stage {
+  max-width: var(--pv-max);
+  margin: 0 auto;
+  padding: 0 32px;
+  min-height: 90vh;
+  display: grid;
+  grid-template-columns: 48px 1fr 37%;
+  align-items: stretch;
 }
 
+/* left rail */
+.pv-hero-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 124px 0 46px;
+}
+.pv-hero-mark { color: var(--pv-ink); display: flex; }
+.pv-hero-rail-mid { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+.pv-hero-rail-line { width: 1px; height: 52px; background: var(--pv-line-2); }
 .pv-hero-vert {
-  position: absolute;
-  left: 26px;
-  top: 46%;
-  transform: rotate(-90deg);
-  transform-origin: left center;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
   font-family: var(--pv-mono);
-  font-size: 0.72rem;
-  letter-spacing: 0.22em;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--pv-ink-3);
 }
+.pv-hero-year { font-family: var(--pv-mono); font-size: 0.74rem; color: var(--pv-ink-3); }
 
-.pv-hero-grid {
-  display: grid;
-  grid-template-columns: 1fr 0.92fr;
-  gap: 50px;
-  align-items: end;
+/* main column: stats top / hello middle / scroll bottom */
+.pv-hero-main {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 124px 44px 46px 40px;
 }
 
-.pv-hero-left { display: flex; flex-direction: column; }
-
-.pv-hero-stats { display: flex; gap: 48px; margin-bottom: 30px; }
+.pv-hero-stats { display: flex; gap: 52px; }
 .pv-hstat strong {
   display: block;
-  font-size: 1.7rem;
-  font-weight: 500;
+  font-size: 2rem;
+  font-weight: 400;
   letter-spacing: -0.02em;
   margin-bottom: 2px;
 }
 .pv-hstat span { font-size: 0.82rem; color: var(--pv-ink-2); }
 
+.pv-hero-center { padding: 24px 0; }
 .pv-hello {
-  font-family: var(--pv-serif);
-  font-weight: 400;
-  font-size: clamp(5rem, 15vw, 13rem);
-  line-height: 0.86;
-  letter-spacing: -0.02em;
+  font-family: var(--pv-sans);
+  font-weight: 300;
+  font-size: clamp(5rem, 14vw, 12.5rem);
+  line-height: 0.9;
+  letter-spacing: -0.045em;
   margin: 0;
 }
-
 .pv-hero-tagline {
   font-size: 1.05rem;
   color: var(--pv-ink-2);
-  margin: 22px 0 0;
+  margin: 18px 0 0;
   max-width: 380px;
 }
 
@@ -198,23 +213,24 @@ a { color: inherit; text-decoration: none; }
   font-size: 0.78rem;
   letter-spacing: 0.04em;
   color: var(--pv-ink-2);
-  margin-top: 44px;
   transition: color 0.2s ease;
 }
 .pv-scroll:hover { color: var(--pv-ink); }
 .pv-scroll-arrow { animation: pv-bob 1.8s ease-in-out infinite; }
 @keyframes pv-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
 
-.pv-hero-photo {
-  border-radius: 14px;
+/* portrait bleeds tall on the right */
+.pv-hero-portrait {
+  position: relative;
   overflow: hidden;
-  aspect-ratio: 4 / 4.4;
   background: var(--pv-cream);
+  width: calc(100% + max(0px, (100vw - var(--pv-max)) / 2) + 32px);
 }
-.pv-hero-photo img {
+.pv-hero-portrait img {
   width: 100%; height: 100%;
   object-fit: cover;
-  filter: grayscale(1) contrast(1.02);
+  object-position: 50% 16%;
+  filter: contrast(1.02);
 }
 
 /* ---------- About ---------- */
@@ -525,10 +541,16 @@ a { color: inherit; text-decoration: none; }
 
 @media (max-width: 940px) {
   .pv-nav-links { display: none; }
-  .pv-hero-vert { display: none; }
-  .pv-hero { padding: 130px 0 60px; }
-  .pv-hero-grid { grid-template-columns: 1fr; gap: 40px; align-items: start; }
-  .pv-hero-photo { max-width: 380px; aspect-ratio: 4 / 4; }
+  .pv-hero-stage { grid-template-columns: 1fr; min-height: auto; gap: 36px; }
+  .pv-hero-rail { display: none; }
+  .pv-hero-main { padding: 120px 0 8px; gap: 40px; }
+  .pv-hero-center { padding: 0; }
+  .pv-hero-portrait {
+    width: 100%;
+    max-width: 420px;
+    aspect-ratio: 4 / 4.2;
+    border-radius: 14px;
+  }
   .pv-about { margin: 0 12px; }
   .pv-about .pv-wrap { padding: 0 32px; }
   .pv-about-grid { grid-template-columns: 1fr; gap: 40px; }

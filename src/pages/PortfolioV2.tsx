@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { ArrowOut, ArrowRight } from '@/icons';
+import { ArrowOut, ArrowRight, HookMark } from '@/icons';
 import { PROJECTS, EXPERIENCE, SKILLS } from '@/data/portfolio';
 import { initPortfolioV2Motion, destroyPortfolioV2Motion } from '@/lib/portfolio-v2-motion';
 
@@ -65,29 +65,43 @@ export function PortfolioV2() {
       <main>
         {/* ---------- Hero ---------- */}
         <section className="pv-hero" id="top">
-          <span className="pv-hero-vert">Product &amp; Strategy</span>
-          <div className="pv-wrap">
-            <div className="pv-hero-grid">
-              <div className="pv-hero-left">
-                <div className="pv-hero-stats pv-reveal">
-                  <div className="pv-hstat">
-                    <strong data-pv-counter="28" data-pv-suffix="Cr+">28Cr+</strong>
-                    <span>Users scaled</span>
-                  </div>
-                  <div className="pv-hstat">
-                    <strong data-pv-counter="22" data-pv-suffix="">22</strong>
-                    <span>Enterprise partners</span>
-                  </div>
+          <div className="pv-hero-stage">
+            <div className="pv-hero-rail">
+              <a href="/" className="pv-hero-mark" aria-label="BlackHook Studio">
+                <HookMark size={22} />
+              </a>
+              <div className="pv-hero-rail-mid">
+                <span className="pv-hero-rail-line" />
+                <span className="pv-hero-vert">Product &amp; Strategy</span>
+                <span className="pv-hero-rail-line" />
+              </div>
+              <span className="pv-hero-year">2026</span>
+            </div>
+
+            <div className="pv-hero-main">
+              <div className="pv-hero-stats pv-reveal">
+                <div className="pv-hstat">
+                  <strong data-pv-counter="28" data-pv-suffix="Cr+">28Cr+</strong>
+                  <span>Users scaled</span>
                 </div>
-                <h1 className="pv-hello pv-reveal">Hello</h1>
-                <p className="pv-hero-tagline pv-reveal">— I&apos;m Hitesh, a product &amp; 0→1 builder.</p>
-                <a href="#about" className="pv-scroll pv-reveal">
-                  Scroll down <span className="pv-scroll-arrow">↓</span>
-                </a>
+                <div className="pv-hstat">
+                  <strong data-pv-counter="22" data-pv-suffix="">22</strong>
+                  <span>Enterprise partners</span>
+                </div>
               </div>
-              <div className="pv-hero-photo pv-reveal">
-                <img src="/hitesh.jpg" alt="Hitesh Agrawal" />
+
+              <div className="pv-hero-center">
+                <h1 className="pv-hello">Hello</h1>
+                <p className="pv-hero-tagline">— I&apos;m Hitesh, a product &amp; 0→1 builder.</p>
               </div>
+
+              <a href="#about" className="pv-scroll">
+                Scroll down <span className="pv-scroll-arrow">↓</span>
+              </a>
+            </div>
+
+            <div className="pv-hero-portrait">
+              <img src="/hitesh-bw.jpg" alt="Hitesh Agrawal" />
             </div>
           </div>
         </section>
