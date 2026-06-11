@@ -1,25 +1,25 @@
 /* =========================================================
    Hitesh Agrawal — Portfolio
-   Editorial monochrome, in the spirit of the BlackHook studio
-   site (cream/ink, Instrument Serif + Geist Mono, clipped
-   corners). Fully self-contained: shares no tokens or classes
-   with the BlackHook studio site.
+   Editorial dark mode, in the spirit of the BlackHook studio
+   site (near-black/cream, Instrument Serif + Geist Mono,
+   clipped corners, film grain). Fully self-contained: shares
+   no tokens or classes with the BlackHook studio site.
    ========================================================= */
 
 :root {
-  --pf-bg: #f4f0e8;
-  --pf-bg-card: #ebe7df;
-  --pf-bg-sunk: rgba(10, 10, 10, 0.05);
-  --pf-bg-featured: #ebe7df;
-  --pf-ink: #0a0a0a;
-  --pf-ink-2: rgba(10, 10, 10, 0.72);
-  --pf-ink-3: rgba(10, 10, 10, 0.42);
-  --pf-accent: #0a0a0a;
-  --pf-accent-ink: #0a0a0a;
-  --pf-accent-soft: rgba(10, 10, 10, 0.06);
-  --pf-status: #1a8a2e;
-  --pf-line: rgba(10, 10, 10, 0.12);
-  --pf-line-2: rgba(10, 10, 10, 0.28);
+  --pf-bg: #0a0a0a;
+  --pf-bg-card: #111110;
+  --pf-bg-sunk: rgba(244, 240, 232, 0.05);
+  --pf-bg-featured: #111110;
+  --pf-ink: #f4f0e8;
+  --pf-ink-2: rgba(244, 240, 232, 0.72);
+  --pf-ink-3: rgba(244, 240, 232, 0.46);
+  --pf-accent: #f4f0e8;
+  --pf-accent-ink: #f4f0e8;
+  --pf-accent-soft: rgba(244, 240, 232, 0.05);
+  --pf-status: #b5f55b;
+  --pf-line: rgba(244, 240, 232, 0.14);
+  --pf-line-2: rgba(244, 240, 232, 0.28);
   --pf-serif: 'Instrument Serif', 'Times New Roman', serif;
   --pf-sans: 'Geist', system-ui, -apple-system, sans-serif;
   --pf-mono: 'Geist Mono', ui-monospace, monospace;
@@ -32,7 +32,7 @@ html { background: var(--pf-bg); -webkit-text-size-adjust: 100%; scroll-behavior
 
 body {
   margin: 0;
-  background: radial-gradient(120% 80% at 50% 0%, #ece5d6 0%, var(--pf-bg) 60%);
+  background: radial-gradient(120% 80% at 50% 0%, #15140f 0%, var(--pf-bg) 60%);
   color: var(--pf-ink);
   font-family: var(--pf-sans);
   font-size: 17px;
@@ -49,9 +49,9 @@ body::after {
   inset: 0;
   pointer-events: none;
   z-index: 1;
-  opacity: 0.05;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  opacity: 0.06;
+  mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }
 
 ::selection { background: var(--pf-ink); color: var(--pf-bg); }
@@ -65,7 +65,7 @@ img, svg { display: block; }
 /* ===== Cursor ===== */
 .pf-cursor { position: fixed; inset: 0; pointer-events: none; z-index: 9999; transition: opacity 0.3s ease; }
 .pf-cursor:not(.on), .pf-cursor.hide { opacity: 0; }
-.pf-cursor-ring { position: absolute; top: 0; left: 0; width: 38px; height: 38px; border: 1px solid rgba(10,10,10,0.3); border-radius: 50%; will-change: transform; transition: width 0.35s cubic-bezier(0.65,0,0.2,1), height 0.35s cubic-bezier(0.65,0,0.2,1), border-color 0.35s ease; }
+.pf-cursor-ring { position: absolute; top: 0; left: 0; width: 38px; height: 38px; border: 1px solid rgba(244,240,232,0.3); border-radius: 50%; will-change: transform; transition: width 0.35s cubic-bezier(0.65,0,0.2,1), height 0.35s cubic-bezier(0.65,0,0.2,1), border-color 0.35s ease; }
 .pf-cursor-dot { position: absolute; top: -4px; left: -4px; width: 8px; height: 8px; background: var(--pf-ink); border-radius: 50%; will-change: transform; transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease; }
 .pf-cursor.link .pf-cursor-ring { width: 56px; height: 56px; border-color: var(--pf-ink); }
 .pf-cursor.link .pf-cursor-dot { transform: translate(-50%, -50%) scale(0) !important; opacity: 0; }
@@ -127,7 +127,7 @@ img, svg { display: block; }
 .pf-hero { padding: 96px 0 80px; }
 .pf-hero-layout { display: flex; align-items: center; justify-content: space-between; gap: 48px; }
 .pf-hero-copy { flex: 1; min-width: 0; }
-.pf-hero-photo { flex-shrink: 0; width: 220px; height: 220px; border-radius: 50%; overflow: hidden; border: 3px solid var(--pf-line-2); box-shadow: 0 12px 40px -16px rgba(10,10,10,0.25); }
+.pf-hero-photo { flex-shrink: 0; width: 220px; height: 220px; border-radius: 50%; overflow: hidden; border: 3px solid var(--pf-line-2); box-shadow: 0 12px 40px -16px rgba(0,0,0,0.5); }
 .pf-hero-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center top; }
 .pf-hero h1 { font-family: var(--pf-serif); font-weight: 400; font-size: clamp(2.7rem, 6.4vw, 5rem); line-height: 1.04; letter-spacing: -0.022em; margin: 26px 0 0; max-width: 16ch; }
 .pf-hero h1 em { font-style: italic; color: var(--pf-ink-2); font-weight: 400; }
@@ -147,7 +147,7 @@ img, svg { display: block; }
 /* ===== Now ===== */
 .pf-now-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
 .pf-now-card { display: block; padding: 30px 26px; background: var(--pf-bg-card); border: 1px solid var(--pf-line); transition: box-shadow 0.3s ease, border-color 0.3s ease; transform-style: preserve-3d; will-change: transform; }
-.pf-now-card:hover { transform: translateY(-3px); border-color: var(--pf-line-2); box-shadow: 0 14px 36px -22px rgba(10, 10, 10, 0.35); }
+.pf-now-card:hover { transform: translateY(-3px); background: var(--pf-bg-sunk); border-color: var(--pf-line-2); box-shadow: 0 14px 36px -22px rgba(0, 0, 0, 0.5); }
 .pf-now-k { display: flex; align-items: center; gap: 7px; font-family: var(--pf-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--pf-ink); margin-bottom: 14px; transition: gap 0.25s ease; }
 .pf-now-card:hover .pf-now-k { gap: 10px; }
 .pf-now-card p { margin: 0; font-size: 15px; line-height: 1.65; color: var(--pf-ink-2); }
@@ -164,7 +164,7 @@ img, svg { display: block; }
 
 /* ===== Projects — shared ===== */
 .pf-proj { display: flex; flex-direction: column; padding: 28px 28px 26px; background: var(--pf-bg-card); border: 1px solid var(--pf-line); transition: box-shadow 0.3s ease, border-color 0.3s ease; transform-style: preserve-3d; will-change: transform; }
-.pf-proj:hover { transform: translateY(-3px); border-color: var(--pf-line-2); box-shadow: 0 16px 40px -24px rgba(10, 10, 10, 0.4); }
+.pf-proj:hover { transform: translateY(-3px); background: var(--pf-bg-sunk); border-color: var(--pf-line-2); box-shadow: 0 16px 40px -24px rgba(0, 0, 0, 0.55); }
 .pf-proj-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
 .pf-proj-year { font-family: var(--pf-mono); font-size: 11.5px; letter-spacing: 0.04em; color: var(--pf-ink-3); }
 .pf-proj-links { display: flex; gap: 14px; }
@@ -181,12 +181,13 @@ img, svg { display: block; }
   margin-bottom: 18px;
   background: var(--pf-bg-featured);
   border-color: var(--pf-line-2);
-  box-shadow: 0 2px 20px -8px rgba(10, 10, 10, 0.1);
+  box-shadow: 0 2px 20px -8px rgba(0, 0, 0, 0.3);
 }
 .pf-proj--featured:hover {
   transform: translateY(-4px);
+  background: var(--pf-bg-sunk);
   border-color: var(--pf-ink-3);
-  box-shadow: 0 12px 40px -12px rgba(10, 10, 10, 0.2);
+  box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.5);
 }
 .pf-proj--featured .pf-proj-name { font-size: 36px; }
 .pf-proj--featured .pf-proj-tagline { font-size: 17px; }
@@ -197,7 +198,7 @@ img, svg { display: block; }
 /* ===== Badges ===== */
 .pf-badge { font-family: var(--pf-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 100px; padding: 4px 10px; }
 .pf-badge:not(.pf-badge-ai):not(.pf-badge-featured) { color: var(--pf-ink); background: var(--pf-accent-soft); border: 1px solid var(--pf-line-2); }
-.pf-badge-ai { color: var(--pf-status); background: rgba(26, 138, 46, 0.08); border: 1px solid rgba(26, 138, 46, 0.3); }
+.pf-badge-ai { color: var(--pf-status); background: rgba(181, 245, 91, 0.08); border: 1px solid rgba(181, 245, 91, 0.3); }
 .pf-badge-featured { color: var(--pf-ink-2); background: var(--pf-accent-soft); border: 1px solid var(--pf-line-2); }
 
 /* ===== Project grid (non-featured) ===== */
