@@ -85,24 +85,6 @@ function setupCounters() {
   });
 }
 
-function setupCardTilt() {
-  if (isTouch()) return;
-  document.querySelectorAll<HTMLElement>('.pv-work-card').forEach((card) => {
-    let rect: DOMRect | null = null;
-    card.addEventListener('pointerenter', () => { rect = card.getBoundingClientRect(); });
-    card.addEventListener('pointermove', (e) => {
-      if (!rect) rect = card.getBoundingClientRect();
-      const px = (e.clientX - rect.left) / rect.width;
-      const py = (e.clientY - rect.top) / rect.height;
-      gsap.to(card, { rotateX: (py - 0.5) * -4, rotateY: (px - 0.5) * 5, transformPerspective: 900, duration: 0.45, ease: 'power2.out' });
-    });
-    card.addEventListener('pointerleave', () => {
-      rect = null;
-      gsap.to(card, { rotateX: 0, rotateY: 0, duration: 0.85, ease: 'elastic.out(1,0.4)' });
-    });
-  });
-}
-
 function setupNav() {
   const nav = document.querySelector<HTMLElement>('.pv-nav');
   if (!nav) return;
@@ -119,7 +101,6 @@ export function initPortfolioV2Motion() {
   setupHeroEntrance();
   setupReveals();
   setupCounters();
-  setupCardTilt();
   setupMagnetic();
   setTimeout(() => ScrollTrigger.refresh(), 300);
 }

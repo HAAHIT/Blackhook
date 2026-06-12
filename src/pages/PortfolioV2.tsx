@@ -1,15 +1,16 @@
 import { useEffect } from 'react';
-import { ArrowOut, ArrowRight, HookMark } from '@/icons';
-import { PROJECTS, EXPERIENCE, SKILLS } from '@/data/portfolio';
+import { ArrowOut, ArrowRight, GithubMark, HookMark } from '@/icons';
+import { PROJECTS, EXPERIENCE, SKILLS, CASE_STUDIES, PRINCIPLES, RECOGNITION } from '@/data/portfolio';
 import { initPortfolioV2Motion, destroyPortfolioV2Motion } from '@/lib/portfolio-v2-motion';
 
 const WHATSAPP = 'https://wa.me/919309803663';
 const EMAIL = 'agrawalhitesh4444@gmail.com';
 const LINKEDIN = 'https://www.linkedin.com/in/hitesh-agrawal-5a02a416b/';
 const GITHUB = 'https://github.com/HAAHIT';
+const RESUME = '/Hitesh-Agrawal-Resume.pdf';
 
 const EXP_TAGS: Record<string, string[]> = {
-  'BlackHook Services': ['Product', '0→1', 'Ops'],
+  'BlackHook Services': ['Product', '0→1', 'P&L'],
   'Jio Platforms Limited': ['Scale', 'Loyalty', 'B2B'],
   FindUtsav: ['0→1', 'Mobile'],
   'Savitribai Phule Pune University': ['B.E. ECE', 'CAT / XAT'],
@@ -42,7 +43,6 @@ export function PortfolioV2() {
     return () => destroyPortfolioV2Motion();
   }, []);
 
-  const featured = PROJECTS.filter((p) => p.featured || p.current).slice(0, 6);
   const allSkills = SKILLS.flatMap((g) => g.items).slice(0, 12);
 
   return (
@@ -52,13 +52,16 @@ export function PortfolioV2() {
           <a href="#top" className="pv-logo">Hitesh<span>.</span></a>
           <nav className="pv-nav-links">
             <a href="#about">About</a>
+            <a href="#work">Case studies</a>
             <a href="#journey">Journey</a>
-            <a href="#work">Work</a>
             <a href="#now">Now</a>
           </nav>
-          <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pv-nav-cta pv-magnetic">
-            Book a call <ArrowOut size={12} />
-          </a>
+          <div className="pv-nav-right">
+            <a href={RESUME} target="_blank" rel="noopener noreferrer" className="pv-nav-resume">Résumé</a>
+            <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pv-nav-cta pv-magnetic">
+              Book a call <ArrowOut size={12} />
+            </a>
+          </div>
         </div>
       </header>
 
@@ -81,18 +84,24 @@ export function PortfolioV2() {
             <div className="pv-hero-main">
               <div className="pv-hero-stats pv-reveal">
                 <div className="pv-hstat">
-                  <strong data-pv-counter="28" data-pv-suffix="Cr+">28Cr+</strong>
-                  <span>Users scaled</span>
+                  <strong data-pv-counter="280" data-pv-suffix="M+">280M+</strong>
+                  <span>Users migrated, zero downtime</span>
                 </div>
                 <div className="pv-hstat">
                   <strong data-pv-counter="22" data-pv-suffix="">22</strong>
                   <span>Enterprise partners</span>
                 </div>
+                <div className="pv-hstat">
+                  <strong data-pv-counter="5" data-pv-suffix="">5</strong>
+                  <span>Ventures in flight</span>
+                </div>
               </div>
 
               <div className="pv-hero-center">
                 <h1 className="pv-hello">Hello</h1>
-                <p className="pv-hero-tagline">— I&apos;m Hitesh, a product &amp; 0→1 builder.</p>
+                <p className="pv-hero-tagline">
+                  — I&apos;m Hitesh Agrawal. Product leader across 0→1 and 280M-user scale.
+                </p>
               </div>
 
               <a href="#about" className="pv-scroll">
@@ -109,14 +118,20 @@ export function PortfolioV2() {
         {/* ---------- About ---------- */}
         <section className="pv-section pv-about" id="about">
           <div className="pv-wrap">
-            <div className="pv-label pv-reveal"><span className="pv-bullet" />About Me</div>
+            <div className="pv-label pv-reveal"><span className="pv-bullet" />About</div>
             <div className="pv-about-grid">
               <div className="pv-about-copy pv-reveal">
                 <h2>
-                  I turn fuzzy <em>ambition</em> into shipped product. I&apos;ve scaled an
-                  enterprise platform to 28&nbsp;Cr+ users and bootstrapped ventures from a
-                  blank page to paying customers.
+                  I&apos;ve operated at both extremes of product — <em>280M-user</em> enterprise
+                  scale, and founder-mode <em>0→1</em> with my own capital on the line.
                 </h2>
+                <p className="pv-about-lede">
+                  Most product people pick a lane. I&apos;ve shipped a zero-downtime migration for
+                  one of the world&apos;s largest consumer platforms, sold a B2B product before it
+                  existed, and run a services business that turned profitable in its first
+                  quarter. Today I operate three ventures simultaneously as sole PM — with AI
+                  tooling as the force multiplier.
+                </p>
                 <div className="pv-tools">
                   {allSkills.map((s) => (
                     <span key={s}>{s}</span>
@@ -131,15 +146,84 @@ export function PortfolioV2() {
                 </div>
                 <ul className="pv-about-points">
                   <li>
-                    <span className="pv-point-k">Jio · Product Manager</span>
-                    Migrated 28&nbsp;Cr+ customers with zero downtime. Sole Star Performer.
+                    <span className="pv-point-k">Jio Platforms · Product Manager</span>
+                    280M+ customers migrated with zero downtime. Sole Star Performer.
                   </li>
                   <li>
                     <span className="pv-point-k">BlackHook · Co-Founder</span>
-                    Three ventures from 0→1, a paying pilot secured before MVP.
+                    Three ventures from 0→1 — one sold before it was built, one profitable in Q1.
                   </li>
                 </ul>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ---------- Case studies ---------- */}
+        <section className="pv-section pv-work" id="work">
+          <div className="pv-wrap">
+            <div className="pv-label pv-reveal"><span className="pv-bullet" />Selected work</div>
+            <h2 className="pv-h2 pv-reveal">Proof, not <em>promises</em></h2>
+            <p className="pv-section-sub pv-reveal">
+              Four problems, four shipped outcomes — at enterprise scale and from zero.
+            </p>
+            <div className="pv-cs-list">
+              {CASE_STUDIES.map((cs, i) => (
+                <article key={cs.title} className="pv-cs pv-reveal">
+                  <div className="pv-cs-head">
+                    <span className="pv-cs-num">{String(i + 1).padStart(2, '0')}</span>
+                    <div>
+                      <div className="pv-cs-kicker">{cs.kicker}</div>
+                      <h3>{cs.title}</h3>
+                    </div>
+                  </div>
+                  <div className="pv-cs-grid">
+                    <div className="pv-cs-col">
+                      <h4>The problem</h4>
+                      <p>{cs.challenge}</p>
+                    </div>
+                    <div className="pv-cs-col">
+                      <h4>What I did</h4>
+                      <p>{cs.approach}</p>
+                    </div>
+                    <div className="pv-cs-col">
+                      <h4>The outcome</h4>
+                      <p>{cs.outcome}</p>
+                    </div>
+                  </div>
+                  <div className="pv-cs-metrics">
+                    {cs.metrics.map((m) => (
+                      <div key={m.label} className="pv-cs-metric">
+                        <strong>{m.value}</strong>
+                        <span>{m.label}</span>
+                      </div>
+                    ))}
+                    {cs.link && (
+                      <a href={cs.link.href} target="_blank" rel="noopener noreferrer" className="pv-cs-link">
+                        {cs.link.label} <ArrowOut size={12} />
+                      </a>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ---------- Hiring banner ---------- */}
+        <section className="pv-promo">
+          <div className="pv-wrap">
+            <div className="pv-promo-inner pv-reveal">
+              <div>
+                <div className="pv-label pv-label--light"><span className="pv-bullet" />The short version</div>
+                <h2>
+                  I&apos;ve done the 280M-user thing and the zero-to-one thing.
+                  I&apos;m looking for the next hard problem.
+                </h2>
+              </div>
+              <a href={RESUME} target="_blank" rel="noopener noreferrer" className="pv-btn pv-btn-light pv-magnetic">
+                View résumé <ArrowOut size={13} />
+              </a>
             </div>
           </div>
         </section>
@@ -148,7 +232,7 @@ export function PortfolioV2() {
         <section className="pv-section pv-journey" id="journey">
           <div className="pv-wrap">
             <div className="pv-label pv-reveal"><span className="pv-bullet" />Experience</div>
-            <h2 className="pv-h2 pv-reveal">Explore my design <em>journey</em></h2>
+            <h2 className="pv-h2 pv-reveal">Where I&apos;ve <em>been</em></h2>
             <div className="pv-journey-list">
               {EXPERIENCE.map((x) => (
                 <article key={x.org} className="pv-journey-item pv-reveal">
@@ -160,7 +244,7 @@ export function PortfolioV2() {
                     <span>{x.role}</span>
                     <span className="pv-journey-place">{x.place}</span>
                   </div>
-                  <p className="pv-journey-desc">{x.desc}</p>
+                  <p className="pv-journey-desc">{x.desc.replace('28Cr+', '280M+')}</p>
                   <div className="pv-journey-tags">
                     {(EXP_TAGS[x.org] ?? []).map((t) => (
                       <span key={t}>{t}</span>
@@ -172,63 +256,14 @@ export function PortfolioV2() {
           </div>
         </section>
 
-        {/* ---------- Promo banner ---------- */}
-        <section className="pv-promo">
-          <div className="pv-wrap">
-            <div className="pv-promo-inner pv-reveal">
-              <div>
-                <div className="pv-label pv-label--light"><span className="pv-bullet" />Let&apos;s work together</div>
-                <h2>Have something worth building? Let&apos;s make it real.</h2>
-              </div>
-              <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pv-btn pv-btn-light pv-magnetic">
-                Start a conversation <ArrowRight size={13} />
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* ---------- Latest Works ---------- */}
-        <section className="pv-section pv-work" id="work">
-          <div className="pv-wrap">
-            <div className="pv-work-head">
-              <div className="pv-label pv-reveal pv-center"><span className="pv-bullet" />Portfolio</div>
-              <h2 className="pv-h2 pv-center pv-reveal">Latest works</h2>
-            </div>
-            <div className="pv-work-grid">
-              {featured.map((p, i) => (
-                <a
-                  key={p.name}
-                  href={p.live ?? p.repo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`pv-work-card pv-tone-${(i % 4) + 1} pv-reveal`}
-                >
-                  <div className="pv-work-cover">
-                    <span className="pv-art-sphere" />
-                    <span className="pv-art-base" />
-                    {p.featured && <div className="pv-work-badge">Featured</div>}
-                  </div>
-                  <div className="pv-work-body">
-                    <h3>{p.name}</h3>
-                    <span className="pv-work-arrow"><ArrowOut size={14} /></span>
-                  </div>
-                  <div className="pv-work-tagline">{p.tagline}</div>
-                </a>
-              ))}
-            </div>
-            <div className="pv-work-more pv-reveal">
-              <a href={GITHUB} target="_blank" rel="noopener noreferrer" className="pv-btn pv-btn-ghost pv-magnetic">
-                View all on GitHub <ArrowOut size={13} />
-              </a>
-            </div>
-          </div>
-        </section>
-
         {/* ---------- Now building ---------- */}
         <section className="pv-section pv-now" id="now">
           <div className="pv-wrap">
             <div className="pv-label pv-reveal"><span className="pv-bullet" />Now</div>
             <h2 className="pv-h2 pv-reveal">What I&apos;m <em>building today</em></h2>
+            <p className="pv-section-sub pv-reveal">
+              Five ventures in flight as sole PM — here are three.
+            </p>
             <div className="pv-now-grid">
               {NOW_BUILDING.map((n, i) => (
                 <a key={n.name} href={n.href} target="_blank" rel="noopener noreferrer" className={`pv-now-card pv-tone-${i + 1} pv-reveal`}>
@@ -246,16 +281,87 @@ export function PortfolioV2() {
           </div>
         </section>
 
+        {/* ---------- Ship log ---------- */}
+        <section className="pv-section pv-ship">
+          <div className="pv-wrap">
+            <div className="pv-label pv-reveal"><span className="pv-bullet" />Ship log</div>
+            <h2 className="pv-h2 pv-reveal">Everything else I&apos;ve <em>shipped</em></h2>
+            <div className="pv-ship-list pv-reveal">
+              {PROJECTS.map((p) => (
+                <div key={p.name} className="pv-ship-row">
+                  <span className="pv-ship-year">{p.year}</span>
+                  <span className="pv-ship-name">{p.name}</span>
+                  <span className="pv-ship-tag">{p.tagline}</span>
+                  <span className="pv-ship-links">
+                    <a href={p.repo} target="_blank" rel="noopener noreferrer" aria-label={`${p.name} on GitHub`}>
+                      <GithubMark size={15} />
+                    </a>
+                    {p.live && (
+                      <a href={p.live} target="_blank" rel="noopener noreferrer" aria-label={`${p.name} live`}>
+                        <ArrowOut size={13} />
+                      </a>
+                    )}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="pv-ship-more pv-reveal">
+              <a href={GITHUB} target="_blank" rel="noopener noreferrer" className="pv-btn pv-btn-ghost pv-magnetic">
+                Everything on GitHub <ArrowOut size={13} />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* ---------- How I operate ---------- */}
+        <section className="pv-section pv-principles">
+          <div className="pv-wrap">
+            <div className="pv-label pv-reveal"><span className="pv-bullet" />Operating system</div>
+            <h2 className="pv-h2 pv-reveal">How I <em>operate</em></h2>
+            <div className="pv-principles-grid">
+              {PRINCIPLES.map((pr, i) => (
+                <div key={pr.title} className="pv-principle pv-reveal">
+                  <span className="pv-principle-num">{String(i + 1).padStart(2, '0')}</span>
+                  <h3>{pr.title}</h3>
+                  <p>{pr.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ---------- Recognition ---------- */}
+        <section className="pv-section pv-recog">
+          <div className="pv-wrap">
+            <div className="pv-label pv-reveal"><span className="pv-bullet" />Recognition</div>
+            <div className="pv-recog-grid">
+              {RECOGNITION.map((r) => (
+                <div key={r.value} className="pv-recog-item pv-reveal">
+                  <strong>{r.value}</strong>
+                  <span className="pv-recog-label">{r.label}</span>
+                  <span className="pv-recog-detail">{r.detail}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* ---------- Final CTA ---------- */}
-        <section className="pv-cta">
+        <section className="pv-cta" id="contact">
           <div className="pv-wrap pv-cta-inner pv-reveal">
-            <h2>Got a vision?<br />Let&apos;s bring it <em>to life.</em></h2>
+            <h2>Hiring for a senior<br />product seat? <em>Let&apos;s talk.</em></h2>
             <div className="pv-cta-actions">
               <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pv-btn pv-btn-primary pv-magnetic">
                 Book a call <ArrowRight size={13} />
               </a>
+              <a href={RESUME} target="_blank" rel="noopener noreferrer" className="pv-btn pv-btn-ghost pv-magnetic">
+                View résumé
+              </a>
               <a href={`mailto:${EMAIL}`} className="pv-cta-mail">{EMAIL}</a>
             </div>
+            <p className="pv-availability">
+              Open to senior product roles worldwide — remote or relocation · IST (UTC+5:30), overlap-flexible.
+            </p>
           </div>
         </section>
       </main>
@@ -269,6 +375,7 @@ export function PortfolioV2() {
             <div className="pv-footer-links">
               <a href={LINKEDIN} target="_blank" rel="noopener noreferrer">LinkedIn</a>
               <a href={GITHUB} target="_blank" rel="noopener noreferrer">GitHub</a>
+              <a href={RESUME} target="_blank" rel="noopener noreferrer">Résumé</a>
               <a href="/">BlackHook Studio ↗</a>
             </div>
             <span className="pv-footer-copy">© 2026 Hitesh Agrawal</span>

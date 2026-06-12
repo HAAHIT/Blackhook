@@ -136,3 +136,125 @@ export const SKILLS: SkillGroup[] = [
   { label: 'Analytics & Tools', items: ['SQL', 'Mixpanel', 'Figma', 'JIRA', 'Confluence', 'Notion', 'Postman', 'Azure DevOps'] },
   { label: 'Technical & Domains', items: ['REST APIs', 'Webhooks', 'Loyalty', 'B2B SaaS', 'Marketplaces'] },
 ];
+
+export interface CaseStudy {
+  kicker: string;
+  title: string;
+  challenge: string;
+  approach: string;
+  outcome: string;
+  metrics: { value: string; label: string }[];
+  link?: { href: string; label: string };
+}
+
+export const CASE_STUDIES: CaseStudy[] = [
+  {
+    kicker: 'Jio Platforms · Enterprise scale',
+    title: 'Migrating 280M+ customers with zero downtime',
+    challenge:
+      "Reliance's ROne loyalty platform had to absorb 280M+ customers from legacy systems while the business kept transacting every day. At that scale, a failed cutover is national news.",
+    approach:
+      'Owned the migration end to end — a custom gateway with phased cohort cutovers, a partner-onboarding playbook that brought 22 enterprise brands (including Jio Financial Services and Tira) onto one loyalty rail, and 6+ core platform features shipped along the way.',
+    outcome:
+      'Every customer moved. Zero downtime. Sole recipient of the Star Performer Award.',
+    metrics: [
+      { value: '280M+', label: 'Customers migrated' },
+      { value: '0', label: 'Minutes of downtime' },
+      { value: '22', label: 'Enterprise partners' },
+    ],
+  },
+  {
+    kicker: 'BlackHook · B2B commodity SaaS',
+    title: 'The customer paid before the product existed',
+    challenge:
+      'The edible-oil and cement trade runs on phone calls and notebooks. Software pitches die on adoption — buyers are sceptical, offline-first and allergic to subscriptions.',
+    approach:
+      'Started with discovery, not a deck: sat with traders, mapped the highest-pain workflow — live SKU pricing and order booking — scoped the MVP around exactly that, and closed a paying pilot before a line of code was written.',
+    outcome:
+      'Pilot revenue covered the full build cost before launch. The platform now runs live pricing and orders for the trade.',
+    metrics: [
+      { value: '100%', label: 'Build cost covered pre-launch' },
+      { value: '1', label: 'Paying pilot before the MVP' },
+    ],
+    link: { href: 'https://murlioils.com', label: 'murlioils.com' },
+  },
+  {
+    kicker: 'BlackHook · Healthcare at home',
+    title: 'Owning the P&L, not just the roadmap',
+    challenge:
+      'Home healthcare — nursing, physiotherapy, elder care — is an operations business. Software is necessary but not sufficient; unit economics decide survival.',
+    approach:
+      'Built both sides: the ops platform (visit scheduling, partner payouts, billing) and the business itself — partner network, pricing and service design.',
+    outcome:
+      'Profitable in its first quarter: 300+ visits at 30% margin, on a platform I built and still run.',
+    metrics: [
+      { value: '300+', label: 'Visits in the first quarter' },
+      { value: '30%', label: 'Margin from day one' },
+      { value: '₹3L+', label: 'Monthly recurring revenue' },
+    ],
+    link: { href: 'https://care-ops-central.vercel.app', label: 'care-ops-central' },
+  },
+  {
+    kicker: 'Independent · AI-native product',
+    title: 'Most PMs spec AI products. I ship them.',
+    challenge:
+      'AI memory is fragmented — every conversation with Claude, ChatGPT or Gemini is lost the moment it ends, locked in separate silos.',
+    approach:
+      'Designed, built and shipped smriti solo: a browser extension that archives conversations across all three, a local SQLite search index, and an MCP server that hands your history back to Claude in context.',
+    outcome:
+      'Three distribution layers — extension, CLI, MCP protocol — one product, zero engineers hired. The same loop now powers bolodb, a text-to-SQL product.',
+    metrics: [
+      { value: '3', label: 'Distribution layers' },
+      { value: '0', label: 'Engineers hired' },
+    ],
+    link: { href: 'https://github.com/HAAHIT/smriti', label: 'github.com/HAAHIT/smriti' },
+  },
+];
+
+export interface Principle {
+  title: string;
+  desc: string;
+}
+
+export const PRINCIPLES: Principle[] = [
+  {
+    title: 'Discovery before decks',
+    desc: 'Every venture I run began as customer conversations, not internal conviction. The commodity SaaS was sold before it was built.',
+  },
+  {
+    title: 'Revenue is the strongest validation',
+    desc: 'A paying customer before the MVP beats any market-sizing slide. I optimise for proof, not polish.',
+  },
+  {
+    title: 'Own the whole problem',
+    desc: "Strategy, ops, hiring funnels — and the code, when it's the fastest path. Seniority is range, not altitude.",
+  },
+  {
+    title: 'AI is leverage, not garnish',
+    desc: "AI tooling gives me 3× delivery velocity. It's how one product person runs three ventures without dropping quality.",
+  },
+];
+
+export interface Recognition {
+  value: string;
+  label: string;
+  detail: string;
+}
+
+export const RECOGNITION: Recognition[] = [
+  {
+    value: 'Star Performer',
+    label: 'Jio Platforms Limited',
+    detail: 'Sole recipient of the award',
+  },
+  {
+    value: 'Top 2.5%',
+    label: 'CAT & XAT, nationwide',
+    detail: 'Interview calls from 15 IIMs and XLRI',
+  },
+  {
+    value: '9.23 / 10',
+    label: 'B.E. Electronics & Telecom',
+    detail: 'Savitribai Phule Pune University',
+  },
+];
