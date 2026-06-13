@@ -105,14 +105,14 @@ export const EXPERIENCE: Experience[] = [
     role: 'Co-Founder & Product Manager',
     org: 'BlackHook Services',
     place: 'Dhule, IN',
-    desc: 'Building SoloBooks and a commodity-industry SaaS (paying pilot secured before MVP), plus a healthcare-at-home services business at ₹3L+ MRR. Sole PM across all three — product, ops, hiring funnels and scaling playbooks, with AI tooling for 3× velocity.',
+    desc: 'Building SoloBooks and a commodity-industry SaaS (paying pilot secured before MVP), plus a healthcare-at-home services business at ₹3L+ MRR. Sole PM across all three — product, ops, hiring funnels and scaling playbooks, leaning on AI tooling to move faster.',
   },
   {
     range: '2022 — 2024',
     role: 'Product Manager',
     org: 'Jio Platforms Limited',
     place: 'Mumbai, IN',
-    desc: "Scaled Reliance's ROne loyalty platform from scratch — migrated 28Cr+ customers via a custom gateway with zero downtime, onboarded 22 enterprise partners (incl. JFS, Tira) and shipped 6+ core features. Sole recipient of the Star Performer Award.",
+    desc: "Helped scale Reliance's ROne loyalty platform from the ground up — moved 28Cr+ customers via a custom gateway with zero downtime, onboarded 22 enterprise partners (incl. JFS, Tira) and shipped 6+ core features. Recognised with the company's Star Performer Award.",
   },
   {
     range: '2020 — 2022',
@@ -154,9 +154,9 @@ export const CASE_STUDIES: CaseStudy[] = [
     challenge:
       "Reliance's ROne loyalty platform had to absorb 280M+ customers from legacy systems while the business kept transacting every day. At that scale, a failed cutover is national news.",
     approach:
-      'Owned the migration end to end — a custom gateway with phased cohort cutovers, a partner-onboarding playbook that brought 22 enterprise brands (including Jio Financial Services and Tira) onto one loyalty rail, and 6+ core platform features shipped along the way.',
+      'Led it as PM, working closely with engineering — a custom gateway with phased cohort cutovers, a partner-onboarding playbook that brought 22 enterprise brands (including Jio Financial Services and Tira) onto one loyalty rail, and 6+ core platform features shipped along the way.',
     outcome:
-      'Every customer moved. Zero downtime. Sole recipient of the Star Performer Award.',
+      'Every customer moved, with zero downtime. The work earned a Star Performer Award.',
     metrics: [
       { value: '280M+', label: 'Customers migrated' },
       { value: '0', label: 'Minutes of downtime' },
@@ -180,7 +180,7 @@ export const CASE_STUDIES: CaseStudy[] = [
   },
   {
     kicker: 'BlackHook · Healthcare at home',
-    title: 'Owning the P&L, not just the roadmap',
+    title: 'Taking on the P&L, not just the roadmap',
     challenge:
       'Home healthcare — nursing, physiotherapy, elder care — is an operations business. Software is necessary but not sufficient; unit economics decide survival.',
     approach:
@@ -196,13 +196,13 @@ export const CASE_STUDIES: CaseStudy[] = [
   },
   {
     kicker: 'Independent · AI-native product',
-    title: 'Most PMs spec AI products. I ship them.',
+    title: 'Building and shipping an AI product solo',
     challenge:
       'AI memory is fragmented — every conversation with Claude, ChatGPT or Gemini is lost the moment it ends, locked in separate silos.',
     approach:
       'Designed, built and shipped smriti solo: a browser extension that archives conversations across all three, a local SQLite search index, and an MCP server that hands your history back to Claude in context.',
     outcome:
-      'Three distribution layers — extension, CLI, MCP protocol — one product, zero engineers hired. The same loop now powers bolodb, a text-to-SQL product.',
+      'Three distribution layers — extension, CLI, MCP protocol — one product, built without a team. The same approach now powers bolodb, a text-to-SQL product.',
     metrics: [
       { value: '3', label: 'Distribution layers' },
       { value: '0', label: 'Engineers hired' },
@@ -219,19 +219,19 @@ export interface Principle {
 export const PRINCIPLES: Principle[] = [
   {
     title: 'Discovery before decks',
-    desc: 'Every venture I run began as customer conversations, not internal conviction. The commodity SaaS was sold before it was built.',
+    desc: "Every venture I've run started as customer conversations, not internal conviction. The commodity SaaS was sold before it was built.",
   },
   {
-    title: 'Revenue is the strongest validation',
-    desc: 'A paying customer before the MVP beats any market-sizing slide. I optimise for proof, not polish.',
+    title: 'Revenue over slides',
+    desc: 'A paying customer before the MVP tells me more than any market-sizing deck. I try to optimise for proof over polish.',
   },
   {
     title: 'Own the whole problem',
-    desc: "Strategy, ops, hiring funnels — and the code, when it's the fastest path. Seniority is range, not altitude.",
+    desc: "Strategy, ops, hiring funnels — and the code, when that's the fastest path. To me, seniority is range, not altitude.",
   },
   {
-    title: 'AI is leverage, not garnish',
-    desc: "AI tooling gives me 3× delivery velocity. It's how one product person runs three ventures without dropping quality.",
+    title: 'AI is leverage',
+    desc: "Used well, AI tooling lets one product person build and run more than usually fits in a day — it's how I keep three ventures moving without cutting corners.",
   },
 ];
 
@@ -245,7 +245,7 @@ export const RECOGNITION: Recognition[] = [
   {
     value: 'Star Performer',
     label: 'Jio Platforms Limited',
-    detail: 'Sole recipient of the award',
+    detail: 'For the ROne loyalty-platform migration',
   },
   {
     value: 'Top 2.5%',
