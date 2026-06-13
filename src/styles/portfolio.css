@@ -66,6 +66,70 @@ img, svg { display: block; }
 
 .pf-wrap { max-width: var(--pf-max); margin: 0 auto; padding: 0 28px; }
 
+/* ===== Stacking: content above the WebGL backdrop ===== */
+main, .pf-footer, .pf-wordmark { position: relative; z-index: 1; }
+
+/* ===== WebGL backdrop + CSS aurora fallback ===== */
+.pf-webgl { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.pf-webgl::before {
+  content: ''; position: absolute; inset: -20%;
+  background:
+    radial-gradient(38% 38% at 30% 24%, rgba(212, 181, 106, 0.13), transparent 70%),
+    radial-gradient(42% 42% at 78% 66%, rgba(200, 202, 206, 0.07), transparent 72%);
+  animation: pf-aurora 22s ease-in-out infinite alternate;
+  transition: opacity 1.2s ease;
+}
+.pf-webgl canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; display: block; opacity: 0; transition: opacity 1.2s ease; }
+.pf-webgl.on::before { opacity: 0; }
+.pf-webgl.on canvas { opacity: 1; }
+
+/* ===== Scroll progress ===== */
+.pf-progress { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 60; pointer-events: none; }
+.pf-progress span { display: block; height: 100%; width: 100%; transform: scaleX(0); transform-origin: 0 50%; background: var(--pf-gold); box-shadow: 0 0 12px rgba(212, 181, 106, 0.5); }
+
+/* ===== Preloader ===== */
+.pf-loader { position: fixed; inset: 0; z-index: 9998; background: #121216; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.pf-loader-inner { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.pf-loader-name { font-family: var(--pf-serif); font-weight: 400; font-size: clamp(30px, 6vw, 56px); letter-spacing: -0.02em; color: var(--pf-ink); }
+.pf-loader-name i { font-style: italic; background: var(--pf-gold); background-clip: text; -webkit-background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+.pf-loader-count { font-family: var(--pf-mono); font-size: 13px; letter-spacing: 0.12em; color: var(--pf-ink-3); display: inline-flex; align-items: baseline; }
+.pf-loader-count i { font-style: normal; margin-left: 1px; }
+.pf-loader-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: rgba(244, 240, 232, 0.08); }
+.pf-loader-bar span { display: block; height: 100%; transform: scaleX(0); transform-origin: 0 50%; background: var(--pf-gold); }
+body.pf-loading { overflow: hidden; }
+
+/* ===== Hero portrait halo ===== */
+.pf-hero-photo-wrap { position: relative; flex-shrink: 0; width: 220px; height: 220px; display: grid; place-items: center; }
+.pf-hero-photo-wrap::before {
+  content: ''; position: absolute; inset: -20px; border-radius: 50%;
+  background: conic-gradient(from 0deg,
+    rgba(212, 181, 106, 0) 0deg,
+    rgba(212, 181, 106, 0.5) 90deg,
+    rgba(255, 240, 200, 0.92) 150deg,
+    rgba(200, 202, 206, 0.45) 215deg,
+    rgba(212, 181, 106, 0) 320deg);
+  filter: blur(7px); opacity: 0.7; z-index: 0;
+  animation: pf-spin 9s linear infinite;
+}
+.pf-hero-photo-wrap::after {
+  content: ''; position: absolute; inset: -3px; border-radius: 50%;
+  background: radial-gradient(closest-side, transparent 78%, rgba(212, 181, 106, 0.22) 100%);
+  z-index: 0;
+}
+.pf-hero-photo-wrap .pf-hero-photo { position: relative; z-index: 1; }
+
+/* ===== Marquee divider ===== */
+.pf-marquee { overflow: hidden; border-top: 1px solid var(--pf-line); border-bottom: 1px solid var(--pf-line); background: var(--pf-bg-card); }
+.pf-marquee-track { display: flex; width: max-content; animation: pf-marq 34s linear infinite; }
+.pf-marquee:hover .pf-marquee-track { animation-play-state: paused; }
+.pf-marquee-set { display: flex; }
+.pf-marquee-item { display: inline-flex; align-items: center; gap: 26px; padding: 18px 26px; font-family: var(--pf-serif); font-style: italic; font-size: clamp(18px, 2.4vw, 26px); color: var(--pf-ink-2); white-space: nowrap; }
+.pf-marquee-item .s { font-style: normal; font-size: 9px; color: var(--pf-gold-solid); }
+
+@keyframes pf-spin { to { transform: rotate(360deg); } }
+@keyframes pf-aurora { from { transform: translate3d(-3%, -2%, 0) scale(1.05); } to { transform: translate3d(3%, 4%, 0) scale(1.16); } }
+@keyframes pf-marq { to { transform: translateX(-50%); } }
+
 /* ===== Cursor ===== */
 .pf-cursor { position: fixed; inset: 0; pointer-events: none; z-index: 9999; transition: opacity 0.3s ease; }
 .pf-cursor:not(.on), .pf-cursor.hide { opacity: 0; }
@@ -367,9 +431,16 @@ img, svg { display: block; }
   .pf-cs-link { margin-left: 0; }
   .pf-principles { grid-template-columns: 1fr; }
   .pf-recog { grid-template-columns: 1fr; gap: 26px; }
+  .pf-hero-photo-wrap { width: 120px; height: 120px; }
+  .pf-hero-photo-wrap::before { inset: -12px; filter: blur(5px); }
+  .pf-marquee-item { gap: 18px; padding: 14px 18px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .pf-reveal { opacity: 1 !important; transform: none !important; }
+  .pf-loader { display: none !important; }
+  .pf-marquee-track,
+  .pf-hero-photo-wrap::before,
+  .pf-webgl::before { animation: none !important; }
 }

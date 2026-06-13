@@ -8,6 +8,15 @@ const EMAIL = 'agrawalhitesh4444@gmail.com';
 const LINKEDIN = 'https://www.linkedin.com/in/hitesh-agrawal-5a02a416b/';
 const RESUME = '/Hitesh-Agrawal-Resume.pdf';
 
+const MARQUEE = [
+  'Product strategy',
+  '0→1 to 280M users',
+  'AI in the loop',
+  'Discovery before decks',
+  'Revenue is validation',
+  'Own the whole problem',
+];
+
 export function Portfolio() {
   useEffect(() => {
     initPortfolioMotion();
@@ -20,6 +29,17 @@ export function Portfolio() {
         <div className="pf-cursor-ring" />
         <div className="pf-cursor-dot" />
       </div>
+
+      <div className="pf-loader" aria-hidden="true">
+        <div className="pf-loader-inner">
+          <div className="pf-loader-name">Hitesh <i>Agrawal</i></div>
+          <div className="pf-loader-count"><span data-pf-load>0</span><i>%</i></div>
+        </div>
+        <div className="pf-loader-bar"><span /></div>
+      </div>
+
+      <div className="pf-progress" aria-hidden="true"><span /></div>
+      <div className="pf-webgl" aria-hidden="true" />
 
       <header className="pf-nav">
         <div className="pf-nav-inner">
@@ -62,8 +82,10 @@ export function Portfolio() {
                   </a>
                 </div>
               </div>
-              <div className="pf-hero-photo pf-reveal">
-                <img src="/hitesh.jpg" alt="Hitesh Agrawal" />
+              <div className="pf-hero-photo-wrap">
+                <div className="pf-hero-photo pf-reveal">
+                  <img src="/hitesh.jpg" alt="Hitesh Agrawal" />
+                </div>
               </div>
             </div>
             <div className="pf-facts">
@@ -73,6 +95,18 @@ export function Portfolio() {
             </div>
           </div>
         </section>
+
+        <div className="pf-marquee" aria-hidden="true">
+          <div className="pf-marquee-track">
+            {[0, 1].map((dup) => (
+              <div className="pf-marquee-set" key={dup}>
+                {MARQUEE.map((m) => (
+                  <span className="pf-marquee-item" key={m}>{m}<span className="s">◆</span></span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
 
         <section className="pf-section" id="proof">
           <div className="pf-wrap">

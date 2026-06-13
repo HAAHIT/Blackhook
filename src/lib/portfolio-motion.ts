@@ -6,7 +6,10 @@ gsap.registerPlugin(ScrollTrigger);
 
 let lenis: Lenis | null = null;
 let lenisRaf: number | null = null;
+let backdrop: { destroy: () => void } | null = null;
+let counters: { el: HTMLElement; run: () => void }[] = [];
 const isTouch = () => window.matchMedia('(pointer: coarse)').matches;
+const prefersReduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function setupLenis() {
   lenis = new Lenis({
@@ -98,13 +101,81 @@ function setupMagnetic() {
   });
 }
 
+/* WebGL hero backdrop — desktop, motion-on, sized-up screens only.
+   Everything else keeps the CSS aurora fallback (see .pf-webgl::before). */
+function setupWebGL() {
+  const el = document.querySelector<HTMLElement>('.pf-webgl');
+  if (!el) return;
+  if (isTouch() || prefersReduced() || window.innerWidth < 760) return;
+  // Lazy-load three.js only on capable desktops, after first paint.
+  import('./portfolio-webgl').then(({ Backdrop }) => {
+    try {
+      Backdrop.mount(el);
+    } catch {
+      return;
+    }
+    backdrop = Backdrop;
+    requestAnimationFrame(() => el.classList.add('on'));
+    ScrollTrigger.create({
+      trigger: '.pf-hero', start: 'top top', end: 'bottom top',
+      onUpdate: (self) => Backdrop.setScroll(self.progress),
+    });
+  }).catch(() => { /* WebGL unavailable — CSS aurora fallback stays */ });
+}
+
+function setupProgress() {
+  const bar = document.querySelector<HTMLElement>('.pf-progress span');
+  if (!bar) return;
+  ScrollTrigger.create({
+    start: 0, end: 'max',
+    onUpdate: (self) => { bar.style.transform = `scaleX(${self.progress})`; },
+  });
+}
+
+/* Intro preloader — counts to 100, then curtains up and hands off to
+   the hero entrance. On reduced-motion it's removed instantly. */
+function setupPreloader(done: () => void) {
+  const loader = document.querySelector<HTMLElement>('.pf-loader');
+  if (!loader || prefersReduced()) {
+    loader?.remove();
+    done();
+    return;
+  }
+  const num = loader.querySelector<HTMLElement>('[data-pf-load]');
+  const bar = loader.querySelector<HTMLElement>('.pf-loader-bar span');
+
+  lenis?.stop();
+  document.body.classList.add('pf-loading');
+
+  const counter = { v: 0 };
+  const tl = gsap.timeline();
+  tl.to(counter, {
+    v: 100, duration: 1.15, ease: 'power2.inOut',
+    onUpdate: () => {
+      if (num) num.textContent = String(Math.round(counter.v));
+      if (bar) bar.style.transform = `scaleX(${counter.v / 100})`;
+    },
+  });
+  tl.to('.pf-loader-inner', { y: -24, opacity: 0, duration: 0.5, ease: 'power2.in' }, '+=0.12');
+  tl.to(loader, {
+    yPercent: -100, duration: 0.95, ease: 'expo.inOut',
+    onComplete: () => loader.remove(),
+  }, '<0.05');
+  tl.add(() => {
+    document.body.classList.remove('pf-loading');
+    lenis?.start();
+    done();
+  }, '<0.18');
+}
+
 function setupHeroEntrance() {
-  const tl = gsap.timeline({ delay: 0.1 });
+  const tl = gsap.timeline({ delay: 0.05 });
   const eyebrow = document.querySelector<HTMLElement>('.pf-hero .pf-eyebrow');
   const h1 = document.querySelector<HTMLElement>('.pf-hero h1');
   const sub = document.querySelector<HTMLElement>('.pf-hero-sub');
   const ctas = document.querySelector<HTMLElement>('.pf-hero-ctas');
   const facts = document.querySelectorAll<HTMLElement>('.pf-fact');
+  const photoWrap = document.querySelector<HTMLElement>('.pf-hero-photo-wrap');
   const photo = document.querySelector<HTMLElement>('.pf-hero-photo');
 
   if (eyebrow) { gsap.set(eyebrow, { y: 14, opacity: 0 }); tl.to(eyebrow, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }, 0); }
@@ -116,7 +187,10 @@ function setupHeroEntrance() {
   if (sub) { gsap.set(sub, { y: 22, opacity: 0 }); tl.to(sub, { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out' }, 0.5); }
   if (ctas) { gsap.set(Array.from(ctas.children), { y: 16, opacity: 0 }); tl.to(ctas.children, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out', stagger: 0.1 }, 0.65); }
   if (facts.length) { gsap.set(facts, { y: 14, opacity: 0 }); tl.to(facts, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out', stagger: 0.08 }, 0.8); }
-  if (photo) { gsap.set(photo, { scale: 0.85, opacity: 0 }); tl.to(photo, { scale: 1, opacity: 1, duration: 1.3, ease: 'expo.out' }, 0.1); }
+  if (photoWrap) { gsap.set(photoWrap, { scale: 0.85, opacity: 0 }); tl.to(photoWrap, { scale: 1, opacity: 1, duration: 1.3, ease: 'expo.out' }, 0.1); }
+  if (photo && !prefersReduced()) {
+    tl.to(photo, { y: -12, duration: 3.6, ease: 'sine.inOut', repeat: -1, yoyo: true }, '>-0.2');
+  }
 }
 
 function setupReveals() {
@@ -150,6 +224,11 @@ function setupReveals() {
     gsap.set(el, { y: 40, opacity: 0 });
     ScrollTrigger.create({ trigger: el, start: 'top 88%', once: true,
       onEnter: () => gsap.to(el, { y: 0, opacity: 1, duration: 0.95, ease: 'expo.out' }) });
+    const num = el.querySelector<HTMLElement>('.pf-cs-num');
+    if (num && !prefersReduced()) {
+      gsap.to(num, { yPercent: -45, ease: 'none',
+        scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: 1 } });
+    }
   });
 
   const principles = Array.from(document.querySelectorAll<HTMLElement>('.pf-principle'));
@@ -195,17 +274,31 @@ function setupReveals() {
 }
 
 function setupCounters() {
+  counters = [];
   document.querySelectorAll<HTMLElement>('[data-pf-counter]').forEach((el) => {
     const target = parseFloat(el.dataset['pfCounter']!);
     const suffix = el.dataset['pfSuffix'] ?? '';
     el.textContent = '0' + suffix;
-    ScrollTrigger.create({ trigger: el, start: 'top 90%', once: true,
-      onEnter: () => {
-        const obj = { v: 0 };
-        gsap.to(obj, { v: target, duration: 2.0, ease: 'expo.out',
-          onUpdate: () => { el.textContent = Math.round(obj.v) + suffix; } });
-      },
-    });
+    let started = false;
+    const run = () => {
+      if (started) return;
+      started = true;
+      const obj = { v: 0 };
+      gsap.to(obj, { v: target, duration: 2.0, ease: 'expo.out',
+        onUpdate: () => { el.textContent = Math.round(obj.v) + suffix; } });
+    };
+    counters.push({ el, run });
+    ScrollTrigger.create({ trigger: el, start: 'top 95%', once: true, onEnter: run });
+  });
+}
+
+// Fire counters already in view (e.g. hero stats) once scrolling unlocks —
+// ScrollTrigger won't reliably onEnter for elements above the start line at load.
+function kickVisibleCounters() {
+  const vh = window.innerHeight;
+  counters.forEach(({ el, run }) => {
+    const r = el.getBoundingClientRect();
+    if (r.top < vh && r.bottom > 0) run();
   });
 }
 
@@ -249,18 +342,26 @@ export function initPortfolioMotion() {
   setupLenis();
   setupCursor();
   setupNav();
-  setupHeroEntrance();
+  setupWebGL();
+  setupProgress();
   setupReveals();
   setupCounters();
   setupCardTilt();
   setupMagnetic();
   setupWordmark();
-  setTimeout(() => ScrollTrigger.refresh(), 300);
+  setupPreloader(() => {
+    // Re-measure against the now-unlocked layout so reveals fire correctly,
+    // then explicitly kick the in-view hero counters.
+    ScrollTrigger.refresh();
+    kickVisibleCounters();
+    setupHeroEntrance();
+  });
 }
 
 export function destroyPortfolioMotion() {
   if (lenisRaf !== null) { cancelAnimationFrame(lenisRaf); lenisRaf = null; }
   lenis?.destroy(); lenis = null;
+  if (backdrop) { backdrop.destroy(); backdrop = null; }
   ScrollTrigger.getAll().forEach((t) => t.kill());
   gsap.globalTimeline.clear();
 }
