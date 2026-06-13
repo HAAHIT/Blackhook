@@ -146,11 +146,24 @@ function setupReveals() {
       onEnter: () => gsap.to(el, { y: 0, opacity: 1, duration: 0.85, ease: 'expo.out' }) });
   });
 
-  const featured = document.querySelector<HTMLElement>('.pf-proj--featured');
-  if (featured) {
-    gsap.set(featured, { y: 44, opacity: 0 });
-    ScrollTrigger.create({ trigger: featured, start: 'top 88%', once: true,
-      onEnter: () => gsap.to(featured, { y: 0, opacity: 1, duration: 1.0, ease: 'expo.out' }) });
+  document.querySelectorAll<HTMLElement>('.pf-cs').forEach((el) => {
+    gsap.set(el, { y: 40, opacity: 0 });
+    ScrollTrigger.create({ trigger: el, start: 'top 88%', once: true,
+      onEnter: () => gsap.to(el, { y: 0, opacity: 1, duration: 0.95, ease: 'expo.out' }) });
+  });
+
+  const principles = Array.from(document.querySelectorAll<HTMLElement>('.pf-principle'));
+  if (principles.length) {
+    gsap.set(principles, { y: 28, opacity: 0 });
+    ScrollTrigger.create({ trigger: '.pf-principles', start: 'top 86%', once: true,
+      onEnter: () => gsap.to(principles, { y: 0, opacity: 1, duration: 0.85, ease: 'expo.out', stagger: 0.1 }) });
+  }
+
+  const recogs = Array.from(document.querySelectorAll<HTMLElement>('.pf-recog-item'));
+  if (recogs.length) {
+    gsap.set(recogs, { y: 24, opacity: 0 });
+    ScrollTrigger.create({ trigger: '.pf-recog', start: 'top 88%', once: true,
+      onEnter: () => gsap.to(recogs, { y: 0, opacity: 1, duration: 0.8, ease: 'expo.out', stagger: 0.12 }) });
   }
 
   const projCards = Array.from(document.querySelectorAll<HTMLElement>('.pf-proj-grid .pf-proj'));

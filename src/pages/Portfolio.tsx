@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
 import { ArrowOut, ArrowRight, GithubMark } from '@/icons';
-import { PROJECTS, EXPERIENCE, SKILLS } from '@/data/portfolio';
+import { PROJECTS, EXPERIENCE, SKILLS, CASE_STUDIES, PRINCIPLES, RECOGNITION } from '@/data/portfolio';
 import { initPortfolioMotion, destroyPortfolioMotion } from '@/lib/portfolio-motion';
 
 const WHATSAPP = 'https://wa.me/919309803663';
 const EMAIL = 'agrawalhitesh4444@gmail.com';
 const LINKEDIN = 'https://www.linkedin.com/in/hitesh-agrawal-5a02a416b/';
+const RESUME = '/Hitesh-Agrawal-Resume.pdf';
 
 export function Portfolio() {
   useEffect(() => {
@@ -24,12 +25,13 @@ export function Portfolio() {
         <div className="pf-nav-inner">
           <a href="#top" className="pf-logo">Hitesh Agrawal<b>.</b></a>
           <nav className="pf-nav-links">
+            <a href="#proof">Proof</a>
             <a href="#now">Now</a>
             <a href="#path">Path</a>
             <a href="#projects">Projects</a>
             <a href="#contact">Contact</a>
           </nav>
-          <a href="/" className="pf-nav-studio">BlackHook Studio <ArrowOut size={11} /></a>
+          <a href={RESUME} target="_blank" rel="noopener noreferrer" className="pf-nav-studio">Résumé <ArrowOut size={11} /></a>
         </div>
       </header>
 
@@ -40,22 +42,22 @@ export function Portfolio() {
               <div className="pf-hero-copy">
                 <div className="pf-eyebrow pf-reveal">
                   <span className="dot" />
-                  Hitesh Agrawal — Product &amp; Strategy
+                  Open to senior product roles — worldwide
                 </div>
                 <h1 className="pf-reveal">
                   I turn fuzzy <em>ambition</em> into shipped product.
                 </h1>
                 <p className="pf-hero-sub pf-reveal">
-                  Product manager and 0-to-1 builder. I&apos;ve scaled an enterprise
-                  platform to 28&nbsp;Cr+ users and bootstrapped ventures from a blank
-                  page to paying customers. This is my corner of the web — what I&apos;m
-                  building, where I&apos;ve been, and the things I&apos;ve shipped.
+                  Product leader across 0→1 and 280M-user scale. I&apos;ve migrated
+                  280M+ customers with zero downtime at one of the world&apos;s largest
+                  consumer platforms, sold a B2B product before it existed, and run a
+                  services business that turned profitable in its first quarter.
                 </p>
                 <div className="pf-hero-ctas pf-reveal">
                   <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-primary pf-magnetic">
                     Start a conversation <ArrowRight size={13} />
                   </a>
-                  <a href="/Hitesh-Agrawal-Resume.pdf" target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-ghost pf-magnetic">
+                  <a href={RESUME} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-ghost pf-magnetic">
                     Read résumé
                   </a>
                 </div>
@@ -65,9 +67,59 @@ export function Portfolio() {
               </div>
             </div>
             <div className="pf-facts">
-              <div className="pf-fact"><strong data-pf-counter="28" data-pf-suffix="Cr+">28Cr+</strong><span>Users scaled at Jio</span></div>
+              <div className="pf-fact"><strong data-pf-counter="280" data-pf-suffix="M+">280M+</strong><span>Users migrated · zero downtime</span></div>
               <div className="pf-fact"><strong data-pf-counter="22" data-pf-suffix="">22</strong><span>Enterprise partners</span></div>
-              <div className="pf-fact"><strong>3+ yrs</strong><span>Scale &amp; 0→1</span></div>
+              <div className="pf-fact"><strong data-pf-counter="5" data-pf-suffix="">5</strong><span>Ventures in flight</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section className="pf-section" id="proof">
+          <div className="pf-wrap">
+            <div className="pf-section-head pf-reveal">
+              <div className="pf-section-tag">Proof</div>
+              <h2>Proof, not <em>promises</em></h2>
+              <p>Four problems, four shipped outcomes — at enterprise scale and from zero.</p>
+            </div>
+            <div className="pf-cs-list">
+              {CASE_STUDIES.map((cs, i) => (
+                <article key={cs.title} className="pf-cs pf-reveal">
+                  <div className="pf-cs-head">
+                    <span className="pf-cs-num">{String(i + 1).padStart(2, '0')}</span>
+                    <div>
+                      <div className="pf-cs-kicker">{cs.kicker}</div>
+                      <h3>{cs.title}</h3>
+                    </div>
+                  </div>
+                  <div className="pf-cs-grid">
+                    <div className="pf-cs-col">
+                      <h4>The problem</h4>
+                      <p>{cs.challenge}</p>
+                    </div>
+                    <div className="pf-cs-col">
+                      <h4>What I did</h4>
+                      <p>{cs.approach}</p>
+                    </div>
+                    <div className="pf-cs-col">
+                      <h4>The outcome</h4>
+                      <p>{cs.outcome}</p>
+                    </div>
+                  </div>
+                  <div className="pf-cs-metrics">
+                    {cs.metrics.map((m) => (
+                      <div key={m.label} className="pf-cs-metric">
+                        <strong>{m.value}</strong>
+                        <span>{m.label}</span>
+                      </div>
+                    ))}
+                    {cs.link && (
+                      <a href={cs.link.href} target="_blank" rel="noopener noreferrer" className="pf-cs-link">
+                        {cs.link.label} <ArrowOut size={11} />
+                      </a>
+                    )}
+                  </div>
+                </article>
+              ))}
             </div>
           </div>
         </section>
@@ -77,7 +129,7 @@ export function Portfolio() {
             <div className="pf-section-head pf-reveal">
               <div className="pf-section-tag">Now</div>
               <h2>What I&apos;m <em>building today</em></h2>
-              <p>Five things in flight at once — all started from customer discovery, not a deck.</p>
+              <p>Five ventures in flight at once — all started from customer discovery, not a deck.</p>
             </div>
             <div className="pf-now-grid">
               <a href="https://github.com/HAAHIT/bolodb" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal">
@@ -140,7 +192,7 @@ export function Portfolio() {
                       <span className="pf-xp-org">{x.org}</span>
                       <span className="pf-xp-place">{x.place}</span>
                     </div>
-                    <p className="pf-xp-desc">{x.desc}</p>
+                    <p className="pf-xp-desc">{x.desc.replace('28Cr+', '280M+')}</p>
                   </div>
                 </article>
               ))}
@@ -153,39 +205,22 @@ export function Portfolio() {
             <div className="pf-section-head pf-reveal">
               <div className="pf-section-tag">Projects</div>
               <h2>Things I&apos;ve <em>shipped</em></h2>
-              <p>A selection of repos — products, tools and experiments, most built with AI in the loop.</p>
+              <p>Eight repos — products, tools and experiments, most built with AI in the loop.</p>
             </div>
-            {PROJECTS.filter((p) => p.featured).map((p) => (
-              <article key={p.name} className="pf-proj pf-proj--featured pf-reveal">
-                <div className="pf-proj-top">
-                  <div className="pf-proj-featured-badges">
-                    <span className="pf-badge pf-badge-ai">AI Product</span>
-                    <span className="pf-badge pf-badge-featured">Featured</span>
-                  </div>
-                  <div className="pf-proj-links">
-                    <a href={p.repo} target="_blank" rel="noopener noreferrer" aria-label={`${p.name} on GitHub`}>
-                      <GithubMark size={16} />
-                    </a>
-                    {p.live && (
-                      <a href={p.live} target="_blank" rel="noopener noreferrer" aria-label={`${p.name} live`}>
-                        <ArrowOut size={14} />
-                      </a>
-                    )}
-                  </div>
-                </div>
-                <h3 className="pf-proj-name">{p.name}</h3>
-                <div className="pf-proj-tagline">{p.tagline}</div>
-                <p className="pf-proj-desc">{p.desc}</p>
-                <div className="pf-proj-tags">
-                  {p.tags.map((t) => <span key={t}>{t}</span>)}
-                </div>
-              </article>
-            ))}
             <div className="pf-proj-grid">
-              {PROJECTS.filter((p) => !p.featured).map((p) => (
+              {PROJECTS.map((p) => (
                 <article key={p.name} className="pf-proj pf-reveal">
                   <div className="pf-proj-top">
-                    {p.current ? <span className="pf-badge">Current</span> : <span className="pf-proj-year">{p.year}</span>}
+                    {p.featured ? (
+                      <div className="pf-proj-featured-badges">
+                        <span className="pf-badge pf-badge-ai">AI Product</span>
+                        <span className="pf-badge pf-badge-featured">Featured</span>
+                      </div>
+                    ) : p.current ? (
+                      <span className="pf-badge">Current</span>
+                    ) : (
+                      <span className="pf-proj-year">{p.year}</span>
+                    )}
                     <div className="pf-proj-links">
                       <a href={p.repo} target="_blank" rel="noopener noreferrer" aria-label={`${p.name} on GitHub`}>
                         <GithubMark size={16} />
@@ -232,19 +267,65 @@ export function Portfolio() {
           </div>
         </section>
 
+        <section className="pf-section" id="principles">
+          <div className="pf-wrap">
+            <div className="pf-section-head pf-reveal">
+              <div className="pf-section-tag">Operating system</div>
+              <h2>How I <em>operate</em></h2>
+            </div>
+            <div className="pf-principles">
+              {PRINCIPLES.map((pr, i) => (
+                <div key={pr.title} className="pf-principle pf-reveal">
+                  <span className="pf-principle-num">{String(i + 1).padStart(2, '0')}</span>
+                  <h3>{pr.title}</h3>
+                  <p>{pr.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="pf-section" id="recognition">
+          <div className="pf-wrap">
+            <div className="pf-section-head pf-reveal">
+              <div className="pf-section-tag">Recognition</div>
+              <h2>Worth <em>noting</em></h2>
+            </div>
+            <div className="pf-recog">
+              {RECOGNITION.map((r) => (
+                <div key={r.value} className="pf-recog-item pf-reveal">
+                  <strong>{r.value}</strong>
+                  <span className="pf-recog-label">{r.label}</span>
+                  <span className="pf-recog-detail">{r.detail}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="pf-contact" id="contact">
           <div className="pf-wrap">
             <div className="pf-contact-grid">
               <div className="pf-reveal">
                 <div className="pf-section-tag">Contact</div>
-                <h2>Have something <em>worth building?</em></h2>
-                <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-primary pf-magnetic">
-                  Chat on WhatsApp <ArrowRight size={13} />
-                </a>
+                <h2>Hiring for a senior <em>product seat?</em></h2>
+                <div className="pf-contact-ctas">
+                  <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-primary pf-magnetic">
+                    Chat on WhatsApp <ArrowRight size={13} />
+                  </a>
+                  <a href={RESUME} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-ghost pf-magnetic">
+                    View résumé
+                  </a>
+                </div>
+                <p className="pf-availability">
+                  <span className="d" />
+                  Remote or relocation · IST (UTC+5:30), overlap-flexible
+                </p>
               </div>
               <div className="pf-contact-rows pf-reveal">
                 <div className="pf-contact-row"><span>Email</span><a href={`mailto:${EMAIL}`}>{EMAIL}</a></div>
                 <div className="pf-contact-row"><span>LinkedIn</span><a href={LINKEDIN} target="_blank" rel="noopener noreferrer">hitesh-agrawal</a></div>
+                <div className="pf-contact-row"><span>Résumé</span><a href={RESUME} target="_blank" rel="noopener noreferrer">Hitesh-Agrawal-Resume.pdf</a></div>
                 <div className="pf-contact-row"><span>Based in</span><a href={WHATSAPP} target="_blank" rel="noopener noreferrer">Dhule · Mumbai, IN</a></div>
               </div>
             </div>
@@ -272,7 +353,7 @@ export function Portfolio() {
       <footer className="pf-footer">
         <div className="pf-footer-inner">
           <span>Hitesh Agrawal · © 2026</span>
-          <span className="pf-footer-status"><span className="d" /> Open to conversations</span>
+          <span className="pf-footer-status"><span className="d" /> Open to senior product roles</span>
           <a href="/" className="pf-footer-back">BlackHook Studio <ArrowOut size={11} /></a>
         </div>
       </footer>
