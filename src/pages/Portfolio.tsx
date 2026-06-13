@@ -26,7 +26,7 @@ export function Portfolio() {
   return (
     <>
       <div className="pf-cursor" aria-hidden="true">
-        <div className="pf-cursor-ring" />
+        <div className="pf-cursor-ring"><span className="pf-cursor-label" /></div>
         <div className="pf-cursor-dot" />
       </div>
 
@@ -74,7 +74,7 @@ export function Portfolio() {
                   services business that turned profitable in its first quarter.
                 </p>
                 <div className="pf-hero-ctas pf-reveal">
-                  <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-primary pf-magnetic">
+                  <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-primary pf-magnetic" data-cursor="Let's talk">
                     Start a conversation <ArrowRight size={13} />
                   </a>
                   <a href={RESUME} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-ghost pf-magnetic">
@@ -147,7 +147,7 @@ export function Portfolio() {
                       </div>
                     ))}
                     {cs.link && (
-                      <a href={cs.link.href} target="_blank" rel="noopener noreferrer" className="pf-cs-link">
+                      <a href={cs.link.href} target="_blank" rel="noopener noreferrer" className="pf-cs-link" data-cursor="Open">
                         {cs.link.label} <ArrowOut size={11} />
                       </a>
                     )}
@@ -166,7 +166,7 @@ export function Portfolio() {
               <p>Five ventures in flight at once — all started from customer discovery, not a deck.</p>
             </div>
             <div className="pf-now-grid">
-              <a href="https://github.com/HAAHIT/bolodb" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal">
+              <a href="https://github.com/HAAHIT/bolodb" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal" data-cursor="View">
                 <div className="pf-now-k">bolodb <ArrowOut size={10} /></div>
                 <p>
                   Ask your data, trust the answer — a text-to-SQL product for
@@ -174,7 +174,7 @@ export function Portfolio() {
                   the right query and an answer you can rely on.
                 </p>
               </a>
-              <a href="https://github.com/HAAHIT/smriti" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal">
+              <a href="https://github.com/HAAHIT/smriti" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal" data-cursor="View">
                 <div className="pf-now-k">smriti <ArrowOut size={10} /></div>
                 <p>
                   An AI memory layer — a browser extension that archives conversations
@@ -182,7 +182,7 @@ export function Portfolio() {
                   MCP server that hands your history back to Claude in context.
                 </p>
               </a>
-              <a href="https://solobooks.in" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal">
+              <a href="https://solobooks.in" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal" data-cursor="View">
                 <div className="pf-now-k">SoloBooks <ArrowOut size={10} /></div>
                 <p>
                   Bookkeeping for Indian MSMEs that speaks plain business, not
@@ -190,7 +190,7 @@ export function Portfolio() {
                   OCR under the hood.
                 </p>
               </a>
-              <a href="https://murlioils.com" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal">
+              <a href="https://murlioils.com" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal" data-cursor="View">
                 <div className="pf-now-k">Commodity SaaS <ArrowOut size={10} /></div>
                 <p>
                   A pricing and order-management platform for the oil and cement trade.
@@ -198,7 +198,7 @@ export function Portfolio() {
                   the full build before launch.
                 </p>
               </a>
-              <a href="https://care-ops-central.vercel.app" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal">
+              <a href="https://care-ops-central.vercel.app" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal" data-cursor="View">
                 <div className="pf-now-k">Healthcare at home <ArrowOut size={10} /></div>
                 <p>
                   An Urban-Company-style services business — nursing, physiotherapy and
@@ -256,11 +256,11 @@ export function Portfolio() {
                       <span className="pf-proj-year">{p.year}</span>
                     )}
                     <div className="pf-proj-links">
-                      <a href={p.repo} target="_blank" rel="noopener noreferrer" aria-label={`${p.name} on GitHub`}>
+                      <a href={p.repo} target="_blank" rel="noopener noreferrer" aria-label={`${p.name} on GitHub`} data-cursor="Code">
                         <GithubMark size={16} />
                       </a>
                       {p.live && (
-                        <a href={p.live} target="_blank" rel="noopener noreferrer" aria-label={`${p.name} live`}>
+                        <a href={p.live} target="_blank" rel="noopener noreferrer" aria-label={`${p.name} live`} data-cursor="Live">
                           <ArrowOut size={14} />
                         </a>
                       )}
@@ -344,7 +344,7 @@ export function Portfolio() {
                 <div className="pf-section-tag">Contact</div>
                 <h2>Hiring for a senior <em>product seat?</em></h2>
                 <div className="pf-contact-ctas">
-                  <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-primary pf-magnetic">
+                  <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-primary pf-magnetic" data-cursor="Let's talk">
                     Chat on WhatsApp <ArrowRight size={13} />
                   </a>
                   <a href={RESUME} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-ghost pf-magnetic">

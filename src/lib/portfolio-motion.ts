@@ -56,6 +56,7 @@ function setupCursor() {
   if (!el) return;
   const ring = el.querySelector<HTMLElement>('.pf-cursor-ring');
   const dot = el.querySelector<HTMLElement>('.pf-cursor-dot');
+  const label = el.querySelector<HTMLElement>('.pf-cursor-label');
   let tx = 0, ty = 0, rx = 0, ry = 0, first = true;
 
   window.addEventListener('pointermove', (e) => {
@@ -68,16 +69,43 @@ function setupCursor() {
   window.addEventListener('pointerdown', () => el.classList.add('press'));
   window.addEventListener('pointerup', () => el.classList.remove('press'));
 
+  // The ring trails the cursor; in label/disc modes it settles faster so
+  // the text feels "attached" rather than lagging behind.
   const tick = () => {
-    rx += (tx - rx) * 0.14; ry += (ty - ry) * 0.14;
+    const ease = el.classList.contains('label') ? 0.22 : 0.14;
+    rx += (tx - rx) * ease; ry += (ty - ry) * ease;
     if (ring) ring.style.transform = `translate3d(${rx}px,${ry}px,0) translate(-50%,-50%)`;
     requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
 
+  // Morph the cursor by intent: labelled disc over [data-cursor] elements,
+  // a slim gold ring over any other interactive target.
   document.addEventListener('pointerover', (e) => {
-    const over = !!(e.target as Element).closest?.('a, button');
-    el.classList.toggle('link', over);
+    const target = e.target as Element;
+    const labeled = target.closest?.('[data-cursor]') as HTMLElement | null;
+    if (labeled) {
+      if (label) label.textContent = labeled.dataset['cursor'] ?? '';
+      el.classList.add('label');
+      el.classList.remove('link');
+    } else if (target.closest?.('a, button')) {
+      el.classList.add('link');
+      el.classList.remove('label');
+    } else {
+      el.classList.remove('link', 'label');
+    }
+  });
+}
+
+/* Gold spotlight that tracks the pointer inside each card surface. */
+function setupSpotlight() {
+  if (isTouch()) return;
+  document.querySelectorAll<HTMLElement>('.pf-proj, .pf-now-card, .pf-cs').forEach((card) => {
+    card.addEventListener('pointermove', (e) => {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
+      card.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
+    });
   });
 }
 
@@ -347,6 +375,7 @@ export function initPortfolioMotion() {
   setupReveals();
   setupCounters();
   setupCardTilt();
+  setupSpotlight();
   setupMagnetic();
   setupWordmark();
   setupPreloader(() => {
