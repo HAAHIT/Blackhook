@@ -17,6 +17,9 @@ const MARQUEE = [
   'Own the whole problem',
 ];
 
+const projectRank = (p: (typeof PROJECTS)[number]) => (p.featured ? 0 : p.current ? 1 : 2);
+const orderedProjects = [...PROJECTS].sort((a, b) => projectRank(a) - projectRank(b));
+
 export function Portfolio() {
   useEffect(() => {
     initPortfolioMotion();
@@ -46,9 +49,8 @@ export function Portfolio() {
           <a href="#top" className="pf-logo">Hitesh Agrawal<b>.</b></a>
           <nav className="pf-nav-links">
             <a href="#proof">Work</a>
-            <a href="#now">Now</a>
             <a href="#path">Path</a>
-            <a href="#projects">Projects</a>
+            <a href="#projects">Building</a>
             <a href="#contact">Contact</a>
           </nav>
           <a href={RESUME} target="_blank" rel="noopener noreferrer" className="pf-nav-studio">Résumé <ArrowOut size={11} /></a>
@@ -159,58 +161,6 @@ export function Portfolio() {
           </div>
         </section>
 
-        <section className="pf-section" id="now">
-          <div className="pf-wrap">
-            <div className="pf-section-head pf-reveal">
-              <div className="pf-section-tag">Now</div>
-              <h2>What I&apos;m <em>building today</em></h2>
-              <p>A few things I&apos;m building right now — each one started from customer conversations, not a deck.</p>
-            </div>
-            <div className="pf-now-grid">
-              <a href="https://github.com/HAAHIT/bolodb" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal" data-cursor="View">
-                <div className="pf-now-k">bolodb <ArrowOut size={10} /></div>
-                <p>
-                  Ask your data, trust the answer — a text-to-SQL product for
-                  non-technical users. Type a question in plain language, get back
-                  the right query and an answer you can rely on.
-                </p>
-              </a>
-              <a href="https://github.com/HAAHIT/smriti" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal" data-cursor="View">
-                <div className="pf-now-k">smriti <ArrowOut size={10} /></div>
-                <p>
-                  An AI memory layer — a browser extension that archives conversations
-                  from Claude, ChatGPT and Gemini, a local SQLite search index, and an
-                  MCP server that hands your history back to Claude in context.
-                </p>
-              </a>
-              <a href="https://solobooks.in" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal" data-cursor="View">
-                <div className="pf-now-k">SoloBooks <ArrowOut size={10} /></div>
-                <p>
-                  Bookkeeping for Indian MSMEs that speaks plain business, not
-                  accounting jargon — fast billing, party ledgers and AI purchase-bill
-                  OCR under the hood.
-                </p>
-              </a>
-              <a href="https://murlioils.com" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal" data-cursor="View">
-                <div className="pf-now-k">Commodity SaaS <ArrowOut size={10} /></div>
-                <p>
-                  A pricing and order-management platform for the oil and cement trade.
-                  Validated through discovery, then secured a paying pilot that covered
-                  the full build before launch.
-                </p>
-              </a>
-              <a href="https://care-ops-central.vercel.app" target="_blank" rel="noopener noreferrer" className="pf-now-card pf-reveal" data-cursor="View">
-                <div className="pf-now-k">Healthcare at home <ArrowOut size={10} /></div>
-                <p>
-                  An Urban-Company-style services business — nursing, physiotherapy and
-                  elder care. 300+ visits and ₹3L+ MRR at 30% margin in the first
-                  quarter, on an ops platform I built and run.
-                </p>
-              </a>
-            </div>
-          </div>
-        </section>
-
         <section className="pf-section" id="path">
           <div className="pf-wrap">
             <div className="pf-section-head pf-reveal">
@@ -238,12 +188,12 @@ export function Portfolio() {
         <section className="pf-section" id="projects">
           <div className="pf-wrap">
             <div className="pf-section-head pf-reveal">
-              <div className="pf-section-tag">Projects</div>
-              <h2>Things I&apos;ve <em>shipped</em></h2>
-              <p>Eight repos — products, tools and experiments, most built with AI in the loop.</p>
+              <div className="pf-section-tag">Building &amp; shipped</div>
+              <h2>What I&apos;ve <em>built</em></h2>
+              <p>From the products I&apos;m actively building to the tools and experiments behind them — most shipped with AI in the loop, each one started from a real problem, not a deck. Peek inside any card before you dig deeper.</p>
             </div>
             <div className="pf-proj-grid">
-              {PROJECTS.map((p) => (
+              {orderedProjects.map((p) => (
                 <article key={p.name} className="pf-proj pf-reveal">
                   {p.glimpse && (
                     <div className="pf-glimpse" aria-hidden="true">
@@ -273,7 +223,7 @@ export function Portfolio() {
                         <span className="pf-badge pf-badge-featured">Featured</span>
                       </div>
                     ) : p.current ? (
-                      <span className="pf-badge">Current</span>
+                      <span className="pf-badge pf-badge-now"><i />Building now</span>
                     ) : (
                       <span className="pf-proj-year">{p.year}</span>
                     )}

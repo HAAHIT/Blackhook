@@ -100,7 +100,7 @@ function setupCursor() {
 /* Gold spotlight that tracks the pointer inside each card surface. */
 function setupSpotlight() {
   if (isTouch()) return;
-  document.querySelectorAll<HTMLElement>('.pf-proj, .pf-now-card, .pf-cs').forEach((card) => {
+  document.querySelectorAll<HTMLElement>('.pf-proj, .pf-cs').forEach((card) => {
     card.addEventListener('pointermove', (e) => {
       const r = card.getBoundingClientRect();
       card.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
@@ -252,13 +252,6 @@ function setupReveals() {
       onEnter: () => gsap.to(el, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }) });
   });
 
-  const nowCards = Array.from(document.querySelectorAll<HTMLElement>('.pf-now-card'));
-  if (nowCards.length) {
-    gsap.set(nowCards, { y: 36, opacity: 0 });
-    ScrollTrigger.create({ trigger: '.pf-now-grid', start: 'top 86%', once: true,
-      onEnter: () => gsap.to(nowCards, { y: 0, opacity: 1, duration: 0.9, ease: 'expo.out', stagger: 0.1 }) });
-  }
-
   document.querySelectorAll<HTMLElement>('.pf-xp').forEach((el) => {
     gsap.set(el, { y: 28, opacity: 0 });
     ScrollTrigger.create({ trigger: el, start: 'top 88%', once: true,
@@ -349,7 +342,7 @@ function kickVisibleCounters() {
 
 function setupCardTilt() {
   if (isTouch()) return;
-  document.querySelectorAll<HTMLElement>('.pf-proj, .pf-now-card').forEach((card) => {
+  document.querySelectorAll<HTMLElement>('.pf-proj').forEach((card) => {
     let rect: DOMRect | null = null;
     card.addEventListener('pointerenter', () => { rect = card.getBoundingClientRect(); });
     card.addEventListener('pointermove', (e) => {
