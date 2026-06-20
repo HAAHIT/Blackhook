@@ -116,6 +116,8 @@ export const PROJECTS: Project[] = [
     current: true,
     glimpse: {
       chrome: 'murlioils.com',
+      shot: '/shots/murlioils.webp',
+      shotFit: 'tall',
       rows: [
         { type: 'item', text: 'Soybean Oil · 15L tin', value: '₹1,820', trend: 'up' },
         { type: 'item', text: 'Palm Oil · 15L tin', value: '₹1,540', trend: 'down' },
@@ -155,6 +157,8 @@ export const PROJECTS: Project[] = [
     year: '2026',
     glimpse: {
       chrome: 'blackhook.in',
+      shot: '/shots/blackhook.webp',
+      shotFit: 'wide',
       rows: [
         { type: 'a', text: 'WebGL hook · hand-written shader' },
         { type: 'item', text: 'Frame budget', value: '60 fps' },
