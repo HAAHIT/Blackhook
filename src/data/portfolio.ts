@@ -9,6 +9,10 @@ export interface GlimpseRow {
 export interface Glimpse {
   /** window chrome label — usually the live domain or app surface */
   chrome: string;
+  /** optional real product screenshot; when set, the card shows it (with a hover scroll-tour) instead of the rows */
+  shot?: string;
+  /** 'tall' pans further on hover for full-page / portrait captures */
+  shotFit?: 'wide' | 'tall';
   rows: GlimpseRow[];
 }
 
@@ -49,6 +53,8 @@ export const PROJECTS: Project[] = [
     featured: true,
     glimpse: {
       chrome: 'smriti · memory',
+      shot: '/shots/smriti.webp',
+      shotFit: 'wide',
       rows: [
         { type: 'q', text: 'What did we decide about the gateway?' },
         { type: 'a', text: 'Found 3 memories · piped into context' },
@@ -87,6 +93,8 @@ export const PROJECTS: Project[] = [
     current: true,
     glimpse: {
       chrome: 'solobooks.in',
+      shot: '/shots/solobooks.webp',
+      shotFit: 'tall',
       rows: [
         { type: 'item', text: 'Invoice #1042 · Sharma Traders', value: '₹12,400' },
         { type: 'item', text: 'Udhar khata · pending', value: '₹3,200' },
@@ -159,6 +167,8 @@ export const PROJECTS: Project[] = [
     year: '2025',
     glimpse: {
       chrome: 'audit-cms',
+      shot: '/shots/audit.webp',
+      shotFit: 'tall',
       rows: [
         { type: 'item', text: 'Report · Q3 FY25', value: 'Draft' },
         { type: 'a', text: 'Generated · 18 pages exported' },
@@ -175,6 +185,8 @@ export const PROJECTS: Project[] = [
     year: '2024',
     glimpse: {
       chrome: 'spacepro',
+      shot: '/shots/spacepro.webp',
+      shotFit: 'wide',
       rows: [
         { type: 'item', text: 'Oslo · 3-seater sofa', value: 'In stock' },
         { type: 'a', text: 'Product showcase · browse view' },
