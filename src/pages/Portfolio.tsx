@@ -69,7 +69,7 @@ export function Portfolio() {
                 </h1>
                 <p className="pf-hero-sub pf-reveal">
                   A product manager who&apos;s worked from 0→1 to 280M-user scale.
-                  At Jio I helped move 280M+ customers onto a new loyalty platform
+                  At Jio I helped onboard 280M+ customers onto a new loyalty platform
                   with zero downtime. Since then, on my own, I&apos;ve sold a B2B
                   product before building it and grown a small services business to
                   profitability in its first quarter.
@@ -90,7 +90,7 @@ export function Portfolio() {
               </div>
             </div>
             <div className="pf-facts">
-              <div className="pf-fact"><strong data-pf-counter="280" data-pf-suffix="M+">280M+</strong><span>Users migrated · zero downtime</span></div>
+              <div className="pf-fact"><strong data-pf-counter="280" data-pf-suffix="M+">280M+</strong><span>Users onboarded · zero downtime</span></div>
               <div className="pf-fact"><strong data-pf-counter="22" data-pf-suffix="">22</strong><span>Enterprise partners</span></div>
               <div className="pf-fact"><strong data-pf-counter="5" data-pf-suffix="">5</strong><span>Active ventures</span></div>
             </div>
@@ -245,6 +245,27 @@ export function Portfolio() {
             <div className="pf-proj-grid">
               {PROJECTS.map((p) => (
                 <article key={p.name} className="pf-proj pf-reveal">
+                  {p.glimpse && (
+                    <div className="pf-glimpse" aria-hidden="true">
+                      <div className="pf-glimpse-bar">
+                        <span className="pf-glimpse-dots"><i /><i /><i /></span>
+                        <span className="pf-glimpse-chrome">{p.glimpse.chrome}</span>
+                      </div>
+                      <div className="pf-glimpse-body">
+                        {p.glimpse.rows.map((r, ri) => (
+                          <div key={ri} className={`pf-gl-row pf-gl-${r.type}`}>
+                            <span className="pf-gl-text">{r.text}</span>
+                            {r.value && (
+                              <span className={`pf-gl-val${r.trend ? ` pf-gl-${r.trend}` : ''}`}>
+                                {r.value}
+                                {r.trend === 'up' ? ' ▲' : r.trend === 'down' ? ' ▼' : ''}
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <div className="pf-proj-top">
                     {p.featured ? (
                       <div className="pf-proj-featured-badges">

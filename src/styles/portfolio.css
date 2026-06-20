@@ -291,6 +291,46 @@ body.pf-loading { overflow: hidden; }
 .pf-proj-tags { display: flex; flex-wrap: wrap; gap: 7px; }
 .pf-proj-tags span { font-family: var(--pf-mono); font-size: 10.5px; letter-spacing: 0.03em; color: var(--pf-ink-2); background: var(--pf-bg-sunk); border-radius: 100px; padding: 4px 11px; }
 
+/* ===== Product glimpse (in-card preview) ===== */
+.pf-glimpse {
+  margin-bottom: 22px;
+  border: 1px solid var(--pf-line);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(244, 240, 232, 0.025), rgba(0, 0, 0, 0.12));
+  overflow: hidden;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+}
+.pf-proj:hover .pf-glimpse { border-color: rgba(212, 181, 106, 0.3); box-shadow: 0 0 28px -18px rgba(212, 181, 106, 0.55); }
+.pf-proj--featured .pf-glimpse { border-color: rgba(212, 181, 106, 0.22); }
+.pf-glimpse-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--pf-line);
+  background: rgba(0, 0, 0, 0.18);
+}
+.pf-glimpse-dots { display: inline-flex; gap: 5px; }
+.pf-glimpse-dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--pf-line-2); }
+.pf-glimpse-dots i:first-child { background: rgba(212, 181, 106, 0.55); }
+.pf-glimpse-chrome { font-family: var(--pf-mono); font-size: 10.5px; letter-spacing: 0.04em; color: var(--pf-ink-3); }
+.pf-glimpse-body { padding: 13px 14px; display: flex; flex-direction: column; gap: 8px; }
+.pf-gl-row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; font-size: 12.5px; line-height: 1.4; }
+.pf-gl-text { min-width: 0; }
+.pf-gl-q .pf-gl-text { font-family: var(--pf-sans); color: var(--pf-ink); }
+.pf-gl-q .pf-gl-text::before { content: '› '; color: var(--pf-gold-solid); }
+.pf-gl-code .pf-gl-text {
+  font-family: var(--pf-mono); font-size: 11.5px; color: var(--pf-ink-2);
+  background: var(--pf-bg-sunk); border-radius: 6px; padding: 5px 9px; display: inline-block;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;
+}
+.pf-gl-a .pf-gl-text { font-family: var(--pf-sans); color: var(--pf-ink-2); }
+.pf-gl-a .pf-gl-text::before { content: '✓ '; color: var(--pf-status); font-weight: 600; }
+.pf-gl-item .pf-gl-text { font-family: var(--pf-sans); color: var(--pf-ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pf-gl-val { font-family: var(--pf-mono); font-size: 12px; color: var(--pf-gold-solid); white-space: nowrap; flex-shrink: 0; }
+.pf-gl-val.pf-gl-up { color: var(--pf-status); }
+.pf-gl-val.pf-gl-down { color: #d98c6a; }
+.pf-gl-meta { padding-top: 7px; margin-top: 1px; border-top: 1px dashed var(--pf-line); }
+.pf-gl-meta .pf-gl-text { font-family: var(--pf-mono); font-size: 10.5px; letter-spacing: 0.02em; color: var(--pf-ink-3); }
+
 /* ===== Featured project card (smriti) ===== */
 .pf-proj--featured {
   margin-bottom: 18px;

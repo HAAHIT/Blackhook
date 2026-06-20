@@ -1,3 +1,17 @@
+export interface GlimpseRow {
+  /** q = input/prompt · a = result/output · code = query/code line · item = label+value row · meta = caption */
+  type: 'q' | 'a' | 'code' | 'item' | 'meta';
+  text: string;
+  value?: string;
+  trend?: 'up' | 'down';
+}
+
+export interface Glimpse {
+  /** window chrome label — usually the live domain or app surface */
+  chrome: string;
+  rows: GlimpseRow[];
+}
+
 export interface Project {
   name: string;
   tagline: string;
@@ -8,6 +22,7 @@ export interface Project {
   year: string;
   current?: boolean;
   featured?: boolean;
+  glimpse?: Glimpse;
 }
 
 export interface Experience {
@@ -32,6 +47,16 @@ export const PROJECTS: Project[] = [
     repo: 'https://github.com/HAAHIT/smriti',
     year: '2025',
     featured: true,
+    glimpse: {
+      chrome: 'smriti · memory',
+      rows: [
+        { type: 'q', text: 'What did we decide about the gateway?' },
+        { type: 'a', text: 'Found 3 memories · piped into context' },
+        { type: 'item', text: 'Claude', value: '2d ago' },
+        { type: 'item', text: 'ChatGPT', value: '5d ago' },
+        { type: 'meta', text: 'Local SQLite index · MCP server live' },
+      ],
+    },
   },
   {
     name: 'bolodb',
@@ -41,6 +66,15 @@ export const PROJECTS: Project[] = [
     repo: 'https://github.com/HAAHIT/bolodb',
     year: '2026 — Now',
     current: true,
+    glimpse: {
+      chrome: 'bolodb',
+      rows: [
+        { type: 'q', text: 'Top 5 customers by revenue this quarter' },
+        { type: 'code', text: 'SELECT name, SUM(total) … LIMIT 5' },
+        { type: 'a', text: '5 rows · 240ms · verified' },
+        { type: 'meta', text: 'Plain English in, trustworthy answer out' },
+      ],
+    },
   },
   {
     name: 'SoloBooks',
@@ -51,6 +85,15 @@ export const PROJECTS: Project[] = [
     live: 'https://solobooks.in',
     year: '2025 — Now',
     current: true,
+    glimpse: {
+      chrome: 'solobooks.in',
+      rows: [
+        { type: 'item', text: 'Invoice #1042 · Sharma Traders', value: '₹12,400' },
+        { type: 'item', text: 'Udhar khata · pending', value: '₹3,200' },
+        { type: 'a', text: 'Purchase bill scanned · 7 line items' },
+        { type: 'meta', text: 'Plain business actions → double-entry books' },
+      ],
+    },
   },
   {
     name: 'Edible Oil B2B Portal',
@@ -61,6 +104,15 @@ export const PROJECTS: Project[] = [
     live: 'https://murlioils.com',
     year: '2025 — Now',
     current: true,
+    glimpse: {
+      chrome: 'murlioils.com',
+      rows: [
+        { type: 'item', text: 'Soybean Oil · 15L tin', value: '₹1,820', trend: 'up' },
+        { type: 'item', text: 'Palm Oil · 15L tin', value: '₹1,540', trend: 'down' },
+        { type: 'a', text: 'Order #318 booked · 40 units' },
+        { type: 'meta', text: 'Live SKU pricing · multi-user logins' },
+      ],
+    },
   },
   {
     name: 'CareOps Central',
@@ -71,6 +123,15 @@ export const PROJECTS: Project[] = [
     live: 'https://care-ops-central.vercel.app',
     year: '2025 — Now',
     current: true,
+    glimpse: {
+      chrome: 'care-ops-central',
+      rows: [
+        { type: 'item', text: 'Visit · Physiotherapy · 4:30 PM', value: 'Assigned' },
+        { type: 'item', text: 'Partner payout · cleared', value: '₹1,200' },
+        { type: 'a', text: '300+ visits · 30% margin in Q1' },
+        { type: 'meta', text: 'Scheduling · billing · payouts in one place' },
+      ],
+    },
   },
   {
     name: 'BlackHook Studio',
@@ -80,6 +141,14 @@ export const PROJECTS: Project[] = [
     repo: 'https://github.com/HAAHIT/Blackhook',
     live: 'https://blackhook.in',
     year: '2026',
+    glimpse: {
+      chrome: 'blackhook.in',
+      rows: [
+        { type: 'a', text: 'WebGL hook · hand-written shader' },
+        { type: 'item', text: 'Frame budget', value: '60 fps' },
+        { type: 'meta', text: 'Three.js + GSAP motion system' },
+      ],
+    },
   },
   {
     name: 'Audit Report CMS',
@@ -88,6 +157,14 @@ export const PROJECTS: Project[] = [
     tags: ['Next.js', 'TypeScript'],
     repo: 'https://github.com/suraj-ingle/audit-report-management-cms',
     year: '2025',
+    glimpse: {
+      chrome: 'audit-cms',
+      rows: [
+        { type: 'item', text: 'Report · Q3 FY25', value: 'Draft' },
+        { type: 'a', text: 'Generated · 18 pages exported' },
+        { type: 'meta', text: 'Structured data in, clean reports out' },
+      ],
+    },
   },
   {
     name: 'SpacePro Furniture',
@@ -96,6 +173,14 @@ export const PROJECTS: Project[] = [
     tags: ['HTML', 'CSS', 'Web'],
     repo: 'https://github.com/HAAHIT/SpacePro-Furniture',
     year: '2024',
+    glimpse: {
+      chrome: 'spacepro',
+      rows: [
+        { type: 'item', text: 'Oslo · 3-seater sofa', value: 'In stock' },
+        { type: 'a', text: 'Product showcase · browse view' },
+        { type: 'meta', text: 'Storefront concept · built from scratch' },
+      ],
+    },
   },
 ];
 
@@ -112,7 +197,7 @@ export const EXPERIENCE: Experience[] = [
     role: 'Product Manager',
     org: 'Jio Platforms Limited',
     place: 'Mumbai, IN',
-    desc: "Helped scale Reliance's ROne loyalty platform from the ground up — moved 28Cr+ customers via a custom gateway with zero downtime, onboarded 22 enterprise partners (incl. JFS, Tira) and shipped 6+ core features. Recognised with the company's Star Performer Award.",
+    desc: "Helped scale Reliance's ROne loyalty platform from the ground up — onboarded 28Cr+ customers via a custom gateway with zero downtime, brought 22 enterprise partners (incl. JFS, Tira) onto one loyalty rail and shipped 6+ core features. Recognised with the company's Star Performer Award.",
   },
   {
     range: '2020 — 2022',
@@ -150,17 +235,17 @@ export interface CaseStudy {
 export const CASE_STUDIES: CaseStudy[] = [
   {
     kicker: 'Jio Platforms · Enterprise scale',
-    title: 'Migrating 280M+ customers with zero downtime',
+    title: 'Onboarding 280M+ customers with zero downtime',
     challenge:
-      "Reliance's ROne loyalty platform had to absorb 280M+ customers from legacy systems while the business kept transacting every day. At that scale, a failed cutover is national news.",
+      "Reliance's new ROne loyalty platform had to onboard 280M+ existing customers — and the enterprise brands they transact with — without a single broken login or lost point, while the business kept running every day. At that scale, a botched onboarding is national news.",
     approach:
-      'Led it as PM, working closely with engineering — a custom gateway with phased cohort cutovers, a partner-onboarding playbook that brought 22 enterprise brands (including Jio Financial Services and Tira) onto one loyalty rail, and 6+ core platform features shipped along the way.',
+      'Led it as PM, working closely with engineering — a custom onboarding gateway with phased cohort rollouts, a partner-onboarding playbook that brought 22 enterprise brands (including Jio Financial Services and Tira) onto one loyalty rail, and 6+ core platform features shipped along the way.',
     outcome:
-      'Every customer moved, with zero downtime. The work earned a Star Performer Award.',
+      'Every customer and partner onboarded, with zero downtime. The work earned a Star Performer Award.',
     metrics: [
-      { value: '280M+', label: 'Customers migrated' },
+      { value: '280M+', label: 'Customers onboarded' },
       { value: '0', label: 'Minutes of downtime' },
-      { value: '22', label: 'Enterprise partners' },
+      { value: '22', label: 'Partners onboarded' },
     ],
   },
   {
@@ -245,7 +330,7 @@ export const RECOGNITION: Recognition[] = [
   {
     value: 'Star Performer',
     label: 'Jio Platforms Limited',
-    detail: 'For the ROne loyalty-platform migration',
+    detail: 'For the ROne loyalty-platform onboarding',
   },
   {
     value: 'Top 2.5%',
