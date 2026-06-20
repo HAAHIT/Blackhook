@@ -4,6 +4,10 @@ import { PROJECTS, EXPERIENCE, SKILLS, CASE_STUDIES, PRINCIPLES, RECOGNITION } f
 import type { Glimpse } from '@/data/portfolio';
 import { initPortfolioMotion, destroyPortfolioMotion } from '@/lib/portfolio-motion';
 
+// Feature flag: in-card product previews (screenshots + synthetic glimpse).
+// Disabled until we have appropriate, real assets for every product.
+const SHOW_PRODUCT_PREVIEWS = false;
+
 const WHATSAPP = 'https://wa.me/919309803663';
 const EMAIL = 'agrawalhitesh4444@gmail.com';
 const LINKEDIN = 'https://www.linkedin.com/in/hitesh-agrawal-5a02a416b/';
@@ -238,12 +242,12 @@ export function Portfolio() {
             <div className="pf-section-head pf-reveal">
               <div className="pf-section-tag">Building &amp; shipped</div>
               <h2>What I&apos;ve <em>built</em></h2>
-              <p>From the products I&apos;m actively building to the tools and experiments behind them — most shipped with AI in the loop, each one started from a real problem, not a deck. Peek inside any card before you dig deeper.</p>
+              <p>From the products I&apos;m actively building to the tools and experiments behind them — most shipped with AI in the loop, each one started from a real problem, not a deck.{SHOW_PRODUCT_PREVIEWS ? ' Peek inside any card before you dig deeper.' : ''}</p>
             </div>
             <div className="pf-proj-grid">
               {orderedProjects.map((p) => (
                 <article key={p.name} className="pf-proj pf-reveal">
-                  {p.glimpse && <GlimpsePreview glimpse={p.glimpse} />}
+                  {SHOW_PRODUCT_PREVIEWS && p.glimpse && <GlimpsePreview glimpse={p.glimpse} />}
                   <div className="pf-proj-top">
                     {p.featured ? (
                       <div className="pf-proj-featured-badges">
