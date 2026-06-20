@@ -74,6 +74,8 @@ export const PROJECTS: Project[] = [
     current: true,
     glimpse: {
       chrome: 'bolodb',
+      shot: '/shots/bolodb.webp',
+      shotFit: 'tall',
       rows: [
         { type: 'q', text: 'Top 5 customers by revenue this quarter' },
         { type: 'code', text: 'SELECT name, SUM(total) … LIMIT 5' },
@@ -133,6 +135,8 @@ export const PROJECTS: Project[] = [
     current: true,
     glimpse: {
       chrome: 'care-ops-central',
+      shot: '/shots/careops.webp',
+      shotFit: 'wide',
       rows: [
         { type: 'item', text: 'Visit · Physiotherapy · 4:30 PM', value: 'Assigned' },
         { type: 'item', text: 'Partner payout · cleared', value: '₹1,200' },

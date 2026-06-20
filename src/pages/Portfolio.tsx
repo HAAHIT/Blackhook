@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowOut, ArrowRight, GithubMark } from '@/icons';
 import { PROJECTS, EXPERIENCE, SKILLS, CASE_STUDIES, PRINCIPLES, RECOGNITION } from '@/data/portfolio';
+import type { Glimpse } from '@/data/portfolio';
 import { initPortfolioMotion, destroyPortfolioMotion } from '@/lib/portfolio-motion';
 
 const WHATSAPP = 'https://wa.me/919309803663';
@@ -19,6 +20,53 @@ const MARQUEE = [
 
 const projectRank = (p: (typeof PROJECTS)[number]) => (p.featured ? 0 : p.current ? 1 : 2);
 const orderedProjects = [...PROJECTS].sort((a, b) => projectRank(a) - projectRank(b));
+
+/**
+ * Card preview window. Shows the real product screenshot (with a hover
+ * scroll-tour) when one is available; if the shot is missing or fails to
+ * load, it falls back to the synthetic glimpse rows so a card is never
+ * left with a broken image. Drop a file at the shot path to light it up.
+ */
+function GlimpsePreview({ glimpse }: { glimpse: Glimpse }) {
+  const [shotFailed, setShotFailed] = useState(false);
+  const showShot = Boolean(glimpse.shot) && !shotFailed;
+
+  return (
+    <div className={`pf-glimpse${showShot ? ' has-shot' : ''}`} aria-hidden="true">
+      <div className="pf-glimpse-bar">
+        <span className="pf-glimpse-dots"><i /><i /><i /></span>
+        <span className="pf-glimpse-chrome">{glimpse.chrome}</span>
+      </div>
+      {showShot ? (
+        <div className={`pf-shot-frame pf-shot-${glimpse.shotFit ?? 'wide'}`}>
+          <img
+            className="pf-shot"
+            src={glimpse.shot}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            onError={() => setShotFailed(true)}
+          />
+          <span className="pf-shot-hint">Hover to explore</span>
+        </div>
+      ) : (
+        <div className="pf-glimpse-body">
+          {glimpse.rows.map((r, ri) => (
+            <div key={ri} className={`pf-gl-row pf-gl-${r.type}`}>
+              <span className="pf-gl-text">{r.text}</span>
+              {r.value && (
+                <span className={`pf-gl-val${r.trend ? ` pf-gl-${r.trend}` : ''}`}>
+                  {r.value}
+                  {r.trend === 'up' ? ' ▲' : r.trend === 'down' ? ' ▼' : ''}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function Portfolio() {
   useEffect(() => {
@@ -195,34 +243,7 @@ export function Portfolio() {
             <div className="pf-proj-grid">
               {orderedProjects.map((p) => (
                 <article key={p.name} className="pf-proj pf-reveal">
-                  {p.glimpse && (
-                    <div className={`pf-glimpse${p.glimpse.shot ? ' has-shot' : ''}`} aria-hidden="true">
-                      <div className="pf-glimpse-bar">
-                        <span className="pf-glimpse-dots"><i /><i /><i /></span>
-                        <span className="pf-glimpse-chrome">{p.glimpse.chrome}</span>
-                      </div>
-                      {p.glimpse.shot ? (
-                        <div className={`pf-shot-frame pf-shot-${p.glimpse.shotFit ?? 'wide'}`}>
-                          <img className="pf-shot" src={p.glimpse.shot} alt="" loading="lazy" decoding="async" />
-                          <span className="pf-shot-hint">Hover to explore</span>
-                        </div>
-                      ) : (
-                        <div className="pf-glimpse-body">
-                          {p.glimpse.rows.map((r, ri) => (
-                            <div key={ri} className={`pf-gl-row pf-gl-${r.type}`}>
-                              <span className="pf-gl-text">{r.text}</span>
-                              {r.value && (
-                                <span className={`pf-gl-val${r.trend ? ` pf-gl-${r.trend}` : ''}`}>
-                                  {r.value}
-                                  {r.trend === 'up' ? ' ▲' : r.trend === 'down' ? ' ▼' : ''}
-                                </span>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  {p.glimpse && <GlimpsePreview glimpse={p.glimpse} />}
                   <div className="pf-proj-top">
                     {p.featured ? (
                       <div className="pf-proj-featured-badges">
