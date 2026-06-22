@@ -475,6 +475,7 @@ body.pf-loading { overflow: hidden; }
 .pf-contact-rows { display: flex; flex-direction: column; gap: 0; }
 .pf-contact-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--pf-line); font-family: var(--pf-mono); font-size: 13.5px; }
 .pf-contact-row span { color: var(--pf-ink-3); }
+.pf-contact-row .pf-contact-loc { color: var(--pf-ink); }
 .pf-contact-row a { color: var(--pf-ink); background-image: linear-gradient(90deg, var(--pf-gold-solid), var(--pf-platinum-solid)); background-repeat: no-repeat; background-position: 0 100%; background-size: 0% 1.5px; transition: background-size 0.35s cubic-bezier(0.65, 0, 0.2, 1); }
 .pf-contact-row a:hover { background-size: 100% 1.5px; }
 

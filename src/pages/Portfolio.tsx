@@ -8,7 +8,6 @@ import { initPortfolioMotion, destroyPortfolioMotion } from '@/lib/portfolio-mot
 // Disabled until we have appropriate, real assets for every product.
 const SHOW_PRODUCT_PREVIEWS = false;
 
-const WHATSAPP = 'https://wa.me/919309803663';
 const EMAIL = 'agrawalhitesh4444@gmail.com';
 const LINKEDIN = 'https://www.linkedin.com/in/hitesh-agrawal-5a02a416b/';
 const RESUME = '/Hitesh-Agrawal-Resume.pdf';
@@ -128,7 +127,7 @@ export function Portfolio() {
                   in one quarter.
                 </p>
                 <div className="pf-hero-ctas pf-reveal">
-                  <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-primary pf-magnetic" data-cursor="Let's talk">
+                  <a href={`mailto:${EMAIL}`} className="pf-btn pf-btn-primary pf-magnetic" data-cursor="Let's talk">
                     Start a conversation <ArrowRight size={13} />
                   </a>
                   <a href={RESUME} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-ghost pf-magnetic">
@@ -347,8 +346,8 @@ export function Portfolio() {
                 <div className="pf-section-tag">Contact</div>
                 <h2>Hiring for a senior <em>product seat?</em></h2>
                 <div className="pf-contact-ctas">
-                  <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-primary pf-magnetic" data-cursor="Let's talk">
-                    Chat on WhatsApp <ArrowRight size={13} />
+                  <a href={`mailto:${EMAIL}`} className="pf-btn pf-btn-primary pf-magnetic" data-cursor="Email me">
+                    Email me <ArrowRight size={13} />
                   </a>
                   <a href={RESUME} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-ghost pf-magnetic">
                     View résumé
@@ -363,7 +362,7 @@ export function Portfolio() {
                 <div className="pf-contact-row"><span>Email</span><a href={`mailto:${EMAIL}`}>{EMAIL}</a></div>
                 <div className="pf-contact-row"><span>LinkedIn</span><a href={LINKEDIN} target="_blank" rel="noopener noreferrer">hitesh-agrawal</a></div>
                 <div className="pf-contact-row"><span>Résumé</span><a href={RESUME} target="_blank" rel="noopener noreferrer">Hitesh-Agrawal-Resume.pdf</a></div>
-                <div className="pf-contact-row"><span>Based in</span><a href={WHATSAPP} target="_blank" rel="noopener noreferrer">Dhule · Mumbai, IN</a></div>
+                <div className="pf-contact-row"><span>Based in</span><span className="pf-contact-loc">Dhule · Mumbai, IN</span></div>
               </div>
             </div>
           </div>
