@@ -122,11 +122,10 @@ export function Portfolio() {
                   I help turn fuzzy ideas into <em>shipped</em> product.
                 </h1>
                 <p className="pf-hero-sub pf-reveal">
-                  A product manager who&apos;s worked from 0→1 to 280M-user scale.
-                  At Jio I helped onboard 280M+ customers onto a new loyalty platform
-                  with zero downtime. Since then, on my own, I&apos;ve sold a B2B
-                  product before building it and grown a small services business to
-                  profitability in its first quarter.
+                  Product manager, 0→1 to 280M-user scale. At Jio I helped onboard
+                  280M+ customers with zero downtime. On my own since: sold a B2B
+                  product before building it, and took a services business to profit
+                  in one quarter.
                 </p>
                 <div className="pf-hero-ctas pf-reveal">
                   <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-primary pf-magnetic" data-cursor="Let's talk">
@@ -168,7 +167,7 @@ export function Portfolio() {
             <div className="pf-section-head pf-reveal">
               <div className="pf-section-tag">Selected work</div>
               <h2>Work I&apos;m <em>proud of</em></h2>
-              <p>Four problems I&apos;ve worked on — from enterprise scale to zero-to-one.</p>
+              <p>Four problems, from enterprise scale to zero-to-one.</p>
             </div>
             <div className="pf-cs-list">
               {CASE_STUDIES.map((cs, i) => (
@@ -242,7 +241,7 @@ export function Portfolio() {
             <div className="pf-section-head pf-reveal">
               <div className="pf-section-tag">Building &amp; shipped</div>
               <h2>What I&apos;ve <em>built</em></h2>
-              <p>From the products I&apos;m actively building to the tools and experiments behind them — most shipped with AI in the loop, each one started from a real problem, not a deck.{SHOW_PRODUCT_PREVIEWS ? ' Peek inside any card before you dig deeper.' : ''}</p>
+              <p>Products I&apos;m building, plus the tools and experiments behind them — most shipped with AI in the loop.{SHOW_PRODUCT_PREVIEWS ? ' Peek inside any card before you dig deeper.' : ''}</p>
             </div>
             <div className="pf-proj-grid">
               {orderedProjects.map((p) => (

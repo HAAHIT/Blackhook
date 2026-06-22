@@ -214,29 +214,9 @@ function setupHeroEntrance() {
   if (sub) { gsap.set(sub, { y: 22, opacity: 0 }); tl.to(sub, { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out' }, 0.5); }
   if (ctas) { gsap.set(Array.from(ctas.children), { y: 16, opacity: 0 }); tl.to(ctas.children, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out', stagger: 0.1 }, 0.65); }
   if (facts.length) { gsap.set(facts, { y: 14, opacity: 0 }); tl.to(facts, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out', stagger: 0.08 }, 0.8); }
-  if (photoWrap) { gsap.set(photoWrap, { scale: 0.85, opacity: 0 }); tl.to(photoWrap, { scale: 1, opacity: 1, duration: 1.3, ease: 'expo.out' }, 0.1); }
+  if (photoWrap) { gsap.set(photoWrap, { y: 24, opacity: 0 }); tl.to(photoWrap, { y: 0, opacity: 1, duration: 1.0, ease: 'power3.out' }, 0.2); }
 }
 
-/* Portrait rolls on its Z axis toward the cursor — a calmer, more
-   deliberate motion than a floating bob. Fine-pointer only. */
-function setupHeroPhotoTilt() {
-  if (isTouch() || prefersReduced()) return;
-  const photo = document.querySelector<HTMLElement>('.pf-hero-photo');
-  if (!photo) return;
-  let target = 0, cur = 0;
-  window.addEventListener('pointermove', (e) => {
-    const r = photo.getBoundingClientRect();
-    const cx = r.left + r.width / 2;
-    const dx = (e.clientX - cx) / (window.innerWidth / 2);
-    target = Math.max(-1, Math.min(1, dx)) * 7;
-  }, { passive: true });
-  const tick = () => {
-    cur += (target - cur) * 0.08;
-    photo.style.transform = `rotate(${cur.toFixed(3)}deg)`;
-    requestAnimationFrame(tick);
-  };
-  requestAnimationFrame(tick);
-}
 
 function setupReveals() {
   document.querySelectorAll<HTMLElement>('.pf-section-head h2, .pf-contact h2').forEach((h) => {
@@ -388,7 +368,6 @@ export function initPortfolioMotion() {
   setupSpotlight();
   setupMagnetic();
   setupWordmark();
-  setupHeroPhotoTilt();
   setupPreloader(() => {
     // Re-measure against the now-unlocked layout so reveals fire correctly,
     // then explicitly kick the in-view hero counters.
