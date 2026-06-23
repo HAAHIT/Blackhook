@@ -42,6 +42,20 @@ export interface SkillGroup {
   items: string[];
 }
 
+/** Big proof numbers for the pinned "chapters" act. */
+export interface ProofStat {
+  value: string;
+  label: string;
+  note: string;
+}
+
+export const PROOF_STATS: ProofStat[] = [
+  { value: '280M+', label: 'Customers onboarded', note: 'At Jio — onto a new loyalty platform, with zero downtime.' },
+  { value: '22', label: 'Enterprise partners', note: 'Brought onto one loyalty rail, including JFS and Tira.' },
+  { value: '₹3L+', label: 'Monthly recurring revenue', note: 'A home-care business, profitable in its first quarter.' },
+  { value: '100%', label: 'Build cost covered', note: 'A B2B product sold through a paying pilot, before launch.' },
+];
+
 export const PROJECTS: Project[] = [
   {
     name: 'smriti',
