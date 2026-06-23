@@ -83,6 +83,67 @@ main, .pf-footer, .pf-wordmark { position: relative; z-index: 1; }
 .pf-webgl.on::before { opacity: 0; }
 .pf-webgl.on canvas { opacity: 1; }
 
+/* ===== Ambient living layer (mira-style) ===== */
+.pf-ambient { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
+
+/* Slow conic gold halo, drifting top-right — the "AI orb" energy */
+.pf-halo {
+  position: absolute; top: -32vmax; right: -22vmax; width: 70vmax; height: 70vmax; border-radius: 50%;
+  background: conic-gradient(from 0deg,
+    rgba(212, 181, 106, 0) 0deg,
+    rgba(212, 181, 106, 0.10) 70deg,
+    rgba(245, 223, 164, 0.16) 150deg,
+    rgba(212, 181, 106, 0.05) 230deg,
+    rgba(212, 181, 106, 0) 360deg);
+  filter: blur(36px);
+  opacity: 0.7;
+  animation: pf-halo-spin 44s linear infinite;
+  will-change: transform;
+}
+.pf-halo::after {
+  content: ''; position: absolute; inset: 22%; border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 223, 164, 0.12), transparent 68%);
+  animation: pf-halo-breathe 9s ease-in-out infinite;
+}
+
+/* Radar-ping rings that expand and fade, like mira's pulse orbs */
+.pf-ping {
+  position: absolute; width: 22px; height: 22px; border-radius: 50%;
+  border: 1px solid rgba(212, 181, 106, 0.5);
+  opacity: 0;
+  animation: pf-ping 7.5s ease-out infinite;
+}
+.pf-ping-1 { left: 16%; top: 38%; animation-delay: 0s; }
+.pf-ping-2 { left: 72%; top: 64%; animation-delay: 2.6s; }
+.pf-ping-3 { left: 40%; top: 82%; animation-delay: 5s; }
+
+/* Drifting gold motes */
+.pf-mote { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: rgba(212, 181, 106, 0.55); box-shadow: 0 0 8px rgba(212, 181, 106, 0.6); opacity: 0; animation: pf-mote-rise linear infinite; }
+.pf-mote-1 { left: 8%;  animation-duration: 24s; animation-delay: 0s;   }
+.pf-mote-2 { left: 21%; animation-duration: 31s; animation-delay: 6s;   }
+.pf-mote-3 { left: 34%; animation-duration: 27s; animation-delay: 13s;  }
+.pf-mote-4 { left: 47%; animation-duration: 35s; animation-delay: 3s;   }
+.pf-mote-5 { left: 58%; animation-duration: 22s; animation-delay: 9s;   }
+.pf-mote-6 { left: 69%; animation-duration: 33s; animation-delay: 17s;  }
+.pf-mote-7 { left: 80%; animation-duration: 28s; animation-delay: 2s;   }
+.pf-mote-8 { left: 90%; animation-duration: 30s; animation-delay: 11s;  }
+.pf-mote-9 { left: 96%; animation-duration: 26s; animation-delay: 20s;  }
+
+@keyframes pf-halo-spin { to { transform: rotate(360deg); } }
+@keyframes pf-halo-breathe { 0%, 100% { transform: scale(0.92); opacity: 0.6; } 50% { transform: scale(1.08); opacity: 1; } }
+@keyframes pf-ping {
+  0%   { transform: scale(0.4); opacity: 0; }
+  10%  { opacity: 0.9; }
+  70%  { transform: scale(7); opacity: 0; }
+  100% { transform: scale(7); opacity: 0; }
+}
+@keyframes pf-mote-rise {
+  0%   { transform: translateY(102vh) translateX(0);   opacity: 0; }
+  8%   { opacity: 0.8; }
+  92%  { opacity: 0.8; }
+  100% { transform: translateY(-6vh) translateX(22px); opacity: 0; }
+}
+
 /* ===== Scroll progress ===== */
 .pf-progress { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 60; pointer-events: none; }
 .pf-progress span { display: block; height: 100%; width: 100%; transform: scaleX(0); transform-origin: 0 50%; background: var(--pf-gold); box-shadow: 0 0 12px rgba(212, 181, 106, 0.5); }
@@ -159,12 +220,13 @@ body.pf-loading { overflow: hidden; }
 /* ===== Nav ===== */
 .pf-nav {
   position: sticky; top: 0; z-index: 50;
-  background: color-mix(in srgb, var(--pf-bg) 88%, transparent);
-  backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--pf-bg) 72%, transparent);
+  backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
   border-bottom: 1px solid transparent;
-  transition: border-color 0.3s ease, background 0.3s ease;
+  transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
 }
-.pf-nav.scrolled { border-bottom-color: var(--pf-line); }
+.pf-nav.scrolled { border-bottom-color: var(--pf-line); background: color-mix(in srgb, var(--pf-bg) 84%, transparent); box-shadow: 0 1px 0 rgba(212, 181, 106, 0.10), 0 14px 40px -28px rgba(0, 0, 0, 0.8); }
 .pf-nav-inner { max-width: var(--pf-max); margin: 0 auto; padding: 18px 28px; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .pf-logo { font-family: var(--pf-serif); font-size: 22px; font-weight: 400; letter-spacing: -0.01em; }
 .pf-logo b { font-style: italic; font-weight: 400; }
@@ -261,7 +323,7 @@ body.pf-loading { overflow: hidden; }
 .pf-xp-desc { font-size: 16px; line-height: 1.7; color: var(--pf-ink-2); margin: 0; max-width: 70ch; }
 
 /* ===== Projects — shared ===== */
-.pf-proj { display: flex; flex-direction: column; padding: 32px 30px 30px; background: var(--pf-bg-card); border: 1px solid var(--pf-line); transition: box-shadow 0.3s ease, border-color 0.3s ease; transform-style: preserve-3d; will-change: transform; }
+.pf-proj { display: flex; flex-direction: column; padding: 32px 30px 30px; background: linear-gradient(180deg, rgba(245, 223, 164, 0.045), transparent 38%), var(--pf-bg-card); border: 1px solid var(--pf-line); transition: box-shadow 0.3s ease, border-color 0.3s ease; transform-style: preserve-3d; will-change: transform; }
 .pf-proj:hover { transform: translateY(-3px); background: var(--pf-bg-sunk); border-color: var(--pf-line-2); box-shadow: 0 16px 40px -24px rgba(0, 0, 0, 0.55); }
 .pf-proj-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
 .pf-proj-year { font-family: var(--pf-mono); font-size: 11.5px; letter-spacing: 0.04em; color: var(--pf-ink-3); }
@@ -454,7 +516,7 @@ body.pf-loading { overflow: hidden; }
 
 /* ===== Principles (Operating system) ===== */
 .pf-principles { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
-.pf-principle { background: var(--pf-bg-card); border: 1px solid var(--pf-line); padding: 34px 32px; transition: border-color 0.3s ease; }
+.pf-principle { background: linear-gradient(180deg, rgba(245, 223, 164, 0.04), transparent 36%), var(--pf-bg-card); border: 1px solid var(--pf-line); padding: 34px 32px; transition: border-color 0.3s ease, box-shadow 0.3s ease; }
 .pf-principle:hover { border-color: var(--pf-line-2); }
 .pf-principle-num {
   display: block; font-family: var(--pf-serif); font-style: italic; font-size: 20px; line-height: 1; margin-bottom: 18px;
@@ -555,10 +617,12 @@ body.pf-loading { overflow: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .pf-reveal { opacity: 1 !important; transform: none !important; }
+  .pf-reveal { opacity: 1 !important; transform: none !important; filter: none !important; }
   .pf-loader { display: none !important; }
   .pf-marquee-track,
-  .pf-webgl::before { animation: none !important; }
+  .pf-webgl::before,
+  .pf-halo, .pf-halo::after, .pf-ping, .pf-mote { animation: none !important; }
+  .pf-ping, .pf-mote { opacity: 0 !important; }
   .pf-hero-photo img { transition: none !important; }
   .pf-hero-photo:hover img { transform: none !important; }
   .pf-shot { transition: none !important; transform: none !important; object-position: 50% 0% !important; }

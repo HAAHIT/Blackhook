@@ -1,8 +1,53 @@
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { CustomEase } from 'gsap/CustomEase';
 import Lenis from 'lenis';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, CustomEase);
+
+/* miralabs.ai's motion language, in our dark+gold film:
+   it leans on two signature cubic-béziers plus framer-motion springs.
+   We recreate the curves verbatim with CustomEase and approximate the
+   spring's overshoot with GSAP's back.out. Used everywhere below so the
+   whole page shares one cohesive, premium cadence.
+     · cine — long soft decelerate for reveals      (.25,.1,.35,1)
+     · snap — punchy in/out for transforms          (.4,0,.1,1)
+     · spring — the framer overshoot (stiff~300)      back.out(1.6) */
+CustomEase.create('pf-cine', '0.25,0.1,0.35,1');
+CustomEase.create('pf-snap', '0.4,0,0.1,1');
+const EASE_CINE = 'pf-cine';
+const EASE_SPRING = 'back.out(1.6)';
+
+/* The mira reveal "fingerprint": rise + 3D flip + scale + blur clearing
+   to sharp. Tunable per call so cards flip harder than paragraphs. */
+type LiftOpts = {
+  y?: number; rotateX?: number; scale?: number; blur?: number;
+  duration?: number; ease?: string; stagger?: number;
+  start?: string; perspective?: number;
+};
+function revealLift(els: HTMLElement[] | HTMLElement | null, opts: LiftOpts = {}) {
+  const list = !els ? [] : Array.isArray(els) ? els : [els];
+  if (!list.length) return;
+  const {
+    y = 26, rotateX = 0, scale = 1, blur = 8,
+    duration = 1.0, ease = EASE_CINE, stagger = 0,
+    start = 'top 88%', perspective = 1100,
+  } = opts;
+  gsap.set(list, {
+    opacity: 0, y, rotateX, scale,
+    filter: `blur(${blur}px)`,
+    transformPerspective: perspective, transformOrigin: '50% 100%',
+  });
+  ScrollTrigger.batch(list, {
+    start,
+    onEnter: (batch) => gsap.to(batch, {
+      opacity: 1, y: 0, rotateX: 0, scale: 1,
+      filter: 'blur(0px)',
+      duration, ease, stagger, overwrite: true,
+    }),
+    once: true,
+  });
+}
 
 let lenis: Lenis | null = null;
 let lenisRaf: number | null = null;
@@ -205,78 +250,62 @@ function setupHeroEntrance() {
   const facts = document.querySelectorAll<HTMLElement>('.pf-fact');
   const photoWrap = document.querySelector<HTMLElement>('.pf-hero-photo-wrap');
 
-  if (eyebrow) { gsap.set(eyebrow, { y: 14, opacity: 0 }); tl.to(eyebrow, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out' }, 0); }
+  if (eyebrow) { gsap.set(eyebrow, { y: 14, opacity: 0, scale: 0.9, filter: 'blur(8px)' }); tl.to(eyebrow, { y: 0, opacity: 1, scale: 1, filter: 'blur(0px)', duration: 0.8, ease: EASE_CINE }, 0); }
   if (h1) {
     const words = splitWords(h1);
-    gsap.set(words, { yPercent: 115, opacity: 0 });
-    tl.to(words, { yPercent: 0, opacity: 1, duration: 1.05, ease: 'expo.out', stagger: 0.055 }, 0.1);
+    gsap.set(words, { yPercent: 115, opacity: 0, filter: 'blur(6px)' });
+    tl.to(words, { yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 1.1, ease: EASE_CINE, stagger: 0.06 }, 0.1);
   }
-  if (sub) { gsap.set(sub, { y: 22, opacity: 0 }); tl.to(sub, { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out' }, 0.5); }
-  if (ctas) { gsap.set(Array.from(ctas.children), { y: 16, opacity: 0 }); tl.to(ctas.children, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out', stagger: 0.1 }, 0.65); }
-  if (facts.length) { gsap.set(facts, { y: 14, opacity: 0 }); tl.to(facts, { y: 0, opacity: 1, duration: 0.7, ease: 'power3.out', stagger: 0.08 }, 0.8); }
-  if (photoWrap) { gsap.set(photoWrap, { y: 24, opacity: 0 }); tl.to(photoWrap, { y: 0, opacity: 1, duration: 1.0, ease: 'power3.out' }, 0.2); }
+  if (sub) { gsap.set(sub, { y: 24, opacity: 0, filter: 'blur(8px)' }); tl.to(sub, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.95, ease: EASE_CINE }, 0.55); }
+  if (ctas) { gsap.set(Array.from(ctas.children), { y: 16, opacity: 0, filter: 'blur(5px)' }); tl.to(ctas.children, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: EASE_CINE, stagger: 0.1 }, 0.7); }
+  if (facts.length) { gsap.set(facts, { y: 14, opacity: 0, filter: 'blur(5px)' }); tl.to(facts, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: EASE_CINE, stagger: 0.08 }, 0.85); }
+  // Portrait does a cinematic focus-pull: scales down from soft + blurred to sharp.
+  if (photoWrap) { gsap.set(photoWrap, { y: 28, opacity: 0, scale: 1.06, filter: 'blur(14px)' }); tl.to(photoWrap, { y: 0, opacity: 1, scale: 1, filter: 'blur(0px)', duration: 1.3, ease: EASE_CINE }, 0.2); }
 }
 
 
 function setupReveals() {
+  // Big serif headings keep the masked word-rise (our most premium move),
+  // now timed on mira's cine curve with a faint blur clearing per word.
   document.querySelectorAll<HTMLElement>('.pf-section-head h2, .pf-work-head h2, .pf-contact h2').forEach((h) => {
     const words = splitWords(h);
-    gsap.set(words, { yPercent: 115, opacity: 0 });
+    gsap.set(words, { yPercent: 115, opacity: 0, filter: 'blur(5px)' });
     ScrollTrigger.create({ trigger: h, start: 'top 88%', once: true,
-      onEnter: () => gsap.to(words, { yPercent: 0, opacity: 1, duration: 0.95, ease: 'expo.out', stagger: 0.05 }) });
+      onEnter: () => gsap.to(words, { yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 1.0, ease: EASE_CINE, stagger: 0.05 }) });
   });
 
+  // Eyebrows / supporting copy: a soft blur-lift, no flip.
   document.querySelectorAll<HTMLElement>('.pf-section-tag, .pf-section-head p').forEach((el) => {
-    gsap.set(el, { y: 14, opacity: 0 });
-    ScrollTrigger.create({ trigger: el, start: 'top 90%', once: true,
-      onEnter: () => gsap.to(el, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' }) });
+    revealLift(el, { y: 16, blur: 6, duration: 0.85, start: 'top 90%' });
   });
 
+  // Experience rows — gentle flip so the timeline feels like turning pages.
   document.querySelectorAll<HTMLElement>('.pf-xp').forEach((el) => {
-    gsap.set(el, { y: 28, opacity: 0 });
-    ScrollTrigger.create({ trigger: el, start: 'top 88%', once: true,
-      onEnter: () => gsap.to(el, { y: 0, opacity: 1, duration: 0.85, ease: 'expo.out' }) });
+    revealLift(el, { y: 34, rotateX: 12, blur: 8, duration: 1.0 });
   });
 
-  const principles = Array.from(document.querySelectorAll<HTMLElement>('.pf-principle'));
-  if (principles.length) {
-    gsap.set(principles, { y: 28, opacity: 0 });
-    ScrollTrigger.create({ trigger: '.pf-principles', start: 'top 86%', once: true,
-      onEnter: () => gsap.to(principles, { y: 0, opacity: 1, duration: 0.85, ease: 'expo.out', stagger: 0.1 }) });
-  }
+  // Card surfaces get the full mira fingerprint: rise + hard 3D flip +
+  // scale-up + blur-to-sharp, landing on a spring overshoot.
+  revealLift(Array.from(document.querySelectorAll<HTMLElement>('.pf-principle')),
+    { y: 44, rotateX: 24, scale: 0.94, blur: 10, duration: 1.05, ease: EASE_SPRING, stagger: 0.1, start: 'top 86%' });
 
-  const recogs = Array.from(document.querySelectorAll<HTMLElement>('.pf-recog-item'));
-  if (recogs.length) {
-    gsap.set(recogs, { y: 24, opacity: 0 });
-    ScrollTrigger.create({ trigger: '.pf-recog', start: 'top 88%', once: true,
-      onEnter: () => gsap.to(recogs, { y: 0, opacity: 1, duration: 0.8, ease: 'expo.out', stagger: 0.12 }) });
-  }
+  revealLift(Array.from(document.querySelectorAll<HTMLElement>('.pf-recog-item')),
+    { y: 30, rotateX: 16, blur: 8, duration: 0.9, stagger: 0.12 });
 
-  const projCards = Array.from(document.querySelectorAll<HTMLElement>('.pf-proj-grid .pf-proj'));
-  if (projCards.length) {
-    gsap.set(projCards, { y: 40, opacity: 0 });
-    ScrollTrigger.create({ trigger: '.pf-proj-grid', start: 'top 86%', once: true,
-      onEnter: () => gsap.to(projCards, { y: 0, opacity: 1, duration: 0.9, ease: 'expo.out', stagger: 0.1 }) });
-  }
+  revealLift(Array.from(document.querySelectorAll<HTMLElement>('.pf-proj-grid .pf-proj')),
+    { y: 52, rotateX: 26, scale: 0.93, blur: 10, duration: 1.15, ease: EASE_SPRING, stagger: 0.1, start: 'top 86%' });
 
-  const skillGroups = Array.from(document.querySelectorAll<HTMLElement>('.pf-skill-group'));
-  if (skillGroups.length) {
-    gsap.set(skillGroups, { y: 24, opacity: 0 });
-    ScrollTrigger.create({ trigger: '.pf-skills', start: 'top 86%', once: true,
-      onEnter: () => gsap.to(skillGroups, { y: 0, opacity: 1, duration: 0.85, ease: 'expo.out', stagger: 0.12 }) });
-  }
+  revealLift(Array.from(document.querySelectorAll<HTMLElement>('.pf-skill-group')),
+    { y: 30, rotateX: 14, blur: 8, duration: 0.95, stagger: 0.12, start: 'top 86%' });
 
-  const contactLeft = document.querySelector<HTMLElement>('.pf-contact-grid > div:first-child');
-  if (contactLeft) {
-    gsap.set(contactLeft, { y: 30, opacity: 0 });
-    ScrollTrigger.create({ trigger: contactLeft, start: 'top 88%', once: true,
-      onEnter: () => gsap.to(contactLeft, { y: 0, opacity: 1, duration: 0.9, ease: 'expo.out' }) });
-  }
+  revealLift(document.querySelector<HTMLElement>('.pf-contact-grid > div:first-child'),
+    { y: 38, rotateX: 12, blur: 9, duration: 1.0 });
+
   const contactRows = Array.from(document.querySelectorAll<HTMLElement>('.pf-contact-row'));
   if (contactRows.length) {
-    gsap.set(contactRows, { x: 24, opacity: 0 });
+    gsap.set(contactRows, { x: 26, opacity: 0, filter: 'blur(5px)' });
     ScrollTrigger.create({ trigger: '.pf-contact-rows', start: 'top 88%', once: true,
-      onEnter: () => gsap.to(contactRows, { x: 0, opacity: 1, duration: 0.7, ease: 'power3.out', stagger: 0.1 }) });
+      onEnter: () => gsap.to(contactRows, { x: 0, opacity: 1, filter: 'blur(0px)', duration: 0.75, ease: EASE_CINE, stagger: 0.1 }) });
   }
 }
 
@@ -330,9 +359,9 @@ function setupCardTilt() {
 function setupWordmark() {
   const wm = document.querySelector<HTMLElement>('.pf-wordmark');
   if (!wm) return;
-  gsap.set(wm, { y: 50, opacity: 0 });
+  gsap.set(wm, { y: 50, opacity: 0, filter: 'blur(16px)' });
   ScrollTrigger.create({ trigger: wm, start: 'top 95%', once: true,
-    onEnter: () => gsap.to(wm, { y: 0, opacity: 1, duration: 1.8, ease: 'expo.out' }) });
+    onEnter: () => gsap.to(wm, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 1.8, ease: EASE_CINE }) });
   gsap.to(wm, { yPercent: -18, ease: 'none',
     scrollTrigger: { trigger: wm, start: 'top bottom', end: 'bottom top', scrub: 1.5 } });
 }
@@ -359,10 +388,12 @@ function setupNumbersStage() {
 
   const mm = gsap.matchMedia();
   mm.add('(min-width: 821px) and (prefers-reduced-motion: no-preference)', () => {
-    gsap.set(chapters, { autoAlpha: 0, yPercent: 16, scale: 0.96 });
-    gsap.set(chapters[0]!, { autoAlpha: 1, yPercent: 0, scale: 1 });
+    // Each chapter racks-focus out (blur + drift up) as the next racks in —
+    // mira's defining scene-to-scene transition, applied to the proof reel.
+    gsap.set(chapters, { autoAlpha: 0, yPercent: 18, scale: 0.94, filter: 'blur(14px)' });
+    gsap.set(chapters[0]!, { autoAlpha: 1, yPercent: 0, scale: 1, filter: 'blur(0px)' });
     const tl = gsap.timeline({
-      defaults: { ease: 'power2.inOut' },
+      defaults: { ease: EASE_CINE },
       scrollTrigger: {
         trigger: section, start: 'top top',
         end: () => '+=' + window.innerHeight * (chapters.length - 1) * 1.05,
@@ -370,9 +401,9 @@ function setupNumbersStage() {
       },
     });
     for (let i = 1; i < chapters.length; i++) {
-      tl.to(chapters[i - 1]!, { autoAlpha: 0, yPercent: -16, scale: 0.96, duration: 0.5 });
-      tl.fromTo(chapters[i]!, { autoAlpha: 0, yPercent: 16, scale: 0.96 },
-        { autoAlpha: 1, yPercent: 0, scale: 1, duration: 0.5 }, '<0.12');
+      tl.to(chapters[i - 1]!, { autoAlpha: 0, yPercent: -18, scale: 0.94, filter: 'blur(14px)', duration: 0.5 });
+      tl.fromTo(chapters[i]!, { autoAlpha: 0, yPercent: 18, scale: 0.94, filter: 'blur(14px)' },
+        { autoAlpha: 1, yPercent: 0, scale: 1, filter: 'blur(0px)', duration: 0.5 }, '<0.12');
     }
   });
 }
@@ -394,7 +425,38 @@ function setupHorizontalWork() {
       pin: true, scrub: 1, anticipatePin: 1, invalidateOnRefresh: true, animation: tween,
       onUpdate: (self) => { if (railFill) railFill.style.transform = `scaleX(${self.progress})`; },
     });
-    return () => { st.kill(); tween.kill(); };
+
+    // Reveal each panel's content as it scrolls into view *horizontally*
+    // (containerAnimation ties the trigger to the track tween), and float the
+    // giant index number on its own depth plane for a parallax layer.
+    const cleanups: Array<() => void> = [];
+    gsap.utils.toArray<HTMLElement>('.pf-wpanel').forEach((panel, i) => {
+      const body = panel.querySelector<HTMLElement>('.pf-wpanel-body');
+      const num = panel.querySelector<HTMLElement>('.pf-wpanel-num');
+      // Panel 1 is already on screen when the pin engages — reveal it with the
+      // hero entrance rather than a containerAnimation trigger (which can miss
+      // at progress 0). Panels 2+ flip in as they scroll across.
+      if (body && i === 0) {
+        gsap.fromTo(body, { opacity: 0, y: 40, rotateX: 14, filter: 'blur(12px)', transformPerspective: 1200, transformOrigin: '50% 100%' },
+          { opacity: 1, y: 0, rotateX: 0, filter: 'blur(0px)', duration: 1.0, ease: EASE_CINE, delay: 0.15 });
+      } else if (body) {
+        gsap.set(body, { opacity: 0, y: 40, rotateX: 18, filter: 'blur(12px)', transformPerspective: 1200, transformOrigin: '50% 100%' });
+        const t = ScrollTrigger.create({
+          trigger: panel, containerAnimation: tween, start: 'left 78%', once: true,
+          onEnter: () => gsap.to(body, { opacity: 1, y: 0, rotateX: 0, filter: 'blur(0px)', duration: 1.0, ease: EASE_CINE }),
+        });
+        cleanups.push(() => t.kill());
+      }
+      if (num) {
+        const t = gsap.fromTo(num, { xPercent: 14 }, {
+          xPercent: -14, ease: 'none',
+          scrollTrigger: { trigger: panel, containerAnimation: tween, start: 'left right', end: 'right left', scrub: true },
+        });
+        cleanups.push(() => t.scrollTrigger?.kill());
+      }
+    });
+
+    return () => { cleanups.forEach((c) => c()); st.kill(); tween.kill(); };
   });
 
   mm.add('(max-width: 820px)', () => {
