@@ -100,7 +100,7 @@ function setupCursor() {
 /* Gold spotlight that tracks the pointer inside each card surface. */
 function setupSpotlight() {
   if (isTouch()) return;
-  document.querySelectorAll<HTMLElement>('.pf-proj, .pf-wpanel').forEach((card) => {
+  document.querySelectorAll<HTMLElement>('.pf-proj, .pf-cs').forEach((card) => {
     card.addEventListener('pointermove', (e) => {
       const r = card.getBoundingClientRect();
       card.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
@@ -219,7 +219,7 @@ function setupHeroEntrance() {
 
 
 function setupReveals() {
-  document.querySelectorAll<HTMLElement>('.pf-section-head h2, .pf-work-head h2, .pf-contact h2').forEach((h) => {
+  document.querySelectorAll<HTMLElement>('.pf-section-head h2, .pf-contact h2').forEach((h) => {
     const words = splitWords(h);
     gsap.set(words, { yPercent: 115, opacity: 0 });
     ScrollTrigger.create({ trigger: h, start: 'top 88%', once: true,
@@ -236,6 +236,17 @@ function setupReveals() {
     gsap.set(el, { y: 28, opacity: 0 });
     ScrollTrigger.create({ trigger: el, start: 'top 88%', once: true,
       onEnter: () => gsap.to(el, { y: 0, opacity: 1, duration: 0.85, ease: 'expo.out' }) });
+  });
+
+  document.querySelectorAll<HTMLElement>('.pf-cs').forEach((el) => {
+    gsap.set(el, { y: 40, opacity: 0 });
+    ScrollTrigger.create({ trigger: el, start: 'top 88%', once: true,
+      onEnter: () => gsap.to(el, { y: 0, opacity: 1, duration: 0.95, ease: 'expo.out' }) });
+    const num = el.querySelector<HTMLElement>('.pf-cs-num');
+    if (num && !prefersReduced()) {
+      gsap.to(num, { yPercent: -45, ease: 'none',
+        scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: 1 } });
+    }
   });
 
   const principles = Array.from(document.querySelectorAll<HTMLElement>('.pf-principle'));
@@ -337,76 +348,6 @@ function setupWordmark() {
     scrollTrigger: { trigger: wm, start: 'top bottom', end: 'bottom top', scrub: 1.5 } });
 }
 
-/* Hero copy drifts up and dims as you scroll into the film. Copy column
-   only — the portrait keeps its own hover transform untouched. */
-function setupHeroParallax() {
-  if (prefersReduced() || isTouch()) return;
-  const copy = document.querySelector<HTMLElement>('.pf-hero-copy');
-  if (!copy) return;
-  gsap.to(copy, {
-    yPercent: -16, opacity: 0.15, ease: 'none',
-    scrollTrigger: { trigger: '.pf-hero', start: 'top top', end: 'bottom top', scrub: true },
-  });
-}
-
-/* Pinned "chapters" stage — each big proof number cross-fades to the next
-   as you scroll. Desktop + motion-on only; mobile stacks them (CSS). */
-function setupNumbersStage() {
-  const section = document.querySelector<HTMLElement>('.pf-numbers');
-  if (!section) return;
-  const chapters = gsap.utils.toArray<HTMLElement>('.pf-num-chapter');
-  if (chapters.length < 2) return;
-
-  const mm = gsap.matchMedia();
-  mm.add('(min-width: 821px) and (prefers-reduced-motion: no-preference)', () => {
-    gsap.set(chapters, { autoAlpha: 0, yPercent: 16, scale: 0.96 });
-    gsap.set(chapters[0]!, { autoAlpha: 1, yPercent: 0, scale: 1 });
-    const tl = gsap.timeline({
-      defaults: { ease: 'power2.inOut' },
-      scrollTrigger: {
-        trigger: section, start: 'top top',
-        end: () => '+=' + window.innerHeight * (chapters.length - 1) * 1.05,
-        pin: true, scrub: 0.8, anticipatePin: 1, invalidateOnRefresh: true,
-      },
-    });
-    for (let i = 1; i < chapters.length; i++) {
-      tl.to(chapters[i - 1]!, { autoAlpha: 0, yPercent: -16, scale: 0.96, duration: 0.5 });
-      tl.fromTo(chapters[i]!, { autoAlpha: 0, yPercent: 16, scale: 0.96 },
-        { autoAlpha: 1, yPercent: 0, scale: 1, duration: 0.5 }, '<0.12');
-    }
-  });
-}
-
-/* Selected work scrolls horizontally while the section is pinned (desktop);
-   on mobile the panels just stack and reveal vertically. */
-function setupHorizontalWork() {
-  const section = document.querySelector<HTMLElement>('.pf-work');
-  const track = document.querySelector<HTMLElement>('.pf-work-track');
-  const railFill = document.querySelector<HTMLElement>('.pf-work-rail-fill');
-  if (!section || !track) return;
-
-  const mm = gsap.matchMedia();
-  mm.add('(min-width: 821px) and (prefers-reduced-motion: no-preference)', () => {
-    const amount = () => Math.max(0, track.scrollWidth - window.innerWidth);
-    const tween = gsap.to(track, { x: () => -amount(), ease: 'none' });
-    const st = ScrollTrigger.create({
-      trigger: section, start: 'top top', end: () => '+=' + amount(),
-      pin: true, scrub: 1, anticipatePin: 1, invalidateOnRefresh: true, animation: tween,
-      onUpdate: (self) => { if (railFill) railFill.style.transform = `scaleX(${self.progress})`; },
-    });
-    return () => { st.kill(); tween.kill(); };
-  });
-
-  mm.add('(max-width: 820px)', () => {
-    const panels = gsap.utils.toArray<HTMLElement>('.pf-wpanel');
-    panels.forEach((p) => {
-      gsap.set(p, { y: 36, opacity: 0 });
-      ScrollTrigger.create({ trigger: p, start: 'top 86%', once: true,
-        onEnter: () => gsap.to(p, { y: 0, opacity: 1, duration: 0.8, ease: 'expo.out' }) });
-    });
-  });
-}
-
 function setupNav() {
   const nav = document.querySelector<HTMLElement>('.pf-nav');
   if (!nav) return;
@@ -427,21 +368,13 @@ export function initPortfolioMotion() {
   setupSpotlight();
   setupMagnetic();
   setupWordmark();
-  setupHeroParallax();
-  setupNumbersStage();
-  setupHorizontalWork();
   setupPreloader(() => {
-    // Re-measure against the now-unlocked layout so reveals + pins fire
-    // correctly, then explicitly kick any in-view counters.
+    // Re-measure against the now-unlocked layout so reveals fire correctly,
+    // then explicitly kick the in-view hero counters.
     ScrollTrigger.refresh();
     kickVisibleCounters();
     setupHeroEntrance();
   });
-
-  // Pinned/horizontal sections depend on final layout — re-measure once
-  // images and webfonts have settled.
-  window.addEventListener('load', () => ScrollTrigger.refresh());
-  document.fonts?.ready.then(() => ScrollTrigger.refresh());
 }
 
 export function destroyPortfolioMotion() {
