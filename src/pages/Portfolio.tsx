@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ArrowOut, ArrowRight, GithubMark } from '@/icons';
-import { PROJECTS, EXPERIENCE, SKILLS, CASE_STUDIES, PRINCIPLES, RECOGNITION, PROOF_STATS } from '@/data/portfolio';
+import { PROJECTS, EXPERIENCE, SKILLS, CASE_STUDIES, PRINCIPLES, RECOGNITION } from '@/data/portfolio';
 import type { Glimpse } from '@/data/portfolio';
 import { initPortfolioMotion, destroyPortfolioMotion } from '@/lib/portfolio-motion';
 
@@ -99,7 +99,7 @@ export function Portfolio() {
         <div className="pf-nav-inner">
           <a href="#top" className="pf-logo">Hitesh Agrawal<b>.</b></a>
           <nav className="pf-nav-links">
-            <a href="#work">Work</a>
+            <a href="#proof">Work</a>
             <a href="#path">Path</a>
             <a href="#projects">Building</a>
             <a href="#contact">Contact</a>
@@ -141,9 +141,10 @@ export function Portfolio() {
                 </div>
               </div>
             </div>
-            <div className="pf-scrollcue pf-reveal" aria-hidden="true">
-              <span>Scroll</span>
-              <i />
+            <div className="pf-facts">
+              <div className="pf-fact"><strong data-pf-counter="280" data-pf-suffix="M+">280M+</strong><span>Users onboarded · zero downtime</span></div>
+              <div className="pf-fact"><strong data-pf-counter="22" data-pf-suffix="">22</strong><span>Enterprise partners</span></div>
+              <div className="pf-fact"><strong data-pf-counter="5" data-pf-suffix="">5</strong><span>Active ventures</span></div>
             </div>
           </div>
         </section>
@@ -160,66 +161,53 @@ export function Portfolio() {
           </div>
         </div>
 
-        <section className="pf-numbers" id="proof-numbers" aria-label="Proof, by the numbers">
-          <div className="pf-num-stage">
-            {PROOF_STATS.map((s, i) => (
-              <div className="pf-num-chapter" key={s.value}>
-                <div className="pf-num-index">
-                  {String(i + 1).padStart(2, '0')} <i>/</i> {String(PROOF_STATS.length).padStart(2, '0')}
-                </div>
-                <div className="pf-num-value">{s.value}</div>
-                <div className="pf-num-label">{s.label}</div>
-                <p className="pf-num-note">{s.note}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="pf-work" id="work" aria-label="Selected work">
-          <div className="pf-work-pin">
-            <div className="pf-work-head">
+        <section className="pf-section" id="proof">
+          <div className="pf-wrap">
+            <div className="pf-section-head pf-reveal">
               <div className="pf-section-tag">Selected work</div>
               <h2>Work I&apos;m <em>proud of</em></h2>
+              <p>Four problems, from enterprise scale to zero-to-one.</p>
             </div>
-            <div className="pf-work-track">
+            <div className="pf-cs-list">
               {CASE_STUDIES.map((cs, i) => (
-                <article key={cs.title} className="pf-wpanel">
-                  <span className="pf-wpanel-num">{String(i + 1).padStart(2, '0')}</span>
-                  <div className="pf-wpanel-body">
-                    <div className="pf-wpanel-kicker">{cs.kicker}</div>
-                    <h3 className="pf-wpanel-title">{cs.title}</h3>
-                    <div className="pf-wpanel-cols">
-                      <div className="pf-wpanel-col">
-                        <h4>The problem</h4>
-                        <p>{cs.challenge}</p>
-                      </div>
-                      <div className="pf-wpanel-col">
-                        <h4>What I did</h4>
-                        <p>{cs.approach}</p>
-                      </div>
-                      <div className="pf-wpanel-col">
-                        <h4>The outcome</h4>
-                        <p>{cs.outcome}</p>
-                      </div>
+                <article key={cs.title} className="pf-cs pf-reveal">
+                  <div className="pf-cs-head">
+                    <span className="pf-cs-num">{String(i + 1).padStart(2, '0')}</span>
+                    <div>
+                      <div className="pf-cs-kicker">{cs.kicker}</div>
+                      <h3>{cs.title}</h3>
                     </div>
-                    <div className="pf-wpanel-metrics">
-                      {cs.metrics.map((m) => (
-                        <div key={m.label} className="pf-wpanel-metric">
-                          <strong>{m.value}</strong>
-                          <span>{m.label}</span>
-                        </div>
-                      ))}
-                      {cs.link && (
-                        <a href={cs.link.href} target="_blank" rel="noopener noreferrer" className="pf-cs-link" data-cursor="Open">
-                          {cs.link.label} <ArrowOut size={11} />
-                        </a>
-                      )}
+                  </div>
+                  <div className="pf-cs-grid">
+                    <div className="pf-cs-col">
+                      <h4>The problem</h4>
+                      <p>{cs.challenge}</p>
                     </div>
+                    <div className="pf-cs-col">
+                      <h4>What I did</h4>
+                      <p>{cs.approach}</p>
+                    </div>
+                    <div className="pf-cs-col">
+                      <h4>The outcome</h4>
+                      <p>{cs.outcome}</p>
+                    </div>
+                  </div>
+                  <div className="pf-cs-metrics">
+                    {cs.metrics.map((m) => (
+                      <div key={m.label} className="pf-cs-metric">
+                        <strong>{m.value}</strong>
+                        <span>{m.label}</span>
+                      </div>
+                    ))}
+                    {cs.link && (
+                      <a href={cs.link.href} target="_blank" rel="noopener noreferrer" className="pf-cs-link" data-cursor="Open">
+                        {cs.link.label} <ArrowOut size={11} />
+                      </a>
+                    )}
                   </div>
                 </article>
               ))}
             </div>
-            <div className="pf-work-rail" aria-hidden="true"><span className="pf-work-rail-fill" /></div>
           </div>
         </section>
 
