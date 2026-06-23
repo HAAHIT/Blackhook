@@ -385,16 +385,16 @@ body.pf-loading { overflow: hidden; }
 .pf-num-stage { position: relative; height: 100vh; max-width: var(--pf-max); margin: 0 auto; padding: 0 28px; }
 .pf-num-chapter {
   position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center;
-  max-width: 18ch;
 }
 .pf-num-index { font-family: var(--pf-mono); font-size: 12px; letter-spacing: 0.16em; color: var(--pf-ink-3); margin-bottom: 22px; }
 .pf-num-index i { font-style: normal; color: var(--pf-line-2); }
 .pf-num-value {
   font-family: var(--pf-serif); font-weight: 400; font-size: clamp(5rem, 17vw, 15rem); line-height: 0.9; letter-spacing: -0.03em;
+  white-space: nowrap;
   background: var(--pf-gold); background-clip: text; -webkit-background-clip: text;
   color: transparent; -webkit-text-fill-color: transparent;
 }
-.pf-num-label { font-family: var(--pf-serif); font-style: italic; font-size: clamp(1.4rem, 3vw, 2.2rem); color: var(--pf-ink); margin-top: 14px; }
+.pf-num-label { font-family: var(--pf-serif); font-style: italic; font-size: clamp(1.4rem, 3vw, 2.2rem); color: var(--pf-ink); margin-top: 14px; max-width: 22ch; }
 .pf-num-note { font-size: 16px; line-height: 1.6; color: var(--pf-ink-2); margin: 18px 0 0; max-width: 40ch; }
 
 /* ===== Act 3 · Selected work (horizontal pinned) ===== */
