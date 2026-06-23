@@ -93,7 +93,19 @@ export function PortfolioFilm() {
       </div>
 
       <div className="pf-progress" aria-hidden="true"><span /></div>
-      <div className="pf-webgl" aria-hidden="true" />
+      <div className="pf-webgl" aria-hidden="true">
+        {/* Ambient living layer — mira-style slow halo, radar pings and
+            drifting motes. Pure CSS, sits behind all content, gold-tinted. */}
+        <div className="pf-ambient">
+          <span className="pf-halo" />
+          <span className="pf-ping pf-ping-1" />
+          <span className="pf-ping pf-ping-2" />
+          <span className="pf-ping pf-ping-3" />
+          {Array.from({ length: 9 }).map((_, i) => (
+            <span key={i} className={`pf-mote pf-mote-${i + 1}`} />
+          ))}
+        </div>
+      </div>
 
       <header className="pf-nav">
         <div className="pf-nav-inner">
