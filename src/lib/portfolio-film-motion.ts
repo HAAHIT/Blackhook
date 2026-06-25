@@ -423,7 +423,7 @@ function setupNumbersStage() {
       scrollTrigger: {
         trigger: section, start: 'top top',
         end: () => '+=' + window.innerHeight * (chapters.length - 1) * 1.05,
-        pin: true, scrub: 0.8, anticipatePin: 1, invalidateOnRefresh: true,
+        pin: true, scrub: 0.8, anticipatePin: 1, invalidateOnRefresh: true, refreshPriority: 1,
       },
     });
     for (let i = 1; i < chapters.length; i++) {
@@ -467,7 +467,7 @@ function setupHorizontalWork() {
     const tween = gsap.to(track, { x: () => -amount(), ease: 'none' });
     const st = ScrollTrigger.create({
       trigger: section, start: 'top top', end: () => '+=' + amount(),
-      pin: true, scrub: 1, anticipatePin: 1, invalidateOnRefresh: true, animation: tween,
+      pin: true, scrub: 1, anticipatePin: 1, invalidateOnRefresh: true, refreshPriority: 2, animation: tween,
       onUpdate: (self) => {
         if (railFill) railFill.style.transform = `scaleX(${self.progress})`;
         sphere?.setProgress(self.progress);
@@ -538,8 +538,11 @@ export function initPortfolioMotion() {
   setupMagnetic();
   setupWordmark();
   setupHeroParallax();
-  setupNumbersStage();
+  // Pin order must follow DOM order (work precedes numbers) so each pin's
+  // spacer is accounted for by the next — otherwise the later section's start
+  // is mis-measured and the two pinned sections overlap.
   setupHorizontalWork();
+  setupNumbersStage();
   setupPreloader(() => {
     // Re-measure against the now-unlocked layout so reveals + pins fire
     // correctly, then explicitly kick any in-view counters and force-reveal
