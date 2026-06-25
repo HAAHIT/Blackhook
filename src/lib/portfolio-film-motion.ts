@@ -225,15 +225,6 @@ function setupWebGL() {
   }).catch(() => { /* WebGL unavailable — CSS aurora fallback stays */ });
 }
 
-function setupProgress() {
-  const bar = document.querySelector<HTMLElement>('.pf-progress span');
-  if (!bar) return;
-  ScrollTrigger.create({
-    start: 0, end: 'max',
-    onUpdate: (self) => { bar.style.transform = `scaleX(${self.progress})`; },
-  });
-}
-
 /* Intro preloader — counts to 100, then curtains up and hands off to
    the hero entrance. On reduced-motion it's removed instantly. */
 function setupPreloader(done: () => void) {
@@ -540,7 +531,6 @@ export function initPortfolioMotion() {
   setupCursor();
   setupNav();
   setupWebGL();
-  setupProgress();
   setupReveals();
   setupCounters();
   setupCardTilt();

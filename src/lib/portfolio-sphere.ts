@@ -70,10 +70,10 @@ class SphereManager {
     geometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
 
     const material = new PointsMaterial({
-      size: 0.026,
+      size: 0.02,
       vertexColors: true,
       transparent: true,
-      opacity: 0.85,
+      opacity: 0.5,
       depthWrite: false,
       blending: AdditiveBlending,
       sizeAttenuation: true,
@@ -113,7 +113,7 @@ class SphereManager {
     const t = (performance.now() - this.start) / 1000;
     this.points.rotation.y = t * 0.08 + this.progress * Math.PI * 0.9;
     this.points.rotation.x = Math.sin(t * 0.12) * 0.08 + this.progress * 0.25;
-    const swell = 1 + Math.sin(this.progress * Math.PI) * 0.16;
+    const swell = 1 + Math.sin(this.progress * Math.PI) * 0.1;
     this.points.scale.setScalar(swell);
     this.renderer.render(this.scene, this.camera);
   };
