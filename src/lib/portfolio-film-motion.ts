@@ -409,7 +409,7 @@ function setupHeroParallax() {
    driver), so the "the brand is a sphere" motif starts in the hero and carries
    into the Selected Work rail. Skipped on touch / reduced-motion / no-WebGL. */
 function setupHeroSphere() {
-  const el = document.querySelector<HTMLElement>('.pf-orb-sphere');
+  const el = document.querySelector<HTMLElement>('.pf-hero-sphere');
   if (!el || isTouch() || prefersReduced()) return;
   import('./portfolio-sphere').then(({ HeroSphere }) => {
     try { HeroSphere.mount(el); } catch { return; }

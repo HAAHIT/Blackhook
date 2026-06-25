@@ -121,12 +121,12 @@ export function PortfolioFilm() {
 
       <main>
         <section className="pf-hero" id="top">
+          <span className="pf-hero-sphere" aria-hidden="true" />
           <div className="pf-wrap">
             <div className="pf-hero-center">
               <div className="pf-hero-copy">
                 <div className="pf-orb pf-reveal">
                   <span className="pf-orb-glow" />
-                  <span className="pf-orb-sphere" aria-hidden="true" />
                   <span className="pf-orb-core">
                     <span className="pf-orb-photo">
                       <img src="/hitesh-round.jpg" alt="Hitesh" width={148} height={148} />
