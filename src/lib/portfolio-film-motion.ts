@@ -81,7 +81,7 @@ function revealLift(els: HTMLElement[] | HTMLElement | null, opts: LiftOpts = {}
 let lenis: Lenis | null = null;
 let lenisRaf: number | null = null;
 let backdrop: { destroy: () => void } | null = null;
-let heroSphere: { destroy: () => void } | null = null;
+let pageSphere: { setMorphState: (n: number) => void; setProgress: (n: number) => void; destroy: () => void } | null = null;
 let counters: { el: HTMLElement; run: () => void }[] = [];
 const isTouch = () => window.matchMedia('(pointer: coarse)').matches;
 const prefersReduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -405,16 +405,41 @@ function setupHeroParallax() {
   });
 }
 
-/* Gold particle sphere behind the hero photo — ambient spin only (no scroll
-   driver), so the "the brand is a sphere" motif starts in the hero and carries
-   into the Selected Work rail. Skipped on touch / reduced-motion / no-WebGL. */
-function setupHeroSphere() {
-  const el = document.querySelector<HTMLElement>('.pf-hero-sphere');
+/* One persistent gold particle sphere lives in a fixed stage behind all
+   content and morphs as you scroll the site (mira-style): each major section
+   sets a discrete morph state, and the sphere eases between forms (calm →
+   rippling → turbulent → swollen). Skipped on touch / reduced-motion / no-WebGL. */
+function setupSphereStage() {
+  const el = document.querySelector<HTMLElement>('.pf-sphere-stage');
   if (!el || isTouch() || prefersReduced()) return;
-  import('./portfolio-sphere').then(({ HeroSphere }) => {
-    try { HeroSphere.mount(el); } catch { return; }
-    heroSphere = HeroSphere;
-  }).catch(() => { /* WebGL unavailable — orb just shows the photo + glow */ });
+  import('./portfolio-sphere').then(({ PortfolioSphere }) => {
+    try { PortfolioSphere.mount(el); } catch { return; }
+    pageSphere = PortfolioSphere;
+    setupSphereMorph();
+  }).catch(() => { /* WebGL unavailable — page just shows the CSS backdrop */ });
+}
+
+/* Map each section to a morph state. As a section's midline crosses the
+   viewport center, the sphere is told to morph to that section's form. */
+function setupSphereMorph() {
+  const stages: Array<[string, number]> = [
+    ['#top', 0],          // hero — calm, faint wave
+    ['#work', 1],         // selected work — rippling
+    ['#path', 2],         // path — turbulent
+    ['#projects', 2],     // building — turbulent
+    ['#skills', 3],       // skills — swollen scatter
+    ['#principles', 3],   // principles — swollen scatter
+    ['#recognition', 4],  // recognition — grand
+    ['#contact', 4],      // contact — grand finale
+  ];
+  stages.forEach(([sel, state]) => {
+    const el = document.querySelector<HTMLElement>(sel);
+    if (!el) return;
+    ScrollTrigger.create({
+      trigger: el, start: 'top center', end: 'bottom center',
+      onToggle: (self) => { if (self.isActive) pageSphere?.setMorphState(state); },
+    });
+  });
 }
 
 /* Selected work scrolls horizontally while the section is pinned (desktop);
@@ -423,17 +448,8 @@ function setupHorizontalWork() {
   const section = document.querySelector<HTMLElement>('.pf-work');
   const track = document.querySelector<HTMLElement>('.pf-work-track');
   const railFill = document.querySelector<HTMLElement>('.pf-work-rail-fill');
-  const sphereEl = document.querySelector<HTMLElement>('.pf-work-sphere');
   const dots = gsap.utils.toArray<HTMLElement>('.pf-work-dot');
   if (!section || !track) return;
-
-  let sphere: { setProgress: (n: number) => void; destroy: () => void } | null = null;
-  if (sphereEl && !isTouch() && !prefersReduced() && window.innerWidth >= 760) {
-    import('./portfolio-sphere').then(({ WorkSphere }) => {
-      try { WorkSphere.mount(sphereEl); } catch { return; }
-      sphere = WorkSphere;
-    }).catch(() => { /* WebGL unavailable — sphere just stays empty */ });
-  }
 
   const panelCount = Math.max(1, gsap.utils.toArray('.pf-wpanel').length);
   const setActiveDot = (progress: number) => {
@@ -453,7 +469,7 @@ function setupHorizontalWork() {
       pin: true, scrub: 1, anticipatePin: 1, invalidateOnRefresh: true, refreshPriority: 2, animation: tween,
       onUpdate: (self) => {
         if (railFill) railFill.style.transform = `scaleX(${self.progress})`;
-        sphere?.setProgress(self.progress);
+        pageSphere?.setProgress(self.progress);
         setActiveDot(self.progress);
       },
     });
@@ -521,7 +537,7 @@ export function initPortfolioMotion() {
   setupMagnetic();
   setupWordmark();
   setupHeroParallax();
-  setupHeroSphere();
+  setupSphereStage();
   setupHorizontalWork();
   setupPreloader(() => {
     // Re-measure against the now-unlocked layout so reveals + pins fire
@@ -543,7 +559,7 @@ export function destroyPortfolioMotion() {
   if (lenisRaf !== null) { cancelAnimationFrame(lenisRaf); lenisRaf = null; }
   lenis?.destroy(); lenis = null;
   if (backdrop) { backdrop.destroy(); backdrop = null; }
-  if (heroSphere) { heroSphere.destroy(); heroSphere = null; }
+  if (pageSphere) { pageSphere.destroy(); pageSphere = null; }
   ScrollTrigger.getAll().forEach((t) => t.kill());
   gsap.globalTimeline.clear();
 }

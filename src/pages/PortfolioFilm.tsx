@@ -92,6 +92,8 @@ export function PortfolioFilm() {
         <div className="pf-loader-bar"><span /></div>
       </div>
 
+      <div className="pf-sphere-stage" aria-hidden="true" />
+
       <div className="pf-webgl" aria-hidden="true">
         {/* Ambient living layer — mira-style slow halo, radar pings and
             drifting motes. Pure CSS, sits behind all content, gold-tinted. */}
@@ -121,7 +123,6 @@ export function PortfolioFilm() {
 
       <main>
         <section className="pf-hero" id="top">
-          <span className="pf-hero-sphere" aria-hidden="true" />
           <div className="pf-wrap">
             <div className="pf-hero-center">
               <div className="pf-hero-copy">
@@ -166,7 +167,6 @@ export function PortfolioFilm() {
 
         <section className="pf-work" id="work" aria-label="Selected work">
           <div className="pf-work-pin">
-            <div className="pf-work-sphere" aria-hidden="true" />
             <div className="pf-work-side-label" aria-hidden="true">
               <span>Selected work</span>
             </div>
