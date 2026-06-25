@@ -226,6 +226,15 @@ function setupWebGL() {
   }).catch(() => { /* WebGL unavailable — CSS aurora fallback stays */ });
 }
 
+function setupProgress() {
+  const bar = document.querySelector<HTMLElement>('.pf-progress span');
+  if (!bar) return;
+  ScrollTrigger.create({
+    start: 0, end: 'max',
+    onUpdate: (self) => { bar.style.transform = `scaleX(${self.progress})`; },
+  });
+}
+
 /* Intro preloader — counts to 100, then curtains up and hands off to
    the hero entrance. On reduced-motion it's removed instantly. */
 function setupPreloader(done: () => void) {
@@ -425,7 +434,6 @@ function setupSphereMorph() {
   const stages: Array<[string, number]> = [
     ['#top', 0],          // hero — calm, faint wave
     ['#work', 1],         // selected work — rippling
-    ['#path', 2],         // path — turbulent
     ['#projects', 2],     // building — turbulent
     ['#skills', 3],       // skills — swollen scatter
     ['#principles', 3],   // principles — swollen scatter
@@ -523,6 +531,18 @@ function setupNav() {
   gsap.from(nav, { y: -40, opacity: 0, duration: 1.0, delay: 0.05, ease: 'expo.out' });
   ScrollTrigger.create({ start: 'top -40', end: 'max',
     onUpdate: (self) => nav.classList.toggle('scrolled', self.scroll() > 40) });
+
+  const links = gsap.utils.toArray<HTMLAnchorElement>('.pf-nav-links a');
+  if (!links.length) return;
+  links.forEach((link) => {
+    const id = link.getAttribute('href');
+    const target = id ? document.querySelector<HTMLElement>(id) : null;
+    if (!target) return;
+    ScrollTrigger.create({
+      trigger: target, start: 'top center', end: 'bottom center',
+      onToggle: (self) => { if (self.isActive) link.setAttribute('aria-current', 'true'); else link.removeAttribute('aria-current'); },
+    });
+  });
 }
 
 export function initPortfolioMotion() {
@@ -530,6 +550,7 @@ export function initPortfolioMotion() {
   setupCursor();
   setupNav();
   setupWebGL();
+  setupProgress();
   setupReveals();
   setupCounters();
   setupCardTilt();

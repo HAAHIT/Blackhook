@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ArrowOut, ArrowRight, GithubMark } from '@/icons';
-import { PROJECTS, EXPERIENCE, SKILLS, CASE_STUDIES, PRINCIPLES, RECOGNITION } from '@/data/portfolio';
+import { PROJECTS, SKILLS, CASE_STUDIES, PRINCIPLES, RECOGNITION } from '@/data/portfolio';
 import type { Glimpse } from '@/data/portfolio';
 import { initPortfolioMotion, destroyPortfolioMotion } from '@/lib/portfolio-film-motion';
 
@@ -92,6 +92,7 @@ export function PortfolioFilm() {
         <div className="pf-loader-bar"><span /></div>
       </div>
 
+      <div className="pf-progress" aria-hidden="true"><span /></div>
       <div className="pf-sphere-stage" aria-hidden="true" />
 
       <div className="pf-webgl" aria-hidden="true">
@@ -113,7 +114,6 @@ export function PortfolioFilm() {
           <a href="#top" className="pf-logo">Hitesh Agrawal<b>.</b></a>
           <nav className="pf-nav-links">
             <a href="#work">Work</a>
-            <a href="#path">Path</a>
             <a href="#projects">Building</a>
             <a href="#contact">Contact</a>
           </nav>
@@ -172,7 +172,7 @@ export function PortfolioFilm() {
             </div>
             <div className="pf-work-head">
               <div className="pf-section-tag">Selected work</div>
-              <h2>Work I&apos;m <em>proud of</em></h2>
+              <h2>Case studies <em>I&apos;m proud of</em></h2>
             </div>
             <div className="pf-work-track">
               {CASE_STUDIES.map((cs, i) => (
@@ -218,30 +218,6 @@ export function PortfolioFilm() {
             ))}
           </div>
         </div>
-
-        <section className="pf-section" id="path">
-          <div className="pf-wrap">
-            <div className="pf-section-head pf-reveal">
-              <div className="pf-section-tag">Path</div>
-              <h2>Where I&apos;ve <em>been</em></h2>
-            </div>
-            <div className="pf-xp-list">
-              {EXPERIENCE.map((x) => (
-                <article key={x.org} className="pf-xp pf-reveal">
-                  <div className="pf-xp-range">{x.range}</div>
-                  <div>
-                    <h3 className="pf-xp-role">{x.role}</h3>
-                    <div className="pf-xp-meta">
-                      <span className="pf-xp-org">{x.org}</span>
-                      <span className="pf-xp-place">{x.place}</span>
-                    </div>
-                    <p className="pf-xp-desc">{x.desc.replace('28Cr+', '280M+')}</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
 
         <section className="pf-section" id="projects">
           <div className="pf-wrap">
