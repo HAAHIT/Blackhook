@@ -92,7 +92,6 @@ export function PortfolioFilm() {
         <div className="pf-loader-bar"><span /></div>
       </div>
 
-      <div className="pf-progress" aria-hidden="true"><span /></div>
       <div className="pf-webgl" aria-hidden="true">
         {/* Ambient living layer — mira-style slow halo, radar pings and
             drifting motes. Pure CSS, sits behind all content, gold-tinted. */}
@@ -206,7 +205,6 @@ export function PortfolioFilm() {
                 <span key={cs.title} className="pf-work-dot" data-active={i === 0 ? 'true' : undefined} />
               ))}
             </div>
-            <div className="pf-work-rail" aria-hidden="true"><span className="pf-work-rail-fill" /></div>
           </div>
         </section>
 

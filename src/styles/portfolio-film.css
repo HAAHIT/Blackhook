@@ -144,10 +144,6 @@ main, .pf-footer, .pf-wordmark { position: relative; z-index: 1; }
   100% { transform: translateY(-6vh) translateX(22px); opacity: 0; }
 }
 
-/* ===== Scroll progress ===== */
-.pf-progress { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 60; pointer-events: none; }
-.pf-progress span { display: block; height: 100%; width: 100%; transform: scaleX(0); transform-origin: 0 50%; background: var(--pf-gold); box-shadow: 0 0 12px rgba(212, 181, 106, 0.5); }
-
 /* ===== Preloader ===== */
 .pf-loader { position: fixed; inset: 0; z-index: 9998; background: #121216; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 .pf-loader-inner { display: flex; flex-direction: column; align-items: center; gap: 16px; }
@@ -492,7 +488,7 @@ body.pf-loading { overflow: hidden; }
 /* ===== Act 3 · Selected work (horizontal pinned) ===== */
 .pf-work { position: relative; height: 100vh; overflow: hidden; border-top: 1px solid var(--pf-line); background: radial-gradient(900px circle at 50% 50%, rgba(212, 181, 106, 0.05), transparent 60%); }
 .pf-work-pin { position: relative; height: 100vh; }
-.pf-work-sphere { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0.55; mix-blend-mode: screen; }
+.pf-work-sphere { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0.28; mix-blend-mode: screen; filter: blur(0.4px); }
 .pf-work-sphere canvas { display: block; width: 100% !important; height: 100% !important; }
 .pf-work-side-label {
   position: absolute; left: 22px; top: 50%; z-index: 3; pointer-events: none;
@@ -549,8 +545,6 @@ body.pf-loading { overflow: hidden; }
   background: var(--pf-gold-solid); transform: scale(1.7);
   box-shadow: 0 0 10px rgba(212, 181, 106, 0.55);
 }
-.pf-work-rail { position: absolute; left: 7vw; right: 7vw; bottom: 56px; height: 2px; background: var(--pf-line); z-index: 3; }
-.pf-work-rail-fill { display: block; height: 100%; width: 100%; transform: scaleX(0); transform-origin: 0 50%; background: var(--pf-gold); box-shadow: 0 0 12px rgba(212, 181, 106, 0.5); }
 .pf-cs-link {
   display: inline-flex; align-items: center; gap: 7px; margin-left: auto;
   font-family: var(--pf-mono); font-size: 12.5px; color: var(--pf-ink-2);
@@ -662,7 +656,7 @@ body.pf-loading { overflow: hidden; }
   .pf-wpanel-num { position: static; font-size: 4rem; color: rgba(244, 240, 232, 0.08); display: block; margin-bottom: 8px; }
   .pf-wpanel-metrics { gap: 18px 30px; justify-content: flex-start; }
   .pf-cs-link { margin-left: 0; }
-  .pf-work-rail, .pf-work-dots, .pf-work-side-label, .pf-work-sphere { display: none; }
+  .pf-work-dots, .pf-work-side-label, .pf-work-sphere { display: none; }
   .pf-wpanel { text-align: left; }
   .pf-wpanel-body { align-items: flex-start; max-width: none; }
 
@@ -696,7 +690,7 @@ body.pf-loading { overflow: hidden; }
   .pf-wpanel { width: 100%; height: auto; padding: 48px 7vw; }
   .pf-wpanel + .pf-wpanel { border-left: none; border-top: 1px solid var(--pf-line); }
   .pf-wpanel-num { position: static; display: block; margin-bottom: 8px; font-size: 4rem; }
-  .pf-work-rail, .pf-work-dots, .pf-work-side-label, .pf-work-sphere { display: none; }
+  .pf-work-dots, .pf-work-side-label, .pf-work-sphere { display: none; }
   .pf-wpanel { text-align: left; }
   .pf-wpanel-body { align-items: flex-start; max-width: none; }
 }
