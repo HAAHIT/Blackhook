@@ -81,6 +81,7 @@ function revealLift(els: HTMLElement[] | HTMLElement | null, opts: LiftOpts = {}
 let lenis: Lenis | null = null;
 let lenisRaf: number | null = null;
 let backdrop: { destroy: () => void } | null = null;
+let heroSphere: { destroy: () => void } | null = null;
 let counters: { el: HTMLElement; run: () => void }[] = [];
 const isTouch = () => window.matchMedia('(pointer: coarse)').matches;
 const prefersReduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -404,6 +405,18 @@ function setupHeroParallax() {
   });
 }
 
+/* Gold particle sphere behind the hero photo — ambient spin only (no scroll
+   driver), so the "the brand is a sphere" motif starts in the hero and carries
+   into the Selected Work rail. Skipped on touch / reduced-motion / no-WebGL. */
+function setupHeroSphere() {
+  const el = document.querySelector<HTMLElement>('.pf-orb-sphere');
+  if (!el || isTouch() || prefersReduced()) return;
+  import('./portfolio-sphere').then(({ HeroSphere }) => {
+    try { HeroSphere.mount(el); } catch { return; }
+    heroSphere = HeroSphere;
+  }).catch(() => { /* WebGL unavailable — orb just shows the photo + glow */ });
+}
+
 /* Selected work scrolls horizontally while the section is pinned (desktop);
    on mobile the panels just stack and reveal vertically. */
 function setupHorizontalWork() {
@@ -508,6 +521,7 @@ export function initPortfolioMotion() {
   setupMagnetic();
   setupWordmark();
   setupHeroParallax();
+  setupHeroSphere();
   setupHorizontalWork();
   setupPreloader(() => {
     // Re-measure against the now-unlocked layout so reveals + pins fire
@@ -529,6 +543,7 @@ export function destroyPortfolioMotion() {
   if (lenisRaf !== null) { cancelAnimationFrame(lenisRaf); lenisRaf = null; }
   lenis?.destroy(); lenis = null;
   if (backdrop) { backdrop.destroy(); backdrop = null; }
+  if (heroSphere) { heroSphere.destroy(); heroSphere = null; }
   ScrollTrigger.getAll().forEach((t) => t.kill());
   gsap.globalTimeline.clear();
 }

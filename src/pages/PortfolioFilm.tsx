@@ -126,14 +126,13 @@ export function PortfolioFilm() {
               <div className="pf-hero-copy">
                 <div className="pf-orb pf-reveal">
                   <span className="pf-orb-glow" />
+                  <span className="pf-orb-sphere" aria-hidden="true" />
                   <span className="pf-orb-core">
                     <span className="pf-orb-photo">
                       <img src="/hitesh-round.jpg" alt="Hitesh" width={148} height={148} />
                     </span>
                   </span>
-                  <span className="pf-orb-sheen" />
                   <span className="pf-orb-spec" />
-                  <span className="pf-orb-ring" />
                 </div>
                 <div className="pf-eyebrow pf-reveal">
                   <span className="dot" />

@@ -30,7 +30,7 @@ const fibonacciSphere = (count: number, radius: number) => {
   return positions;
 };
 
-class SphereManager {
+export class SphereManager {
   private renderer: WebGLRenderer | null = null;
   private scene: Scene | null = null;
   private camera: PerspectiveCamera | null = null;
@@ -143,3 +143,8 @@ class SphereManager {
 }
 
 export const WorkSphere = new SphereManager();
+
+/* A second, independent instance for the hero orb. It runs an ambient spin
+   only (no scroll progress driven), forming a halo of gold dust behind the
+   round photo — the same particle language the Selected Work rail uses. */
+export const HeroSphere = new SphereManager();
