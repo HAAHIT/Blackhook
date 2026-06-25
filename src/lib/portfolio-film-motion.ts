@@ -449,7 +449,26 @@ function setupHorizontalWork() {
   const section = document.querySelector<HTMLElement>('.pf-work');
   const track = document.querySelector<HTMLElement>('.pf-work-track');
   const railFill = document.querySelector<HTMLElement>('.pf-work-rail-fill');
+  const sphereEl = document.querySelector<HTMLElement>('.pf-work-sphere');
+  const dots = gsap.utils.toArray<HTMLElement>('.pf-work-dot');
   if (!section || !track) return;
+
+  let sphere: { setProgress: (n: number) => void; destroy: () => void } | null = null;
+  if (sphereEl && !isTouch() && !prefersReduced() && window.innerWidth >= 760) {
+    import('./portfolio-sphere').then(({ WorkSphere }) => {
+      try { WorkSphere.mount(sphereEl); } catch { return; }
+      sphere = WorkSphere;
+    }).catch(() => { /* WebGL unavailable — sphere just stays empty */ });
+  }
+
+  const panelCount = Math.max(1, gsap.utils.toArray('.pf-wpanel').length);
+  const setActiveDot = (progress: number) => {
+    const i = Math.min(panelCount - 1, Math.floor(progress * panelCount));
+    dots.forEach((d, idx) => {
+      if (idx === i) d.setAttribute('data-active', 'true');
+      else d.removeAttribute('data-active');
+    });
+  };
 
   const mm = gsap.matchMedia();
   mm.add('(min-width: 821px) and (prefers-reduced-motion: no-preference)', () => {
@@ -458,7 +477,11 @@ function setupHorizontalWork() {
     const st = ScrollTrigger.create({
       trigger: section, start: 'top top', end: () => '+=' + amount(),
       pin: true, scrub: 1, anticipatePin: 1, invalidateOnRefresh: true, animation: tween,
-      onUpdate: (self) => { if (railFill) railFill.style.transform = `scaleX(${self.progress})`; },
+      onUpdate: (self) => {
+        if (railFill) railFill.style.transform = `scaleX(${self.progress})`;
+        sphere?.setProgress(self.progress);
+        setActiveDot(self.progress);
+      },
     });
 
     // Reveal each panel's content as it scrolls into view *horizontally*
