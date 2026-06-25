@@ -123,8 +123,15 @@ export function PortfolioFilm() {
       <main>
         <section className="pf-hero" id="top">
           <div className="pf-wrap">
-            <div className="pf-hero-layout">
+            <div className="pf-hero-center">
               <div className="pf-hero-copy">
+                <div className="pf-orb pf-reveal" aria-hidden="true">
+                  <span className="pf-orb-glow" />
+                  <span className="pf-orb-core" />
+                  <span className="pf-orb-sheen" />
+                  <span className="pf-orb-spec" />
+                  <span className="pf-orb-ring" />
+                </div>
                 <div className="pf-eyebrow pf-reveal">
                   <span className="dot" />
                   Open to senior product roles — worldwide
@@ -145,11 +152,6 @@ export function PortfolioFilm() {
                   <a href={RESUME} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-ghost pf-magnetic">
                     Read résumé
                   </a>
-                </div>
-              </div>
-              <div className="pf-hero-photo-wrap">
-                <div className="pf-hero-photo pf-reveal">
-                  <img src="/hitesh.jpg" alt="Hitesh Agrawal" />
                 </div>
               </div>
             </div>
