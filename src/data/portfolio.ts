@@ -273,8 +273,8 @@ export interface CaseStudy {
 
 export const CASE_STUDIES: CaseStudy[] = [
   {
-    kicker: 'Jio Platforms · Enterprise scale',
-    title: 'Onboarding 280M+ customers, with zero',
+    kicker: 'Jio Loyalty · Jio Platforms Limited',
+    title: 'Jio Loyalty: 280M+ customers onboarded, zero',
     accent: 'downtime',
     subtitle: 'A custom onboarding gateway, phased rollouts and a 22-partner playbook — moved an entire base without breaking a single login.',
     challenge:

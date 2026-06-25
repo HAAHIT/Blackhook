@@ -125,9 +125,13 @@ export function PortfolioFilm() {
           <div className="pf-wrap">
             <div className="pf-hero-center">
               <div className="pf-hero-copy">
-                <div className="pf-orb pf-reveal" aria-hidden="true">
+                <div className="pf-orb pf-reveal">
                   <span className="pf-orb-glow" />
-                  <span className="pf-orb-core" />
+                  <span className="pf-orb-core">
+                    <span className="pf-orb-photo">
+                      <img src="/hitesh-round.jpg" alt="Hitesh" width={148} height={148} />
+                    </span>
+                  </span>
                   <span className="pf-orb-sheen" />
                   <span className="pf-orb-spec" />
                   <span className="pf-orb-ring" />
@@ -159,33 +163,6 @@ export function PortfolioFilm() {
               <span>Scroll</span>
               <i />
             </div>
-          </div>
-        </section>
-
-        <div className="pf-marquee" aria-hidden="true">
-          <div className="pf-marquee-track">
-            {[0, 1].map((dup) => (
-              <div className="pf-marquee-set" key={dup}>
-                {MARQUEE.map((m) => (
-                  <span className="pf-marquee-item" key={m}>{m}<span className="s">◆</span></span>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <section className="pf-numbers" id="proof-numbers" aria-label="Proof, by the numbers">
-          <div className="pf-num-stage">
-            {PROOF_STATS.map((s, i) => (
-              <div className="pf-num-chapter" key={s.value}>
-                <div className="pf-num-index">
-                  {String(i + 1).padStart(2, '0')} <i>/</i> {String(PROOF_STATS.length).padStart(2, '0')}
-                </div>
-                <div className="pf-num-value">{s.value}</div>
-                <div className="pf-num-label">{s.label}</div>
-                <p className="pf-num-note">{s.note}</p>
-              </div>
-            ))}
           </div>
         </section>
 
@@ -230,6 +207,33 @@ export function PortfolioFilm() {
               ))}
             </div>
             <div className="pf-work-rail" aria-hidden="true"><span className="pf-work-rail-fill" /></div>
+          </div>
+        </section>
+
+        <div className="pf-marquee" aria-hidden="true">
+          <div className="pf-marquee-track">
+            {[0, 1].map((dup) => (
+              <div className="pf-marquee-set" key={dup}>
+                {MARQUEE.map((m) => (
+                  <span className="pf-marquee-item" key={m}>{m}<span className="s">◆</span></span>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <section className="pf-numbers" id="proof-numbers" aria-label="Proof, by the numbers">
+          <div className="pf-num-stage">
+            {PROOF_STATS.map((s, i) => (
+              <div className="pf-num-chapter" key={s.value}>
+                <div className="pf-num-index">
+                  {String(i + 1).padStart(2, '0')} <i>/</i> {String(PROOF_STATS.length).padStart(2, '0')}
+                </div>
+                <div className="pf-num-value">{s.value}</div>
+                <div className="pf-num-label">{s.label}</div>
+                <p className="pf-num-note">{s.note}</p>
+              </div>
+            ))}
           </div>
         </section>
 
