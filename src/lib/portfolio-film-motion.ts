@@ -18,6 +18,31 @@ CustomEase.create('pf-snap', '0.4,0,0.1,1');
 const EASE_CINE = 'pf-cine';
 const EASE_SPRING = 'back.out(1.6)';
 
+/* Reveal bookkeeping. Each registered element gets a guarded play() so it
+   reveals at most once, whether fired by its ScrollTrigger or force-kicked
+   at load. The kick is what saves content that's already scrolled past on
+   load (anchor deep-link, browser scroll restoration) — with `once:true`,
+   ScrollTrigger won't fire onEnter for elements above the start line, so
+   they'd otherwise stay invisible and blurred forever. */
+let reveals: { el: HTMLElement; play: () => void }[] = [];
+let revealed: WeakSet<HTMLElement> = new WeakSet();
+const START_RATIO = 0.88; // mirrors the 'top 88%' trigger start
+
+function makeReveal(el: HTMLElement, run: () => void) {
+  const play = () => { if (revealed.has(el)) return; revealed.add(el); run(); };
+  reveals.push({ el, play });
+  return play;
+}
+
+// Force-reveal anything already at or above the trigger start at load, so
+// deep-linked / restored scroll positions never strand hidden content.
+function kickPassedReveals() {
+  const startLine = window.innerHeight * START_RATIO;
+  reveals.forEach(({ el, play }) => {
+    if (el.getBoundingClientRect().top < startLine) play();
+  });
+}
+
 /* The mira reveal "fingerprint": rise + 3D flip + scale + blur clearing
    to sharp. Tunable per call so cards flip harder than paragraphs. */
 type LiftOpts = {
@@ -38,13 +63,17 @@ function revealLift(els: HTMLElement[] | HTMLElement | null, opts: LiftOpts = {}
     filter: `blur(${blur}px)`,
     transformPerspective: perspective, transformOrigin: '50% 100%',
   });
+  const to = { opacity: 1, y: 0, rotateX: 0, scale: 1, filter: 'blur(0px)', duration, ease };
+  list.forEach((el) => makeReveal(el, () => gsap.to(el, { ...to })));
   ScrollTrigger.batch(list, {
     start,
-    onEnter: (batch) => gsap.to(batch, {
-      opacity: 1, y: 0, rotateX: 0, scale: 1,
-      filter: 'blur(0px)',
-      duration, ease, stagger, overwrite: true,
-    }),
+    onEnter: (batch) => {
+      // Animate the group together (keeps the stagger); skip any element a
+      // kick already revealed, and mark the rest so a later kick won't repeat.
+      const fresh = (batch as HTMLElement[]).filter((el) => !revealed.has(el));
+      fresh.forEach((el) => revealed.add(el));
+      if (fresh.length) gsap.to(fresh, { ...to, stagger, overwrite: true });
+    },
     once: true,
   });
 }
@@ -248,7 +277,7 @@ function setupHeroEntrance() {
   const sub = document.querySelector<HTMLElement>('.pf-hero-sub');
   const ctas = document.querySelector<HTMLElement>('.pf-hero-ctas');
   const facts = document.querySelectorAll<HTMLElement>('.pf-fact');
-  const photoWrap = document.querySelector<HTMLElement>('.pf-hero-photo-wrap');
+  const orb = document.querySelector<HTMLElement>('.pf-orb');
 
   if (eyebrow) { gsap.set(eyebrow, { y: 14, opacity: 0, scale: 0.9, filter: 'blur(8px)' }); tl.to(eyebrow, { y: 0, opacity: 1, scale: 1, filter: 'blur(0px)', duration: 0.8, ease: EASE_CINE }, 0); }
   if (h1) {
@@ -259,19 +288,24 @@ function setupHeroEntrance() {
   if (sub) { gsap.set(sub, { y: 24, opacity: 0, filter: 'blur(8px)' }); tl.to(sub, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.95, ease: EASE_CINE }, 0.55); }
   if (ctas) { gsap.set(Array.from(ctas.children), { y: 16, opacity: 0, filter: 'blur(5px)' }); tl.to(ctas.children, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: EASE_CINE, stagger: 0.1 }, 0.7); }
   if (facts.length) { gsap.set(facts, { y: 14, opacity: 0, filter: 'blur(5px)' }); tl.to(facts, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: EASE_CINE, stagger: 0.08 }, 0.85); }
-  // Portrait does a cinematic focus-pull: scales down from soft + blurred to sharp.
-  if (photoWrap) { gsap.set(photoWrap, { y: 28, opacity: 0, scale: 1.06, filter: 'blur(14px)' }); tl.to(photoWrap, { y: 0, opacity: 1, scale: 1, filter: 'blur(0px)', duration: 1.3, ease: EASE_CINE }, 0.2); }
+  // Orb materialises first and leads the hero: springs up from a small point
+  // so it feels like it powers on. Scale+opacity only — no lingering filter,
+  // which would flatten the orb's preserve-3d orbit ring.
+  if (orb) { gsap.set(orb, { opacity: 0, scale: 0.35 }); tl.to(orb, { opacity: 1, scale: 1, duration: 1.4, ease: EASE_SPRING }, 0); }
 }
 
 
 function setupReveals() {
+  reveals = [];
+  revealed = new WeakSet();
+
   // Big serif headings keep the masked word-rise (our most premium move),
   // now timed on mira's cine curve with a faint blur clearing per word.
   document.querySelectorAll<HTMLElement>('.pf-section-head h2, .pf-work-head h2, .pf-contact h2').forEach((h) => {
     const words = splitWords(h);
     gsap.set(words, { yPercent: 115, opacity: 0, filter: 'blur(5px)' });
-    ScrollTrigger.create({ trigger: h, start: 'top 88%', once: true,
-      onEnter: () => gsap.to(words, { yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 1.0, ease: EASE_CINE, stagger: 0.05 }) });
+    const play = makeReveal(h, () => gsap.to(words, { yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 1.0, ease: EASE_CINE, stagger: 0.05 }));
+    ScrollTrigger.create({ trigger: h, start: 'top 88%', once: true, onEnter: play });
   });
 
   // Eyebrows / supporting copy: a soft blur-lift, no flip.
@@ -301,11 +335,12 @@ function setupReveals() {
   revealLift(document.querySelector<HTMLElement>('.pf-contact-grid > div:first-child'),
     { y: 38, rotateX: 12, blur: 9, duration: 1.0 });
 
+  const rowsWrap = document.querySelector<HTMLElement>('.pf-contact-rows');
   const contactRows = Array.from(document.querySelectorAll<HTMLElement>('.pf-contact-row'));
-  if (contactRows.length) {
+  if (rowsWrap && contactRows.length) {
     gsap.set(contactRows, { x: 26, opacity: 0, filter: 'blur(5px)' });
-    ScrollTrigger.create({ trigger: '.pf-contact-rows', start: 'top 88%', once: true,
-      onEnter: () => gsap.to(contactRows, { x: 0, opacity: 1, filter: 'blur(0px)', duration: 0.75, ease: EASE_CINE, stagger: 0.1 }) });
+    const play = makeReveal(rowsWrap, () => gsap.to(contactRows, { x: 0, opacity: 1, filter: 'blur(0px)', duration: 0.75, ease: EASE_CINE, stagger: 0.1 }));
+    ScrollTrigger.create({ trigger: rowsWrap, start: 'top 88%', once: true, onEnter: play });
   }
 }
 
@@ -414,7 +449,26 @@ function setupHorizontalWork() {
   const section = document.querySelector<HTMLElement>('.pf-work');
   const track = document.querySelector<HTMLElement>('.pf-work-track');
   const railFill = document.querySelector<HTMLElement>('.pf-work-rail-fill');
+  const sphereEl = document.querySelector<HTMLElement>('.pf-work-sphere');
+  const dots = gsap.utils.toArray<HTMLElement>('.pf-work-dot');
   if (!section || !track) return;
+
+  let sphere: { setProgress: (n: number) => void; destroy: () => void } | null = null;
+  if (sphereEl && !isTouch() && !prefersReduced() && window.innerWidth >= 760) {
+    import('./portfolio-sphere').then(({ WorkSphere }) => {
+      try { WorkSphere.mount(sphereEl); } catch { return; }
+      sphere = WorkSphere;
+    }).catch(() => { /* WebGL unavailable — sphere just stays empty */ });
+  }
+
+  const panelCount = Math.max(1, gsap.utils.toArray('.pf-wpanel').length);
+  const setActiveDot = (progress: number) => {
+    const i = Math.min(panelCount - 1, Math.floor(progress * panelCount));
+    dots.forEach((d, idx) => {
+      if (idx === i) d.setAttribute('data-active', 'true');
+      else d.removeAttribute('data-active');
+    });
+  };
 
   const mm = gsap.matchMedia();
   mm.add('(min-width: 821px) and (prefers-reduced-motion: no-preference)', () => {
@@ -423,7 +477,11 @@ function setupHorizontalWork() {
     const st = ScrollTrigger.create({
       trigger: section, start: 'top top', end: () => '+=' + amount(),
       pin: true, scrub: 1, anticipatePin: 1, invalidateOnRefresh: true, animation: tween,
-      onUpdate: (self) => { if (railFill) railFill.style.transform = `scaleX(${self.progress})`; },
+      onUpdate: (self) => {
+        if (railFill) railFill.style.transform = `scaleX(${self.progress})`;
+        sphere?.setProgress(self.progress);
+        setActiveDot(self.progress);
+      },
     });
 
     // Reveal each panel's content as it scrolls into view *horizontally*
@@ -494,9 +552,11 @@ export function initPortfolioMotion() {
   setupHorizontalWork();
   setupPreloader(() => {
     // Re-measure against the now-unlocked layout so reveals + pins fire
-    // correctly, then explicitly kick any in-view counters.
+    // correctly, then explicitly kick any in-view counters and force-reveal
+    // anything already scrolled past (deep-link / scroll restoration).
     ScrollTrigger.refresh();
     kickVisibleCounters();
+    kickPassedReveals();
     setupHeroEntrance();
   });
 

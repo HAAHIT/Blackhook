@@ -258,7 +258,12 @@ export const SKILLS: SkillGroup[] = [
 
 export interface CaseStudy {
   kicker: string;
+  /** Headline before the italic-serif accent word. */
   title: string;
+  /** Italic-serif accent word that closes the headline (mira-style emphasis). */
+  accent: string;
+  /** Condensed problem → approach → outcome, as one cinematic line. */
+  subtitle: string;
   challenge: string;
   approach: string;
   outcome: string;
@@ -269,7 +274,9 @@ export interface CaseStudy {
 export const CASE_STUDIES: CaseStudy[] = [
   {
     kicker: 'Jio Platforms · Enterprise scale',
-    title: 'Onboarding 280M+ customers with zero downtime',
+    title: 'Onboarding 280M+ customers, with zero',
+    accent: 'downtime',
+    subtitle: 'A custom onboarding gateway, phased rollouts and a 22-partner playbook — moved an entire base without breaking a single login.',
     challenge:
       'Move 280M+ customers and their enterprise partners onto a brand-new loyalty platform — business live, zero room for a broken login.',
     approach:
@@ -284,7 +291,9 @@ export const CASE_STUDIES: CaseStudy[] = [
   },
   {
     kicker: 'BlackHook · B2B commodity SaaS',
-    title: 'The customer paid before the product existed',
+    title: 'The customer paid before the product',
+    accent: 'existed',
+    subtitle: 'Sat with sceptical traders first, scoped the MVP around their workflow, and closed a paying pilot before writing a line of code.',
     challenge:
       'The edible-oil and cement trade runs on phone calls and notebooks — sceptical of software, allergic to subscriptions.',
     approach:
@@ -299,7 +308,9 @@ export const CASE_STUDIES: CaseStudy[] = [
   },
   {
     kicker: 'BlackHook · Healthcare at home',
-    title: 'Taking on the P&L, not just the roadmap',
+    title: 'Taking on the P&L, not just the',
+    accent: 'roadmap',
+    subtitle: 'Built the ops platform and ran the business behind it — scheduling, payouts and billing, profitable from the first quarter.',
     challenge:
       'Home healthcare is an operations business — unit economics, not software, decide survival.',
     approach:
@@ -315,7 +326,9 @@ export const CASE_STUDIES: CaseStudy[] = [
   },
   {
     kicker: 'Independent · AI-native product',
-    title: 'Building and shipping an AI product solo',
+    title: 'Building and shipping an AI product,',
+    accent: 'solo',
+    subtitle: 'One extension archiving Claude, ChatGPT and Gemini into a local index, with an MCP server feeding it all back into context.',
     challenge:
       'Every AI conversation — Claude, ChatGPT, Gemini — is lost the moment it ends, locked in separate silos.',
     approach:

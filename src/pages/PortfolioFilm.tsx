@@ -123,8 +123,15 @@ export function PortfolioFilm() {
       <main>
         <section className="pf-hero" id="top">
           <div className="pf-wrap">
-            <div className="pf-hero-layout">
+            <div className="pf-hero-center">
               <div className="pf-hero-copy">
+                <div className="pf-orb pf-reveal" aria-hidden="true">
+                  <span className="pf-orb-glow" />
+                  <span className="pf-orb-core" />
+                  <span className="pf-orb-sheen" />
+                  <span className="pf-orb-spec" />
+                  <span className="pf-orb-ring" />
+                </div>
                 <div className="pf-eyebrow pf-reveal">
                   <span className="dot" />
                   Open to senior product roles — worldwide
@@ -145,11 +152,6 @@ export function PortfolioFilm() {
                   <a href={RESUME} target="_blank" rel="noopener noreferrer" className="pf-btn pf-btn-ghost pf-magnetic">
                     Read résumé
                   </a>
-                </div>
-              </div>
-              <div className="pf-hero-photo-wrap">
-                <div className="pf-hero-photo pf-reveal">
-                  <img src="/hitesh.jpg" alt="Hitesh Agrawal" />
                 </div>
               </div>
             </div>
@@ -189,6 +191,10 @@ export function PortfolioFilm() {
 
         <section className="pf-work" id="work" aria-label="Selected work">
           <div className="pf-work-pin">
+            <div className="pf-work-sphere" aria-hidden="true" />
+            <div className="pf-work-side-label" aria-hidden="true">
+              <span>Selected work</span>
+            </div>
             <div className="pf-work-head">
               <div className="pf-section-tag">Selected work</div>
               <h2>Work I&apos;m <em>proud of</em></h2>
@@ -199,21 +205,8 @@ export function PortfolioFilm() {
                   <span className="pf-wpanel-num">{String(i + 1).padStart(2, '0')}</span>
                   <div className="pf-wpanel-body">
                     <div className="pf-wpanel-kicker">{cs.kicker}</div>
-                    <h3 className="pf-wpanel-title">{cs.title}</h3>
-                    <div className="pf-wpanel-cols">
-                      <div className="pf-wpanel-col">
-                        <h4>The problem</h4>
-                        <p>{cs.challenge}</p>
-                      </div>
-                      <div className="pf-wpanel-col">
-                        <h4>What I did</h4>
-                        <p>{cs.approach}</p>
-                      </div>
-                      <div className="pf-wpanel-col">
-                        <h4>The outcome</h4>
-                        <p>{cs.outcome}</p>
-                      </div>
-                    </div>
+                    <h3 className="pf-wpanel-title">{cs.title} <em>{cs.accent}</em></h3>
+                    <p className="pf-wpanel-sub">{cs.subtitle}</p>
                     <div className="pf-wpanel-metrics">
                       {cs.metrics.map((m) => (
                         <div key={m.label} className="pf-wpanel-metric">
@@ -229,6 +222,11 @@ export function PortfolioFilm() {
                     </div>
                   </div>
                 </article>
+              ))}
+            </div>
+            <div className="pf-work-dots" aria-hidden="true">
+              {CASE_STUDIES.map((cs, i) => (
+                <span key={cs.title} className="pf-work-dot" data-active={i === 0 ? 'true' : undefined} />
               ))}
             </div>
             <div className="pf-work-rail" aria-hidden="true"><span className="pf-work-rail-fill" /></div>
