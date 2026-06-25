@@ -70,6 +70,11 @@ img, svg { display: block; }
 main, .pf-footer, .pf-wordmark { position: relative; z-index: 1; }
 
 /* ===== WebGL backdrop + CSS aurora fallback ===== */
+/* Persistent morphing particle sphere — a fixed centerpiece behind all
+   content that changes form as you scroll (driven from JS by section). */
+.pf-sphere-stage { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.5; mix-blend-mode: screen; }
+.pf-sphere-stage canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; display: block; }
+
 .pf-webgl { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
 .pf-webgl::before {
   content: ''; position: absolute; inset: -20%;
@@ -294,14 +299,6 @@ body.pf-loading { overflow: hidden; }
 
 /* ===== Hero (centered, orb-led — mira style) ===== */
 .pf-hero { position: relative; padding: 168px 0 104px; text-align: center; }
-/* Gold particle sphere as the hero centerpiece — same module + look as the
-   Selected Work rail, but big and centered behind the copy. */
-.pf-hero-sphere {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  width: min(760px, 92vw); height: min(760px, 92vw);
-  z-index: 0; pointer-events: none; opacity: 0.42; mix-blend-mode: screen; filter: blur(0.4px);
-}
-.pf-hero-sphere canvas { display: block; width: 100% !important; height: 100% !important; }
 .pf-hero .pf-wrap { position: relative; z-index: 1; }
 .pf-hero-center { display: flex; justify-content: center; }
 .pf-hero-copy { display: flex; flex-direction: column; align-items: center; max-width: 780px; min-width: 0; }
@@ -469,8 +466,6 @@ body.pf-loading { overflow: hidden; }
 /* ===== Act 3 · Selected work (horizontal pinned) ===== */
 .pf-work { position: relative; height: 100vh; overflow: hidden; border-top: 1px solid var(--pf-line); background: radial-gradient(900px circle at 50% 50%, rgba(212, 181, 106, 0.05), transparent 60%); }
 .pf-work-pin { position: relative; height: 100vh; }
-.pf-work-sphere { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0.28; mix-blend-mode: screen; filter: blur(0.4px); }
-.pf-work-sphere canvas { display: block; width: 100% !important; height: 100% !important; }
 .pf-work-side-label {
   position: absolute; left: 22px; top: 50%; z-index: 3; pointer-events: none;
   transform: translateY(-50%) rotate(-90deg); transform-origin: left center;
@@ -631,7 +626,7 @@ body.pf-loading { overflow: hidden; }
   .pf-wpanel-num { position: static; font-size: 4rem; color: rgba(244, 240, 232, 0.08); display: block; margin-bottom: 8px; }
   .pf-wpanel-metrics { gap: 18px 30px; justify-content: flex-start; }
   .pf-cs-link { margin-left: 0; }
-  .pf-work-dots, .pf-work-side-label, .pf-work-sphere, .pf-hero-sphere { display: none; }
+  .pf-work-dots, .pf-work-side-label, .pf-sphere-stage { display: none; }
   .pf-wpanel { text-align: left; }
   .pf-wpanel-body { align-items: flex-start; max-width: none; }
 
@@ -662,7 +657,7 @@ body.pf-loading { overflow: hidden; }
   .pf-wpanel { width: 100%; height: auto; padding: 48px 7vw; }
   .pf-wpanel + .pf-wpanel { border-left: none; border-top: 1px solid var(--pf-line); }
   .pf-wpanel-num { position: static; display: block; margin-bottom: 8px; font-size: 4rem; }
-  .pf-work-dots, .pf-work-side-label, .pf-work-sphere, .pf-hero-sphere { display: none; }
+  .pf-work-dots, .pf-work-side-label, .pf-sphere-stage { display: none; }
   .pf-wpanel { text-align: left; }
   .pf-wpanel-body { align-items: flex-start; max-width: none; }
 }
