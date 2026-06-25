@@ -81,6 +81,7 @@ function revealLift(els: HTMLElement[] | HTMLElement | null, opts: LiftOpts = {}
 let lenis: Lenis | null = null;
 let lenisRaf: number | null = null;
 let backdrop: { destroy: () => void } | null = null;
+let heroSphere: { destroy: () => void } | null = null;
 let counters: { el: HTMLElement; run: () => void }[] = [];
 const isTouch = () => window.matchMedia('(pointer: coarse)').matches;
 const prefersReduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -404,34 +405,16 @@ function setupHeroParallax() {
   });
 }
 
-/* Pinned "chapters" stage — each big proof number cross-fades to the next
-   as you scroll. Desktop + motion-on only; mobile stacks them (CSS). */
-function setupNumbersStage() {
-  const section = document.querySelector<HTMLElement>('.pf-numbers');
-  if (!section) return;
-  const chapters = gsap.utils.toArray<HTMLElement>('.pf-num-chapter');
-  if (chapters.length < 2) return;
-
-  const mm = gsap.matchMedia();
-  mm.add('(min-width: 821px) and (prefers-reduced-motion: no-preference)', () => {
-    // Each chapter racks-focus out (blur + drift up) as the next racks in —
-    // mira's defining scene-to-scene transition, applied to the proof reel.
-    gsap.set(chapters, { autoAlpha: 0, yPercent: 18, scale: 0.94, filter: 'blur(14px)' });
-    gsap.set(chapters[0]!, { autoAlpha: 1, yPercent: 0, scale: 1, filter: 'blur(0px)' });
-    const tl = gsap.timeline({
-      defaults: { ease: EASE_CINE },
-      scrollTrigger: {
-        trigger: section, start: 'top top',
-        end: () => '+=' + window.innerHeight * (chapters.length - 1) * 1.05,
-        pin: true, scrub: 0.8, anticipatePin: 1, invalidateOnRefresh: true,
-      },
-    });
-    for (let i = 1; i < chapters.length; i++) {
-      tl.to(chapters[i - 1]!, { autoAlpha: 0, yPercent: -18, scale: 0.94, filter: 'blur(14px)', duration: 0.5 });
-      tl.fromTo(chapters[i]!, { autoAlpha: 0, yPercent: 18, scale: 0.94, filter: 'blur(14px)' },
-        { autoAlpha: 1, yPercent: 0, scale: 1, filter: 'blur(0px)', duration: 0.5 }, '<0.12');
-    }
-  });
+/* Gold particle sphere behind the hero photo — ambient spin only (no scroll
+   driver), so the "the brand is a sphere" motif starts in the hero and carries
+   into the Selected Work rail. Skipped on touch / reduced-motion / no-WebGL. */
+function setupHeroSphere() {
+  const el = document.querySelector<HTMLElement>('.pf-orb-sphere');
+  if (!el || isTouch() || prefersReduced()) return;
+  import('./portfolio-sphere').then(({ HeroSphere }) => {
+    try { HeroSphere.mount(el); } catch { return; }
+    heroSphere = HeroSphere;
+  }).catch(() => { /* WebGL unavailable — orb just shows the photo + glow */ });
 }
 
 /* Selected work scrolls horizontally while the section is pinned (desktop);
@@ -467,7 +450,7 @@ function setupHorizontalWork() {
     const tween = gsap.to(track, { x: () => -amount(), ease: 'none' });
     const st = ScrollTrigger.create({
       trigger: section, start: 'top top', end: () => '+=' + amount(),
-      pin: true, scrub: 1, anticipatePin: 1, invalidateOnRefresh: true, animation: tween,
+      pin: true, scrub: 1, anticipatePin: 1, invalidateOnRefresh: true, refreshPriority: 2, animation: tween,
       onUpdate: (self) => {
         if (railFill) railFill.style.transform = `scaleX(${self.progress})`;
         sphere?.setProgress(self.progress);
@@ -538,7 +521,7 @@ export function initPortfolioMotion() {
   setupMagnetic();
   setupWordmark();
   setupHeroParallax();
-  setupNumbersStage();
+  setupHeroSphere();
   setupHorizontalWork();
   setupPreloader(() => {
     // Re-measure against the now-unlocked layout so reveals + pins fire
@@ -560,6 +543,7 @@ export function destroyPortfolioMotion() {
   if (lenisRaf !== null) { cancelAnimationFrame(lenisRaf); lenisRaf = null; }
   lenis?.destroy(); lenis = null;
   if (backdrop) { backdrop.destroy(); backdrop = null; }
+  if (heroSphere) { heroSphere.destroy(); heroSphere = null; }
   ScrollTrigger.getAll().forEach((t) => t.kill());
   gsap.globalTimeline.clear();
 }
