@@ -31,6 +31,41 @@ export function ArrowRight({ size = 14 }: IconProps) {
   );
 }
 
+export function BrainIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <path d="M9 4.5a2.5 2.5 0 0 0-2.5 2.5v.2A2.8 2.8 0 0 0 4 9.9v1.2a2.8 2.8 0 0 0 1.3 2.36A2.8 2.8 0 0 0 6 18.5a2.5 2.5 0 0 0 4.5 1.4M9 4.5a2.5 2.5 0 0 1 3-2.45M9 4.5v15.4M15 4.5a2.5 2.5 0 0 1 2.5 2.5v.2A2.8 2.8 0 0 1 20 9.9v1.2a2.8 2.8 0 0 1-1.3 2.36A2.8 2.8 0 0 1 18 18.5a2.5 2.5 0 0 1-4.5 1.4M15 4.5a2.5 2.5 0 0 0-3-2.45M15 4.5v15.4" stroke={color} strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function DatabaseIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <path d="M4 6c0-1.66 3.58-3 8-3s8 1.34 8 3-3.58 3-8 3-8-1.34-8-3Z" stroke={color} strokeWidth="1.4" />
+      <path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6" stroke={color} strokeWidth="1.4" />
+      <path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6" stroke={color} strokeWidth="1.4" />
+    </svg>
+  );
+}
+
+export function ReceiptIcon({ size = 24, color = 'currentColor' }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <path d="M6 2.5h12v19l-2.2-1.4L13.6 21.5 11.4 20.1 9.2 21.5 7 20.1 4.8 21.5V4.5L6 3.7" stroke={color} strokeWidth="1.3" strokeLinejoin="round" />
+      <path d="M8.5 8h7M8.5 11.5h7M8.5 15h4.5" stroke={color} strokeWidth="1.3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function CheckIcon({ size = 16, color = 'currentColor' }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
+      <path d="M3 8.5 6.2 12 13 4" stroke={color} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function GithubMark({ size = 16 }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">

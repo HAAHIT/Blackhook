@@ -175,7 +175,7 @@ function setupCursor() {
 /* Gold spotlight that tracks the pointer inside each card surface. */
 function setupSpotlight() {
   if (isTouch()) return;
-  document.querySelectorAll<HTMLElement>('.pf-proj, .pf-wpanel').forEach((card) => {
+  document.querySelectorAll<HTMLElement>('.pf-proj-card, .pf-wpanel').forEach((card) => {
     card.addEventListener('pointermove', (e) => {
       const r = card.getBoundingClientRect();
       card.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
@@ -324,12 +324,6 @@ function setupReveals() {
   revealLift(Array.from(document.querySelectorAll<HTMLElement>('.pf-principle')),
     { y: 44, rotateX: 24, scale: 0.94, blur: 10, duration: 1.05, ease: EASE_SPRING, stagger: 0.1, start: 'top 86%' });
 
-  revealLift(Array.from(document.querySelectorAll<HTMLElement>('.pf-recog-item')),
-    { y: 30, rotateX: 16, blur: 8, duration: 0.9, stagger: 0.12 });
-
-  revealLift(Array.from(document.querySelectorAll<HTMLElement>('.pf-proj-grid .pf-proj')),
-    { y: 52, rotateX: 26, scale: 0.93, blur: 10, duration: 1.15, ease: EASE_SPRING, stagger: 0.1, start: 'top 86%' });
-
   revealLift(Array.from(document.querySelectorAll<HTMLElement>('.pf-skill-group')),
     { y: 30, rotateX: 14, blur: 8, duration: 0.95, stagger: 0.12, start: 'top 86%' });
 
@@ -376,7 +370,7 @@ function kickVisibleCounters() {
 
 function setupCardTilt() {
   if (isTouch()) return;
-  document.querySelectorAll<HTMLElement>('.pf-proj').forEach((card) => {
+  document.querySelectorAll<HTMLElement>('.pf-proj-card').forEach((card) => {
     let rect: DOMRect | null = null;
     card.addEventListener('pointerenter', () => { rect = card.getBoundingClientRect(); });
     card.addEventListener('pointermove', (e) => {
@@ -525,6 +519,54 @@ function setupHorizontalWork() {
   });
 }
 
+/* Projects — mira's "Who benefits" treatment: pin the stage and cross-fade
+   the active card + orbit node as you scrub through the trio. */
+function setupProjectsStage() {
+  const pin = document.querySelector<HTMLElement>('.pf-proj-pin');
+  const cards = gsap.utils.toArray<HTMLElement>('.pf-proj-card');
+  const nodes = gsap.utils.toArray<HTMLElement>('.pf-proj-orbit-node');
+  if (!pin || !cards.length) return;
+
+  const setActive = (i: number) => {
+    cards.forEach((c, idx) => idx === i ? c.setAttribute('data-active', 'true') : c.removeAttribute('data-active'));
+    nodes.forEach((n, idx) => idx === i ? n.setAttribute('data-active', 'true') : n.removeAttribute('data-active'));
+  };
+
+  const mm = gsap.matchMedia();
+  mm.add('(prefers-reduced-motion: no-preference)', () => {
+    const st = ScrollTrigger.create({
+      trigger: pin, start: 'top top', end: `+=${cards.length * 60}%`,
+      pin: true, scrub: 1, anticipatePin: 1,
+      onUpdate: (self) => setActive(Math.min(cards.length - 1, Math.floor(self.progress * cards.length))),
+    });
+    return () => st.kill();
+  });
+}
+
+/* Recognition — mira's "Free for Borrowers" treatment: pin the stage and
+   cross-fade the active panel + card face as you scrub through the stats. */
+function setupRecogStage() {
+  const pin = document.querySelector<HTMLElement>('.pf-recog-pin');
+  const panels = gsap.utils.toArray<HTMLElement>('.pf-recog-panel');
+  const faces = gsap.utils.toArray<HTMLElement>('.pf-recog-card-face');
+  if (!pin || !panels.length) return;
+
+  const setActive = (i: number) => {
+    panels.forEach((p, idx) => idx === i ? p.setAttribute('data-active', 'true') : p.removeAttribute('data-active'));
+    faces.forEach((f, idx) => idx === i ? f.setAttribute('data-active', 'true') : f.removeAttribute('data-active'));
+  };
+
+  const mm = gsap.matchMedia();
+  mm.add('(prefers-reduced-motion: no-preference)', () => {
+    const st = ScrollTrigger.create({
+      trigger: pin, start: 'top top', end: `+=${panels.length * 60}%`,
+      pin: true, scrub: 1, anticipatePin: 1,
+      onUpdate: (self) => setActive(Math.min(panels.length - 1, Math.floor(self.progress * panels.length))),
+    });
+    return () => st.kill();
+  });
+}
+
 function setupNav() {
   const nav = document.querySelector<HTMLElement>('.pf-nav');
   if (!nav) return;
@@ -560,6 +602,8 @@ export function initPortfolioMotion() {
   setupHeroParallax();
   setupSphereStage();
   setupHorizontalWork();
+  setupProjectsStage();
+  setupRecogStage();
   setupPreloader(() => {
     // Re-measure against the now-unlocked layout so reveals + pins fire
     // correctly, then explicitly kick any in-view counters and force-reveal

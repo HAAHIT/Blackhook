@@ -1,12 +1,7 @@
-import { useEffect, useState } from 'react';
-import { ArrowOut, ArrowRight, GithubMark } from '@/icons';
+import { useEffect } from 'react';
+import { ArrowOut, ArrowRight, GithubMark, BrainIcon, DatabaseIcon, ReceiptIcon, CheckIcon } from '@/icons';
 import { PROJECTS, SKILLS, CASE_STUDIES, PRINCIPLES, RECOGNITION } from '@/data/portfolio';
-import type { Glimpse } from '@/data/portfolio';
 import { initPortfolioMotion, destroyPortfolioMotion } from '@/lib/portfolio-film-motion';
-
-// Feature flag: in-card product previews (screenshots + synthetic glimpse).
-// Disabled until we have appropriate, real assets for every product.
-const SHOW_PRODUCT_PREVIEWS = false;
 
 const EMAIL = 'agrawalhitesh4444@gmail.com';
 const LINKEDIN = 'https://www.linkedin.com/in/hitesh-agrawal-5a02a416b/';
@@ -21,55 +16,13 @@ const MARQUEE = [
   'Own the whole problem',
 ];
 
-const projectRank = (p: (typeof PROJECTS)[number]) => (p.featured ? 0 : p.current ? 1 : 2);
-const orderedProjects = [...PROJECTS].sort((a, b) => projectRank(a) - projectRank(b));
-
-/**
- * Card preview window. Shows the real product screenshot (with a hover
- * scroll-tour) when one is available; if the shot is missing or fails to
- * load, it falls back to the synthetic glimpse rows so a card is never
- * left with a broken image. Drop a file at the shot path to light it up.
- */
-function GlimpsePreview({ glimpse }: { glimpse: Glimpse }) {
-  const [shotFailed, setShotFailed] = useState(false);
-  const showShot = Boolean(glimpse.shot) && !shotFailed;
-
-  return (
-    <div className={`pf-glimpse${showShot ? ' has-shot' : ''}`} aria-hidden="true">
-      <div className="pf-glimpse-bar">
-        <span className="pf-glimpse-dots"><i /><i /><i /></span>
-        <span className="pf-glimpse-chrome">{glimpse.chrome}</span>
-      </div>
-      {showShot ? (
-        <div className={`pf-shot-frame pf-shot-${glimpse.shotFit ?? 'wide'}`}>
-          <img
-            className="pf-shot"
-            src={glimpse.shot}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            onError={() => setShotFailed(true)}
-          />
-          <span className="pf-shot-hint">Hover to explore</span>
-        </div>
-      ) : (
-        <div className="pf-glimpse-body">
-          {glimpse.rows.map((r, ri) => (
-            <div key={ri} className={`pf-gl-row pf-gl-${r.type}`}>
-              <span className="pf-gl-text">{r.text}</span>
-              {r.value && (
-                <span className={`pf-gl-val${r.trend ? ` pf-gl-${r.trend}` : ''}`}>
-                  {r.value}
-                  {r.trend === 'up' ? ' ▲' : r.trend === 'down' ? ' ▼' : ''}
-                </span>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
+// The three live products — flagship work, shown as an orbiting trio
+// (mira's "Who benefits" treatment) rather than the full project archive.
+const FEATURED_NAMES = ['smriti', 'bolodb', 'SoloBooks'];
+const featuredProjects = FEATURED_NAMES
+  .map((n) => PROJECTS.find((p) => p.name === n))
+  .filter((p): p is typeof PROJECTS[number] => Boolean(p));
+const PROJECT_ICONS = [BrainIcon, DatabaseIcon, ReceiptIcon];
 
 export function PortfolioFilm() {
   useEffect(() => {
@@ -219,49 +172,54 @@ export function PortfolioFilm() {
           </div>
         </div>
 
-        <section className="pf-section" id="projects">
-          <div className="pf-wrap">
+        <section className="pf-section pf-proj-section" id="projects">
+          <div className="pf-proj-pin">
+            <div className="pf-section-vlabel" aria-hidden="true"><span>Building</span></div>
             <div className="pf-section-head pf-reveal">
               <div className="pf-section-tag">Building &amp; shipped</div>
-              <h2>What I&apos;ve <em>built</em></h2>
-              <p>Products I&apos;m building, plus the tools and experiments behind them — most shipped with AI in the loop.{SHOW_PRODUCT_PREVIEWS ? ' Peek inside any card before you dig deeper.' : ''}</p>
+              <h2>Projects I&apos;m <em>building</em></h2>
             </div>
-            <div className="pf-proj-grid">
-              {orderedProjects.map((p) => (
-                <article key={p.name} className="pf-proj pf-reveal">
-                  {SHOW_PRODUCT_PREVIEWS && p.glimpse && <GlimpsePreview glimpse={p.glimpse} />}
-                  <div className="pf-proj-top">
-                    {p.featured ? (
-                      <div className="pf-proj-featured-badges">
-                        <span className="pf-badge pf-badge-ai">AI Product</span>
-                        <span className="pf-badge pf-badge-featured">Featured</span>
-                      </div>
-                    ) : p.current ? (
-                      <span className="pf-badge pf-badge-now"><i />Building now</span>
-                    ) : (
-                      <span className="pf-proj-year">{p.year}</span>
-                    )}
-                    <div className="pf-proj-links">
-                      <a href={p.repo} target="_blank" rel="noopener noreferrer" aria-label={`${p.name} on GitHub`} data-cursor="Code">
-                        <GithubMark size={16} />
-                      </a>
-                      {p.live && (
-                        <a href={p.live} target="_blank" rel="noopener noreferrer" aria-label={`${p.name} live`} data-cursor="Live">
-                          <ArrowOut size={14} />
+            <div className="pf-proj-stage">
+              <div className="pf-proj-orbit" aria-hidden="true">
+                <span className="pf-proj-orbit-ring pf-proj-orbit-ring-1" />
+                <span className="pf-proj-orbit-ring pf-proj-orbit-ring-2" />
+                <span className="pf-proj-orbit-core"><GithubMark size={26} /></span>
+                {featuredProjects.map((p, i) => {
+                  const Icon = PROJECT_ICONS[i] ?? GithubMark;
+                  return (
+                    <span key={p.name} className={`pf-proj-orbit-node pf-proj-orbit-node-${i}`} data-active={i === 0 ? 'true' : undefined}>
+                      <span className="pf-proj-orbit-node-ico"><Icon size={22} /></span>
+                    </span>
+                  );
+                })}
+              </div>
+              <div className="pf-proj-cards">
+                {featuredProjects.map((p, i) => (
+                  <article key={p.name} className="pf-proj-card" data-active={i === 0 ? 'true' : undefined}>
+                    <div className="pf-proj-card-top">
+                      {p.current ? <span className="pf-badge pf-badge-now"><i />Building now</span> : <span className="pf-proj-year">{p.year}</span>}
+                      <div className="pf-proj-links">
+                        <a href={p.repo} target="_blank" rel="noopener noreferrer" aria-label={`${p.name} on GitHub`} data-cursor="Code">
+                          <GithubMark size={16} />
                         </a>
-                      )}
+                        {p.live && (
+                          <a href={p.live} target="_blank" rel="noopener noreferrer" aria-label={`${p.name} live`} data-cursor="Live">
+                            <ArrowOut size={14} />
+                          </a>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  <h3 className="pf-proj-name">{p.name}</h3>
-                  <div className="pf-proj-tagline">{p.tagline}</div>
-                  <p className="pf-proj-desc">{p.desc}</p>
-                  <div className="pf-proj-tags">
-                    {p.tags.map((t) => (
-                      <span key={t}>{t}</span>
-                    ))}
-                  </div>
-                </article>
-              ))}
+                    <h3 className="pf-proj-name">{p.name}</h3>
+                    <div className="pf-proj-tagline">{p.tagline}</div>
+                    <p className="pf-proj-desc">{p.desc}</p>
+                    <div className="pf-proj-tags">
+                      {p.tags.map((t) => (
+                        <span key={t}>{t}</span>
+                      ))}
+                    </div>
+                  </article>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -287,43 +245,65 @@ export function PortfolioFilm() {
           </div>
         </section>
 
-        <section className="pf-section" id="principles">
+        <section className="pf-section pf-principles-section" id="principles">
+          <div className="pf-section-vlabel" aria-hidden="true"><span>How I operate</span></div>
           <div className="pf-wrap">
             <div className="pf-section-head pf-reveal">
               <div className="pf-section-tag">Operating system</div>
-              <h2>How I <em>operate</em></h2>
+              <h2>Intelligence across <em>every decision</em></h2>
             </div>
             <div className="pf-principles">
               {PRINCIPLES.map((pr, i) => (
-                <div key={pr.title} className="pf-principle pf-reveal">
-                  <span className="pf-principle-num">{String(i + 1).padStart(2, '0')}</span>
-                  <h3>{pr.title}</h3>
-                  <p>{pr.desc}</p>
+                <div key={pr.title} className="pf-principle pf-reveal" style={{ top: `calc(7vh + ${i * 1.6}rem)` }}>
+                  <div className="pf-principle-num">{String(i + 1).padStart(2, '0')}</div>
+                  <div className="pf-principle-body">
+                    <h3>{pr.title}</h3>
+                    <p>{pr.desc}</p>
+                  </div>
+                  <div className="pf-principle-visual" aria-hidden="true">
+                    <span className="pf-principle-visual-ring" />
+                    <span className="pf-principle-visual-core" />
+                  </div>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        <section className="pf-section" id="recognition">
-          <div className="pf-wrap">
-            <div className="pf-section-head pf-reveal">
-              <div className="pf-section-tag">Recognition</div>
-              <h2>Worth <em>noting</em></h2>
-            </div>
-            <div className="pf-recog">
-              {RECOGNITION.map((r) => (
-                <div key={r.value} className="pf-recog-item pf-reveal">
-                  <strong>{r.value}</strong>
-                  <span className="pf-recog-label">{r.label}</span>
-                  <span className="pf-recog-detail">{r.detail}</span>
+        <section className="pf-section pf-recog-section" id="recognition">
+          <div className="pf-recog-pin">
+            <div className="pf-section-vlabel" aria-hidden="true"><span>Recognition</span></div>
+            <div className="pf-wrap pf-recog-stage">
+              <div className="pf-recog-text">
+                <div className="pf-section-tag">Recognition</div>
+                <h2 className="pf-recog-heading">Worth <em>noting</em></h2>
+                <div className="pf-recog-panels">
+                  {RECOGNITION.map((r, i) => (
+                    <div key={r.value} className="pf-recog-panel" data-active={i === 0 ? 'true' : undefined}>
+                      <strong className="pf-recog-panel-value">{r.value}</strong>
+                      <p className="pf-recog-panel-label">{r.label}</p>
+                      <ul className="pf-recog-panel-list">
+                        <li><CheckIcon size={15} /> {r.detail}</li>
+                      </ul>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+              <div className="pf-recog-card" aria-hidden="true">
+                {RECOGNITION.map((r, i) => (
+                  <div key={r.value} className="pf-recog-card-face" data-active={i === 0 ? 'true' : undefined}>
+                    <span className="pf-recog-card-badge">★</span>
+                    <strong>{r.value}</strong>
+                    <span>{r.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
 
         <section className="pf-contact" id="contact">
+          <div className="pf-section-vlabel" aria-hidden="true"><span>Hiring</span></div>
           <div className="pf-wrap">
             <div className="pf-contact-grid">
               <div className="pf-reveal">
