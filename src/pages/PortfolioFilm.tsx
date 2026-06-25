@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ArrowOut, ArrowRight, GithubMark } from '@/icons';
-import { PROJECTS, EXPERIENCE, SKILLS, CASE_STUDIES, PRINCIPLES, RECOGNITION, PROOF_STATS } from '@/data/portfolio';
+import { PROJECTS, EXPERIENCE, SKILLS, CASE_STUDIES, PRINCIPLES, RECOGNITION } from '@/data/portfolio';
 import type { Glimpse } from '@/data/portfolio';
 import { initPortfolioMotion, destroyPortfolioMotion } from '@/lib/portfolio-film-motion';
 
@@ -219,21 +219,6 @@ export function PortfolioFilm() {
             ))}
           </div>
         </div>
-
-        <section className="pf-numbers" id="proof-numbers" aria-label="Proof, by the numbers">
-          <div className="pf-num-stage">
-            {PROOF_STATS.map((s, i) => (
-              <div className="pf-num-chapter" key={s.value}>
-                <div className="pf-num-index">
-                  {String(i + 1).padStart(2, '0')} <i>/</i> {String(PROOF_STATS.length).padStart(2, '0')}
-                </div>
-                <div className="pf-num-value">{s.value}</div>
-                <div className="pf-num-label">{s.label}</div>
-                <p className="pf-num-note">{s.note}</p>
-              </div>
-            ))}
-          </div>
-        </section>
 
         <section className="pf-section" id="path">
           <div className="pf-wrap">

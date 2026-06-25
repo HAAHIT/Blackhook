@@ -404,36 +404,6 @@ function setupHeroParallax() {
   });
 }
 
-/* Pinned "chapters" stage — each big proof number cross-fades to the next
-   as you scroll. Desktop + motion-on only; mobile stacks them (CSS). */
-function setupNumbersStage() {
-  const section = document.querySelector<HTMLElement>('.pf-numbers');
-  if (!section) return;
-  const chapters = gsap.utils.toArray<HTMLElement>('.pf-num-chapter');
-  if (chapters.length < 2) return;
-
-  const mm = gsap.matchMedia();
-  mm.add('(min-width: 821px) and (prefers-reduced-motion: no-preference)', () => {
-    // Each chapter racks-focus out (blur + drift up) as the next racks in —
-    // mira's defining scene-to-scene transition, applied to the proof reel.
-    gsap.set(chapters, { autoAlpha: 0, yPercent: 18, scale: 0.94, filter: 'blur(14px)' });
-    gsap.set(chapters[0]!, { autoAlpha: 1, yPercent: 0, scale: 1, filter: 'blur(0px)' });
-    const tl = gsap.timeline({
-      defaults: { ease: EASE_CINE },
-      scrollTrigger: {
-        trigger: section, start: 'top top',
-        end: () => '+=' + window.innerHeight * (chapters.length - 1) * 1.05,
-        pin: true, scrub: 0.8, anticipatePin: 1, invalidateOnRefresh: true, refreshPriority: 1,
-      },
-    });
-    for (let i = 1; i < chapters.length; i++) {
-      tl.to(chapters[i - 1]!, { autoAlpha: 0, yPercent: -18, scale: 0.94, filter: 'blur(14px)', duration: 0.5 });
-      tl.fromTo(chapters[i]!, { autoAlpha: 0, yPercent: 18, scale: 0.94, filter: 'blur(14px)' },
-        { autoAlpha: 1, yPercent: 0, scale: 1, filter: 'blur(0px)', duration: 0.5 }, '<0.12');
-    }
-  });
-}
-
 /* Selected work scrolls horizontally while the section is pinned (desktop);
    on mobile the panels just stack and reveal vertically. */
 function setupHorizontalWork() {
@@ -538,11 +508,7 @@ export function initPortfolioMotion() {
   setupMagnetic();
   setupWordmark();
   setupHeroParallax();
-  // Pin order must follow DOM order (work precedes numbers) so each pin's
-  // spacer is accounted for by the next — otherwise the later section's start
-  // is mis-measured and the two pinned sections overlap.
   setupHorizontalWork();
-  setupNumbersStage();
   setupPreloader(() => {
     // Re-measure against the now-unlocked layout so reveals + pins fire
     // correctly, then explicitly kick any in-view counters and force-reveal
