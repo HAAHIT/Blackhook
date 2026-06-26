@@ -260,10 +260,6 @@ export function PortfolioFilm() {
                     <h3>{pr.title}</h3>
                     <p>{pr.desc}</p>
                   </div>
-                  <div className="pf-principle-visual" aria-hidden="true">
-                    <span className="pf-principle-visual-ring" />
-                    <span className="pf-principle-visual-core" />
-                  </div>
                 </div>
               ))}
             </div>
@@ -322,11 +318,18 @@ export function PortfolioFilm() {
                   Remote or relocation · IST (UTC+5:30), overlap-flexible
                 </p>
               </div>
-              <div className="pf-contact-rows pf-reveal">
-                <div className="pf-contact-row"><span>Email</span><a href={`mailto:${EMAIL}`}>{EMAIL}</a></div>
-                <div className="pf-contact-row"><span>LinkedIn</span><a href={LINKEDIN} target="_blank" rel="noopener noreferrer">hitesh-agrawal</a></div>
-                <div className="pf-contact-row"><span>Résumé</span><a href={RESUME} target="_blank" rel="noopener noreferrer">Hitesh-Agrawal-Resume.pdf</a></div>
-                <div className="pf-contact-row"><span>Based in</span><span className="pf-contact-loc">Dhule · Mumbai, IN</span></div>
+              <div className="pf-reveal">
+                <div className="pf-hiring-card">
+                  <span className="pf-badge pf-badge-now"><i />Open to offers</span>
+                  <strong>Senior Product Manager</strong>
+                  <span>0→1, growth, or platform — bring the ambiguous problem</span>
+                </div>
+                <div className="pf-contact-rows">
+                  <div className="pf-contact-row"><span>Email</span><a href={`mailto:${EMAIL}`}>{EMAIL}</a></div>
+                  <div className="pf-contact-row"><span>LinkedIn</span><a href={LINKEDIN} target="_blank" rel="noopener noreferrer">hitesh-agrawal</a></div>
+                  <div className="pf-contact-row"><span>Résumé</span><a href={RESUME} target="_blank" rel="noopener noreferrer">Hitesh-Agrawal-Resume.pdf</a></div>
+                  <div className="pf-contact-row"><span>Based in</span><span className="pf-contact-loc">Dhule · Mumbai, IN</span></div>
+                </div>
               </div>
             </div>
           </div>
