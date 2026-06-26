@@ -58,10 +58,10 @@ export function PortfolioFilm() {
               <img src="/hitesh-round.jpg" alt="Hitesh Agrawal" width={88} height={88} />
             </span>
           </div>
-          <p className="pf-intro-eyebrow">Welcome, glad you&apos;re here</p>
+          <p className="pf-intro-eyebrow">Hey there</p>
           <h2 className="pf-intro-bio">
-            Hi, I&apos;m Hitesh — a product manager who took one product to 280M
-            users, then built two more of my own <em>from zero</em>.
+            Thanks for stopping by my corner of the web. A little about me —
+            I enjoy taking things, businesses, products, <em>from concept to reality</em>.
           </h2>
           <p className="pf-intro-question">What brings you here today?</p>
           <div className="pf-intro-options">
@@ -70,7 +70,7 @@ export function PortfolioFilm() {
               <span className="pf-intro-opt-sub">Case studies &amp; impact</span>
             </button>
             <button type="button" className="pf-intro-opt" data-pf-intro="projects">
-              <span className="pf-intro-opt-title">See what he&apos;s building</span>
+              <span className="pf-intro-opt-title">See what I&apos;m building</span>
               <span className="pf-intro-opt-sub">Live products, 0→1</span>
             </button>
             <button type="button" className="pf-intro-opt pf-intro-opt-ghost" data-pf-intro="skip">
