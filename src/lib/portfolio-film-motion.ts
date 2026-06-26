@@ -271,6 +271,50 @@ function setupPreloader(done: () => void) {
   }, '<0.18');
 }
 
+/* Intent picker — a one-off "what brings you here" step shown right after
+   the loader curtain lifts. A brief bio orients first-time visitors, then
+   their choice jumps straight to the relevant section. Reduced-motion and
+   no-element cases skip it instantly, same contract as the preloader. */
+function setupIntro() {
+  const intro = document.querySelector<HTMLElement>('.pf-intro');
+  if (!intro || prefersReduced()) {
+    intro?.remove();
+    return;
+  }
+
+  lenis?.stop();
+  document.body.classList.add('pf-loading');
+  gsap.set(intro, { display: 'flex', opacity: 1 });
+
+  const parts = intro.querySelectorAll<HTMLElement>(
+    '.pf-intro-eyebrow, .pf-intro-bio, .pf-intro-question, .pf-intro-options'
+  );
+  gsap.set(parts, { y: 16, opacity: 0, filter: 'blur(6px)' });
+  gsap.to(parts, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.8, ease: EASE_CINE, stagger: 0.08, delay: 0.1 });
+
+  const dismiss = (targetSelector: string | null) => {
+    gsap.to(intro, {
+      opacity: 0, duration: 0.5, ease: 'power2.in',
+      onComplete: () => {
+        intro.remove();
+        document.body.classList.remove('pf-loading');
+        lenis?.start();
+        ScrollTrigger.refresh();
+        if (targetSelector) {
+          document.querySelector(targetSelector)?.scrollIntoView({ behavior: 'smooth' });
+        }
+      },
+    });
+  };
+
+  intro.querySelectorAll<HTMLButtonElement>('[data-pf-intro]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const choice = btn.dataset['pfIntro'];
+      dismiss(choice === 'work' ? '#work' : choice === 'projects' ? '#projects' : null);
+    }, { once: true });
+  });
+}
+
 function setupHeroEntrance() {
   const tl = gsap.timeline({ delay: 0.05 });
   const eyebrow = document.querySelector<HTMLElement>('.pf-hero .pf-eyebrow');
@@ -278,7 +322,6 @@ function setupHeroEntrance() {
   const sub = document.querySelector<HTMLElement>('.pf-hero-sub');
   const ctas = document.querySelector<HTMLElement>('.pf-hero-ctas');
   const facts = document.querySelectorAll<HTMLElement>('.pf-fact');
-  const orb = document.querySelector<HTMLElement>('.pf-orb');
 
   if (eyebrow) { gsap.set(eyebrow, { y: 14, opacity: 0, scale: 0.9, filter: 'blur(8px)' }); tl.to(eyebrow, { y: 0, opacity: 1, scale: 1, filter: 'blur(0px)', duration: 0.8, ease: EASE_CINE }, 0); }
   if (h1) {
@@ -289,10 +332,6 @@ function setupHeroEntrance() {
   if (sub) { gsap.set(sub, { y: 24, opacity: 0, filter: 'blur(8px)' }); tl.to(sub, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.95, ease: EASE_CINE }, 0.55); }
   if (ctas) { gsap.set(Array.from(ctas.children), { y: 16, opacity: 0, filter: 'blur(5px)' }); tl.to(ctas.children, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: EASE_CINE, stagger: 0.1 }, 0.7); }
   if (facts.length) { gsap.set(facts, { y: 14, opacity: 0, filter: 'blur(5px)' }); tl.to(facts, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: EASE_CINE, stagger: 0.08 }, 0.85); }
-  // Orb materialises first and leads the hero: springs up from a small point
-  // so it feels like it powers on. Scale+opacity only — no lingering filter,
-  // which would flatten the orb's preserve-3d orbit ring.
-  if (orb) { gsap.set(orb, { opacity: 0, scale: 0.35 }); tl.to(orb, { opacity: 1, scale: 1, duration: 1.4, ease: EASE_SPRING }, 0); }
 }
 
 
@@ -612,6 +651,7 @@ export function initPortfolioMotion() {
     kickVisibleCounters();
     kickPassedReveals();
     setupHeroEntrance();
+    setupIntro();
   });
 
   // Pinned/horizontal sections depend on final layout — re-measure once

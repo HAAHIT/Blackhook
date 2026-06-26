@@ -45,6 +45,22 @@ export function PortfolioFilm() {
         <div className="pf-loader-bar"><span /></div>
       </div>
 
+      <div className="pf-intro" aria-hidden="true">
+        <div className="pf-intro-inner">
+          <p className="pf-intro-eyebrow">Hi, I&apos;m Hitesh</p>
+          <p className="pf-intro-bio">
+            Product manager who took a product to 280M users at Jio, then built two
+            of his own — smriti and bolodb — from zero. You&apos;re looking at his portfolio.
+          </p>
+          <p className="pf-intro-question">What brings you here?</p>
+          <div className="pf-intro-options">
+            <button type="button" data-pf-intro="work">See the work</button>
+            <button type="button" data-pf-intro="projects">See what he&apos;s building</button>
+            <button type="button" data-pf-intro="skip">Just exploring</button>
+          </div>
+        </div>
+      </div>
+
       <div className="pf-progress" aria-hidden="true"><span /></div>
       <div className="pf-sphere-stage" aria-hidden="true" />
 
@@ -79,15 +95,6 @@ export function PortfolioFilm() {
           <div className="pf-wrap">
             <div className="pf-hero-center">
               <div className="pf-hero-copy">
-                <div className="pf-orb pf-reveal">
-                  <span className="pf-orb-glow" />
-                  <span className="pf-orb-core">
-                    <span className="pf-orb-photo">
-                      <img src="/hitesh-round.jpg" alt="Hitesh" width={148} height={148} />
-                    </span>
-                  </span>
-                  <span className="pf-orb-spec" />
-                </div>
                 <div className="pf-eyebrow pf-reveal">
                   <span className="dot" />
                   Open to senior product roles — worldwide

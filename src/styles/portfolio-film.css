@@ -164,32 +164,27 @@ main, .pf-footer, .pf-wordmark { position: relative; z-index: 1; }
 .pf-loader-bar span { display: block; height: 100%; transform: scaleX(0); transform-origin: 0 50%; background: var(--pf-gold); }
 body.pf-loading { overflow: hidden; }
 
-/* ===== Hero orb (mira-style centerpiece) ===== */
-.pf-orb { position: relative; width: 148px; height: 148px; margin: 4px auto 32px; perspective: 700px; transform-style: preserve-3d; }
-.pf-orb-glow {
-  position: absolute; inset: -65%; border-radius: 50%;
-  background: radial-gradient(circle, rgba(212, 181, 106, 0.45), rgba(212, 181, 106, 0.10) 44%, transparent 70%);
-  filter: blur(14px); animation: pf-orb-pulse 6s ease-in-out infinite;
+/* ===== Intro / intent picker — shown once, right after the loader curtain
+   lifts, so a first-time visitor gets a one-line bio and a way to jump
+   straight to what they came for. ===== */
+.pf-intro {
+  display: none; position: fixed; inset: 0; z-index: 9997; background: #121216;
+  align-items: center; justify-content: center; padding: 24px;
 }
-.pf-orb-core {
-  position: absolute; inset: 0; border-radius: 50%;
-  background: radial-gradient(circle at 32% 27%, #fff6df 0%, #f3dca1 13%, #d8b15e 37%, #a9842f 61%, #6e521b 85%, #4a3711 100%);
-  box-shadow:
-    inset -10px -13px 28px rgba(0, 0, 0, 0.55),
-    inset 9px 11px 24px rgba(255, 245, 210, 0.5),
-    0 20px 54px -16px rgba(212, 181, 106, 0.6);
-  overflow: hidden;
+.pf-intro-inner { max-width: 480px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.pf-intro-eyebrow { font-family: var(--pf-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pf-gold); }
+.pf-intro-bio { font-family: var(--pf-serif); font-size: clamp(19px, 2.6vw, 24px); font-weight: 400; line-height: 1.45; color: var(--pf-ink); }
+.pf-intro-question { font-size: 13px; color: var(--pf-ink-3); }
+.pf-intro-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 4px; }
+.pf-intro-options button {
+  font-family: var(--pf-mono); font-size: 12.5px; letter-spacing: 0.02em;
+  padding: 11px 20px; border-radius: 100px; border: 1px solid var(--pf-line-2);
+  background: transparent; color: var(--pf-ink); cursor: pointer;
+  transition: border-color 0.25s, background 0.25s;
 }
-.pf-orb-photo {
-  position: absolute; inset: 5px; border-radius: 50%; overflow: hidden; z-index: 1;
-  box-shadow: inset 0 0 0 1px rgba(255, 247, 220, 0.35);
-}
-.pf-orb-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.pf-orb-spec {
-  position: absolute; top: 17%; left: 23%; width: 28px; height: 19px; border-radius: 50%; z-index: 2;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.92), transparent 70%); filter: blur(2px);
-}
-@keyframes pf-orb-pulse { 0%, 100% { transform: scale(0.92); opacity: 0.75; } 50% { transform: scale(1.08); opacity: 1; } }
+.pf-intro-options button:hover { border-color: var(--pf-gold); background: var(--pf-bg-card); }
+.pf-intro-options button[data-pf-intro="work"] { border-color: var(--pf-gold); background: var(--pf-gold); color: var(--pf-bg); }
+.pf-intro-options button[data-pf-intro="work"]:hover { background: color-mix(in srgb, var(--pf-gold) 85%, white); }
 
 /* ===== Marquee divider ===== */
 .pf-marquee { overflow: hidden; border-top: 1px solid var(--pf-line); border-bottom: 1px solid var(--pf-line); background: var(--pf-bg-card); }
@@ -590,7 +585,6 @@ body.pf-loading { overflow: hidden; }
   .pf-nav { top: 12px; }
   .pf-nav-inner { padding: 8px 8px 8px 18px; }
   .pf-hero { padding: 122px 0 64px; }
-  .pf-orb { width: 116px; height: 116px; margin-bottom: 26px; }
   .pf-skills { grid-template-columns: 1fr; gap: 30px; }
   .pf-facts { gap: 28px; }
   .pf-contact-grid { grid-template-columns: 1fr; gap: 36px; align-items: start; }
@@ -633,11 +627,10 @@ body.pf-loading { overflow: hidden; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .pf-reveal { opacity: 1 !important; transform: none !important; filter: none !important; }
-  .pf-loader { display: none !important; }
+  .pf-loader, .pf-intro { display: none !important; }
   .pf-marquee-track,
   .pf-webgl::before,
-  .pf-halo, .pf-halo::after, .pf-ping, .pf-mote,
-  .pf-orb-glow { animation: none !important; }
+  .pf-halo, .pf-halo::after, .pf-ping, .pf-mote { animation: none !important; }
   .pf-ping, .pf-mote { opacity: 0 !important; }
   .pf-shot { transition: none !important; transform: none !important; object-position: 50% 0% !important; }
   .pf-shot-hint { display: none; }
