@@ -335,6 +335,18 @@ function setupIntro(done: () => void) {
     }, { once: true });
   });
 
+  // Scroll-to-enter: a downward wheel or swipe lifts the curtain straight into
+  // the page in its default order (hero → work → …), so the picker never traps
+  // someone who just wants to scroll.
+  intro.addEventListener('wheel', (e) => {
+    if (e.deltaY > 0) dismiss(null);
+  }, { passive: true });
+  let touchY = 0;
+  intro.addEventListener('touchstart', (e) => { touchY = e.touches[0]?.clientY ?? 0; }, { passive: true });
+  intro.addEventListener('touchmove', (e) => {
+    if (touchY - (e.touches[0]?.clientY ?? 0) > 8) dismiss(null);
+  }, { passive: true });
+
   // Keyboard access: move focus into the dialog so the choices are reachable,
   // and let Escape skip straight through like the "just exploring" path.
   intro.querySelector<HTMLButtonElement>('[data-pf-intro="work"]')?.focus();
@@ -620,7 +632,25 @@ function setupProjectsStage() {
       pin: true, scrub: 1, anticipatePin: 1,
       onUpdate: (self) => setActive(Math.min(cards.length - 1, Math.floor(self.progress * cards.length))),
     });
+    // Tapping an orbit node scrolls the pinned scrub so that project lands
+    // active, instead of the node being a dead decoration.
+    const onNode = (i: number) => {
+      const y = st.start + ((i + 0.5) / cards.length) * (st.end - st.start);
+      if (lenis) lenis.scrollTo(y, { duration: 0.9 });
+      else window.scrollTo({ top: y, behavior: 'smooth' });
+    };
+    nodes.forEach((node, i) => node.addEventListener('click', () => onNode(i)));
     return () => st.kill();
+  });
+  // Reduced motion: the stage isn't pinned, so just swap the visible card.
+  mm.add('(prefers-reduced-motion: reduce)', () => {
+    setActive(0);
+    const handlers = nodes.map((node, i) => {
+      const h = () => setActive(i);
+      node.addEventListener('click', h);
+      return [node, h] as const;
+    });
+    return () => handlers.forEach(([n, h]) => n.removeEventListener('click', h));
   });
 }
 

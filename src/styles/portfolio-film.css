@@ -195,9 +195,13 @@ body.pf-loading { overflow: hidden; }
 }
 .pf-intro-question { font-size: 13px; color: var(--pf-ink-3); margin-top: 6px; }
 
-.pf-intro-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 6px; }
+.pf-intro-options {
+  display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 6px;
+  width: 100%; max-width: 300px; margin-left: auto; margin-right: auto;
+}
 .pf-intro-opt {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 3px;
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 3px;
+  width: 100%; min-height: 60px; box-sizing: border-box;
   padding: 12px 20px; border-radius: 16px; border: 1px solid var(--pf-line-2);
   background: var(--pf-bg-card); cursor: pointer; text-align: left;
   transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
@@ -205,9 +209,6 @@ body.pf-loading { overflow: hidden; }
 .pf-intro-opt:hover { border-color: var(--pf-gold-solid); transform: translateY(-2px); box-shadow: 0 14px 30px -16px rgba(212, 181, 106, 0.45); }
 .pf-intro-opt-title { font-family: var(--pf-mono); font-size: 12.5px; letter-spacing: 0.02em; color: var(--pf-ink); }
 .pf-intro-opt-sub { font-size: 11px; color: var(--pf-ink-3); }
-.pf-intro-opt-ghost { background: transparent; align-items: center; }
-.pf-intro-opt-ghost .pf-intro-opt-title { color: var(--pf-ink-2); }
-.pf-intro-opt-ghost:hover { border-color: var(--pf-line-2); transform: none; box-shadow: none; background: rgba(244, 240, 232, 0.04); }
 @keyframes pf-orb-pulse { 0%, 100% { transform: scale(0.92); opacity: 0.75; } 50% { transform: scale(1.08); opacity: 1; } }
 
 /* ===== Marquee divider ===== */
@@ -404,7 +405,7 @@ body.pf-loading { overflow: hidden; }
   background: radial-gradient(circle, rgba(212, 181, 106, 0.18), rgba(212, 181, 106, 0.04));
   border: 1px solid var(--pf-gold); display: flex; align-items: center; justify-content: center; color: var(--pf-gold-solid);
 }
-.pf-proj-orbit-node { position: absolute; width: 58px; height: 58px; }
+.pf-proj-orbit-node { position: absolute; width: 58px; height: 58px; padding: 0; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .pf-proj-orbit-node-0 { top: 0; left: 50%; margin-left: -29px; }
 .pf-proj-orbit-node-1 { bottom: 6%; left: 6%; }
 .pf-proj-orbit-node-2 { bottom: 6%; right: 6%; }
@@ -477,7 +478,7 @@ body.pf-loading { overflow: hidden; }
 .pf-wpanel-title em { font-style: italic; background: var(--pf-gold); background-clip: text; -webkit-background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
 .pf-wpanel-sub { font-size: 16px; line-height: 1.7; color: var(--pf-ink-2); margin: 0 auto; max-width: 52ch; }
 .pf-wpanel-metrics { display: flex; align-items: flex-start; justify-content: center; flex-wrap: wrap; gap: 22px 40px; margin-top: 40px; padding-top: 26px; border-top: 1px solid var(--pf-line); }
-.pf-wpanel-metric { text-align: center; }
+.pf-wpanel-metric { text-align: left; }
 .pf-wpanel-metric strong {
   display: block; font-family: var(--pf-serif); font-weight: 400; font-size: 34px; line-height: 1; letter-spacing: -0.01em;
   background: var(--pf-gold); background-clip: text; -webkit-background-clip: text;
@@ -636,7 +637,7 @@ body.pf-loading { overflow: hidden; }
   .pf-wpanel { width: 100%; height: auto; padding: 40px 22px; }
   .pf-wpanel + .pf-wpanel { border-left: none; border-top: 1px solid var(--pf-line); }
   .pf-wpanel-num { position: static; font-size: 4rem; color: rgba(244, 240, 232, 0.08); display: block; margin-bottom: 8px; }
-  .pf-wpanel-metrics { gap: 18px 30px; justify-content: flex-start; }
+  .pf-wpanel-metrics { flex-direction: column; align-items: flex-start; gap: 18px; justify-content: flex-start; }
   .pf-cs-link { margin-left: 0; }
   .pf-work-dots, .pf-work-side-label, .pf-sphere-stage { display: none; }
   .pf-wpanel { text-align: left; }
