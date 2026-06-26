@@ -67,14 +67,15 @@ export function PortfolioFilm() {
           <div className="pf-intro-options">
             <button type="button" className="pf-intro-opt" data-pf-intro="work">
               <span className="pf-intro-opt-title">See the work</span>
-              <span className="pf-intro-opt-sub">Case studies &amp; impact</span>
+              <span className="pf-intro-opt-sub">Real work &amp; impact</span>
             </button>
             <button type="button" className="pf-intro-opt" data-pf-intro="projects">
               <span className="pf-intro-opt-title">See what I&apos;m building</span>
               <span className="pf-intro-opt-sub">Live products, 0→1</span>
             </button>
-            <button type="button" className="pf-intro-opt pf-intro-opt-ghost" data-pf-intro="skip">
+            <button type="button" className="pf-intro-opt" data-pf-intro="skip">
               <span className="pf-intro-opt-title">Just exploring</span>
+              <span className="pf-intro-opt-sub">Browse at your own pace</span>
             </button>
           </div>
         </div>
@@ -206,16 +207,23 @@ export function PortfolioFilm() {
               <h2>Projects I&apos;m <em>building</em></h2>
             </div>
             <div className="pf-proj-stage">
-              <div className="pf-proj-orbit" aria-hidden="true">
-                <span className="pf-proj-orbit-ring pf-proj-orbit-ring-1" />
-                <span className="pf-proj-orbit-ring pf-proj-orbit-ring-2" />
-                <span className="pf-proj-orbit-core"><GithubMark size={26} /></span>
+              <div className="pf-proj-orbit">
+                <span className="pf-proj-orbit-ring pf-proj-orbit-ring-1" aria-hidden="true" />
+                <span className="pf-proj-orbit-ring pf-proj-orbit-ring-2" aria-hidden="true" />
+                <span className="pf-proj-orbit-core" aria-hidden="true"><GithubMark size={26} /></span>
                 {featuredProjects.map((p, i) => {
                   const Icon = PROJECT_ICONS[i] ?? GithubMark;
                   return (
-                    <span key={p.name} className={`pf-proj-orbit-node pf-proj-orbit-node-${i}`} data-active={i === 0 ? 'true' : undefined}>
+                    <button
+                      type="button"
+                      key={p.name}
+                      className={`pf-proj-orbit-node pf-proj-orbit-node-${i}`}
+                      data-active={i === 0 ? 'true' : undefined}
+                      data-proj-node={i}
+                      aria-label={`Show ${p.name}`}
+                    >
                       <span className="pf-proj-orbit-node-ico"><Icon size={22} /></span>
-                    </span>
+                    </button>
                   );
                 })}
               </div>
