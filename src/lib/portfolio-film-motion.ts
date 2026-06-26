@@ -271,6 +271,71 @@ function setupPreloader(done: () => void) {
   }, '<0.18');
 }
 
+/* Intent picker — a one-off "what brings you here" step shown right after
+   the loader curtain lifts. A brief bio orients first-time visitors, then
+   their choice jumps straight to the relevant section. Reduced-motion and
+   no-element cases skip it instantly, same contract as the preloader. */
+function setupIntro(done: () => void) {
+  const intro = document.querySelector<HTMLElement>('.pf-intro');
+  if (!intro || prefersReduced()) {
+    intro?.remove();
+    done();
+    return;
+  }
+
+  lenis?.stop();
+  document.body.classList.add('pf-loading');
+  gsap.set(intro, { display: 'flex', opacity: 1 });
+
+  const parts = intro.querySelectorAll<HTMLElement>(
+    '.pf-intro-orb, .pf-intro-eyebrow, .pf-intro-bio, .pf-intro-question, .pf-intro-options'
+  );
+  gsap.set(parts, { y: 16, opacity: 0, filter: 'blur(6px)' });
+  gsap.to(parts, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.8, ease: EASE_CINE, stagger: 0.08, delay: 0.1 });
+  gsap.set('.pf-intro-orb', { scale: 0.5 });
+  gsap.to('.pf-intro-orb', { scale: 1, duration: 1.1, ease: EASE_SPRING, delay: 0.1 });
+
+  let dismissing = false;
+  const inner = intro.querySelector<HTMLElement>('.pf-intro-inner');
+
+  const dismiss = (targetSelector: string | null) => {
+    if (dismissing) return;
+    dismissing = true;
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        intro.remove();
+        document.body.classList.remove('pf-loading');
+        lenis?.start();
+        ScrollTrigger.refresh();
+        // The hero was held hidden behind the overlay — play it now so the
+        // curtain lift IS the title-sequence reveal. If they jumped to a
+        // section, the hero still arms itself for when they scroll back up.
+        done();
+        if (targetSelector) {
+          const el = document.querySelector<HTMLElement>(targetSelector);
+          if (el) {
+            const y = el.getBoundingClientRect().top + window.scrollY;
+            if (lenis) lenis.scrollTo(y, { duration: 1.1 });
+            else el.scrollIntoView({ behavior: 'smooth' });
+          }
+        }
+      },
+    });
+    // Content lifts and blurs away first…
+    if (inner) tl.to(inner, { y: -26, opacity: 0, filter: 'blur(8px)', duration: 0.45, ease: 'power2.in' }, 0);
+    // …then the whole panel curtains up off the top, a clean scene cut.
+    tl.to(intro, { yPercent: -100, duration: 0.85, ease: 'expo.inOut' }, 0.18);
+  };
+
+  intro.querySelectorAll<HTMLButtonElement>('[data-pf-intro]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const choice = btn.dataset['pfIntro'];
+      dismiss(choice === 'work' ? '#work' : choice === 'projects' ? '#projects' : null);
+    }, { once: true });
+  });
+}
+
 function setupHeroEntrance() {
   const tl = gsap.timeline({ delay: 0.05 });
   const eyebrow = document.querySelector<HTMLElement>('.pf-hero .pf-eyebrow');
@@ -278,7 +343,6 @@ function setupHeroEntrance() {
   const sub = document.querySelector<HTMLElement>('.pf-hero-sub');
   const ctas = document.querySelector<HTMLElement>('.pf-hero-ctas');
   const facts = document.querySelectorAll<HTMLElement>('.pf-fact');
-  const orb = document.querySelector<HTMLElement>('.pf-orb');
 
   if (eyebrow) { gsap.set(eyebrow, { y: 14, opacity: 0, scale: 0.9, filter: 'blur(8px)' }); tl.to(eyebrow, { y: 0, opacity: 1, scale: 1, filter: 'blur(0px)', duration: 0.8, ease: EASE_CINE }, 0); }
   if (h1) {
@@ -289,10 +353,6 @@ function setupHeroEntrance() {
   if (sub) { gsap.set(sub, { y: 24, opacity: 0, filter: 'blur(8px)' }); tl.to(sub, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.95, ease: EASE_CINE }, 0.55); }
   if (ctas) { gsap.set(Array.from(ctas.children), { y: 16, opacity: 0, filter: 'blur(5px)' }); tl.to(ctas.children, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: EASE_CINE, stagger: 0.1 }, 0.7); }
   if (facts.length) { gsap.set(facts, { y: 14, opacity: 0, filter: 'blur(5px)' }); tl.to(facts, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: EASE_CINE, stagger: 0.08 }, 0.85); }
-  // Orb materialises first and leads the hero: springs up from a small point
-  // so it feels like it powers on. Scale+opacity only — no lingering filter,
-  // which would flatten the orb's preserve-3d orbit ring.
-  if (orb) { gsap.set(orb, { opacity: 0, scale: 0.35 }); tl.to(orb, { opacity: 1, scale: 1, duration: 1.4, ease: EASE_SPRING }, 0); }
 }
 
 
@@ -567,6 +627,46 @@ function setupRecogStage() {
   });
 }
 
+/* Scene transitions — draw a gold "scene cut" rule across the top edge of
+   each major section as it enters, so scrolling reads as cuts between shots
+   rather than one continuous scroll. Cheap (one transform per section) and
+   safe alongside the pinned sections, since the line lives inside each
+   section and only animates on first enter. */
+function setupSceneTransitions() {
+  if (prefersReduced()) return;
+  const sections = gsap.utils.toArray<HTMLElement>(
+    '.pf-work, .pf-proj-section, #skills, .pf-principles-section, .pf-recog-section, .pf-contact'
+  );
+  sections.forEach((section) => {
+    const cut = document.createElement('span');
+    cut.className = 'pf-scene-cut';
+    cut.setAttribute('aria-hidden', 'true');
+    section.prepend(cut);
+    ScrollTrigger.create({
+      trigger: section, start: 'top 92%', once: true,
+      onEnter: () => gsap.fromTo(cut,
+        { scaleX: 0, opacity: 1 },
+        { scaleX: 1, duration: 1.1, ease: 'expo.out',
+          onComplete: () => gsap.to(cut, { opacity: 0.35, duration: 0.8, ease: 'power2.out' }) }),
+    });
+  });
+}
+
+/* Heading drift — the big section headings ride a hair slower than the
+   scroll, a parallax depth cue that makes each section feel layered. */
+function setupHeadingParallax() {
+  if (prefersReduced()) return;
+  gsap.utils.toArray<HTMLElement>('.pf-section-head').forEach((head) => {
+    // Skip pinned-section heads — they're already choreographed by their
+    // own pin timeline, and parallax would fight the pin.
+    if (head.closest('.pf-work, .pf-proj-section, .pf-recog-section')) return;
+    gsap.fromTo(head, { y: 28 }, {
+      y: -28, ease: 'none',
+      scrollTrigger: { trigger: head.parentElement ?? head, start: 'top bottom', end: 'bottom top', scrub: true },
+    });
+  });
+}
+
 function setupNav() {
   const nav = document.querySelector<HTMLElement>('.pf-nav');
   if (!nav) return;
@@ -604,6 +704,8 @@ export function initPortfolioMotion() {
   setupHorizontalWork();
   setupProjectsStage();
   setupRecogStage();
+  setupSceneTransitions();
+  setupHeadingParallax();
   setupPreloader(() => {
     // Re-measure against the now-unlocked layout so reveals + pins fire
     // correctly, then explicitly kick any in-view counters and force-reveal
@@ -611,7 +713,10 @@ export function initPortfolioMotion() {
     ScrollTrigger.refresh();
     kickVisibleCounters();
     kickPassedReveals();
-    setupHeroEntrance();
+    // Hold the hero hidden until the intro curtain lifts, so its entrance
+    // doubles as the title-sequence reveal. If the intro is absent (reduced
+    // motion / already dismissed), setupIntro fires the callback immediately.
+    setupIntro(setupHeroEntrance);
   });
 
   // Pinned/horizontal sections depend on final layout — re-measure once

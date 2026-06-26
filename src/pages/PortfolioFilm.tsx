@@ -45,6 +45,41 @@ export function PortfolioFilm() {
         <div className="pf-loader-bar"><span /></div>
       </div>
 
+      <div className="pf-intro" aria-hidden="true">
+        <div className="pf-intro-ambient">
+          <span className="pf-halo" />
+          <span className="pf-ping pf-ping-1" />
+          <span className="pf-ping pf-ping-2" />
+        </div>
+        <div className="pf-intro-inner">
+          <div className="pf-intro-orb">
+            <span className="pf-intro-orb-glow" />
+            <span className="pf-intro-orb-photo">
+              <img src="/hitesh-round.jpg" alt="Hitesh Agrawal" width={88} height={88} />
+            </span>
+          </div>
+          <p className="pf-intro-eyebrow">Hey there</p>
+          <h2 className="pf-intro-bio">
+            Thanks for stopping by my corner of the web. A little about me —
+            I enjoy taking things, businesses, products, <em>from concept to reality</em>.
+          </h2>
+          <p className="pf-intro-question">What brings you here today?</p>
+          <div className="pf-intro-options">
+            <button type="button" className="pf-intro-opt" data-pf-intro="work">
+              <span className="pf-intro-opt-title">See the work</span>
+              <span className="pf-intro-opt-sub">Case studies &amp; impact</span>
+            </button>
+            <button type="button" className="pf-intro-opt" data-pf-intro="projects">
+              <span className="pf-intro-opt-title">See what I&apos;m building</span>
+              <span className="pf-intro-opt-sub">Live products, 0→1</span>
+            </button>
+            <button type="button" className="pf-intro-opt pf-intro-opt-ghost" data-pf-intro="skip">
+              <span className="pf-intro-opt-title">Just exploring</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div className="pf-progress" aria-hidden="true"><span /></div>
       <div className="pf-sphere-stage" aria-hidden="true" />
 
@@ -79,15 +114,6 @@ export function PortfolioFilm() {
           <div className="pf-wrap">
             <div className="pf-hero-center">
               <div className="pf-hero-copy">
-                <div className="pf-orb pf-reveal">
-                  <span className="pf-orb-glow" />
-                  <span className="pf-orb-core">
-                    <span className="pf-orb-photo">
-                      <img src="/hitesh-round.jpg" alt="Hitesh" width={148} height={148} />
-                    </span>
-                  </span>
-                  <span className="pf-orb-spec" />
-                </div>
                 <div className="pf-eyebrow pf-reveal">
                   <span className="dot" />
                   Open to senior product roles — worldwide
@@ -125,7 +151,7 @@ export function PortfolioFilm() {
             </div>
             <div className="pf-work-head">
               <div className="pf-section-tag">Selected work</div>
-              <h2>Case studies <em>I&apos;m proud of</em></h2>
+              <h2>Work <em>I&apos;m proud of</em></h2>
             </div>
             <div className="pf-work-track">
               {CASE_STUDIES.map((cs, i) => (
@@ -321,7 +347,7 @@ export function PortfolioFilm() {
               <div className="pf-reveal">
                 <div className="pf-hiring-card">
                   <span className="pf-badge pf-badge-now"><i />Open to offers</span>
-                  <strong>Senior Product Manager</strong>
+                  <strong>Product Manager</strong>
                   <span>0→1, growth, or platform — bring the ambiguous problem</span>
                 </div>
                 <div className="pf-contact-rows">
