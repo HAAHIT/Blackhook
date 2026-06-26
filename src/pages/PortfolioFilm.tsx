@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { ArrowOut, ArrowRight, GithubMark, BrainIcon, DatabaseIcon, ReceiptIcon, CheckIcon } from '@/icons';
-import { PROJECTS, SKILLS, CASE_STUDIES, PRINCIPLES, RECOGNITION } from '@/data/portfolio';
+import { PROJECTS, CASE_STUDIES, PRINCIPLES, RECOGNITION } from '@/data/portfolio';
 import { initPortfolioMotion, destroyPortfolioMotion } from '@/lib/portfolio-film-motion';
 
 const EMAIL = 'agrawalhitesh4444@gmail.com';
@@ -246,27 +246,6 @@ export function PortfolioFilm() {
                   </article>
                 ))}
               </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="pf-section" id="skills">
-          <div className="pf-wrap">
-            <div className="pf-section-head pf-reveal">
-              <div className="pf-section-tag">Toolkit</div>
-              <h2>What I <em>work with</em></h2>
-            </div>
-            <div className="pf-skills">
-              {SKILLS.map((g) => (
-                <div key={g.label} className="pf-skill-group pf-reveal">
-                  <div className="pf-skill-label">{g.label}</div>
-                  <div className="pf-skill-items">
-                    {g.items.map((i) => (
-                      <span key={i}>{i}</span>
-                    ))}
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </section>
