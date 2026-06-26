@@ -125,7 +125,7 @@ export function PortfolioFilm() {
             </div>
             <div className="pf-work-head">
               <div className="pf-section-tag">Selected work</div>
-              <h2>Case studies <em>I&apos;m proud of</em></h2>
+              <h2>Work <em>I&apos;m proud of</em></h2>
             </div>
             <div className="pf-work-track">
               {CASE_STUDIES.map((cs, i) => (
@@ -321,7 +321,7 @@ export function PortfolioFilm() {
               <div className="pf-reveal">
                 <div className="pf-hiring-card">
                   <span className="pf-badge pf-badge-now"><i />Open to offers</span>
-                  <strong>Senior Product Manager</strong>
+                  <strong>Product Manager</strong>
                   <span>0→1, growth, or platform — bring the ambiguous problem</span>
                 </div>
                 <div className="pf-contact-rows">
