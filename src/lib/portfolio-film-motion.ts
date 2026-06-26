@@ -287,10 +287,12 @@ function setupIntro() {
   gsap.set(intro, { display: 'flex', opacity: 1 });
 
   const parts = intro.querySelectorAll<HTMLElement>(
-    '.pf-intro-eyebrow, .pf-intro-bio, .pf-intro-question, .pf-intro-options'
+    '.pf-intro-orb, .pf-intro-eyebrow, .pf-intro-bio, .pf-intro-question, .pf-intro-options'
   );
   gsap.set(parts, { y: 16, opacity: 0, filter: 'blur(6px)' });
   gsap.to(parts, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.8, ease: EASE_CINE, stagger: 0.08, delay: 0.1 });
+  gsap.set('.pf-intro-orb', { scale: 0.5 });
+  gsap.to('.pf-intro-orb', { scale: 1, duration: 1.1, ease: EASE_SPRING, delay: 0.1 });
 
   const dismiss = (targetSelector: string | null) => {
     gsap.to(intro, {

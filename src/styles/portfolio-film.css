@@ -165,26 +165,50 @@ main, .pf-footer, .pf-wordmark { position: relative; z-index: 1; }
 body.pf-loading { overflow: hidden; }
 
 /* ===== Intro / intent picker — shown once, right after the loader curtain
-   lifts, so a first-time visitor gets a one-line bio and a way to jump
-   straight to what they came for. ===== */
+   lifts. Mirrors the hero's ambient gold-halo backdrop and orb-photo
+   treatment so it reads as part of the same film, not a bolted-on modal. ===== */
 .pf-intro {
-  display: none; position: fixed; inset: 0; z-index: 9997; background: #121216;
-  align-items: center; justify-content: center; padding: 24px;
+  display: none; position: fixed; inset: 0; z-index: 9997;
+  background: radial-gradient(125% 85% at 50% 0%, #242017 0%, var(--pf-bg) 58%);
+  align-items: center; justify-content: center; padding: 24px; overflow: hidden;
 }
-.pf-intro-inner { max-width: 480px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 18px; }
-.pf-intro-eyebrow { font-family: var(--pf-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pf-gold); }
-.pf-intro-bio { font-family: var(--pf-serif); font-size: clamp(19px, 2.6vw, 24px); font-weight: 400; line-height: 1.45; color: var(--pf-ink); }
-.pf-intro-question { font-size: 13px; color: var(--pf-ink-3); }
-.pf-intro-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 4px; }
-.pf-intro-options button {
-  font-family: var(--pf-mono); font-size: 12.5px; letter-spacing: 0.02em;
-  padding: 11px 20px; border-radius: 100px; border: 1px solid var(--pf-line-2);
-  background: transparent; color: var(--pf-ink); cursor: pointer;
-  transition: border-color 0.25s, background 0.25s;
+.pf-intro-ambient { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.pf-intro-inner { position: relative; z-index: 1; max-width: 460px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+
+.pf-intro-orb { position: relative; width: 88px; height: 88px; margin-bottom: 6px; }
+.pf-intro-orb-glow {
+  position: absolute; inset: -45%; border-radius: 50%;
+  background: radial-gradient(circle, rgba(212, 181, 106, 0.45), rgba(212, 181, 106, 0.10) 44%, transparent 70%);
+  filter: blur(12px); animation: pf-orb-pulse 6s ease-in-out infinite;
 }
-.pf-intro-options button:hover { border-color: var(--pf-gold); background: var(--pf-bg-card); }
-.pf-intro-options button[data-pf-intro="work"] { border-color: var(--pf-gold); background: var(--pf-gold); color: var(--pf-bg); }
-.pf-intro-options button[data-pf-intro="work"]:hover { background: color-mix(in srgb, var(--pf-gold) 85%, white); }
+.pf-intro-orb-photo {
+  position: absolute; inset: 0; border-radius: 50%; overflow: hidden; z-index: 1;
+  box-shadow: 0 0 0 1px var(--pf-line-2), 0 14px 34px -12px rgba(212, 181, 106, 0.5);
+}
+.pf-intro-orb-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.pf-intro-eyebrow { font-family: var(--pf-mono); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--pf-gold-solid); }
+.pf-intro-bio { font-family: var(--pf-serif); font-weight: 400; font-size: clamp(20px, 2.8vw, 26px); line-height: 1.42; color: var(--pf-ink); margin: 0; }
+.pf-intro-bio em {
+  font-style: italic; background: var(--pf-gold); background-clip: text;
+  -webkit-background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+}
+.pf-intro-question { font-size: 13px; color: var(--pf-ink-3); margin-top: 6px; }
+
+.pf-intro-options { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 6px; }
+.pf-intro-opt {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 3px;
+  padding: 12px 20px; border-radius: 16px; border: 1px solid var(--pf-line-2);
+  background: var(--pf-bg-card); cursor: pointer; text-align: left;
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+}
+.pf-intro-opt:hover { border-color: var(--pf-gold-solid); transform: translateY(-2px); box-shadow: 0 14px 30px -16px rgba(212, 181, 106, 0.45); }
+.pf-intro-opt-title { font-family: var(--pf-mono); font-size: 12.5px; letter-spacing: 0.02em; color: var(--pf-ink); }
+.pf-intro-opt-sub { font-size: 11px; color: var(--pf-ink-3); }
+.pf-intro-opt-ghost { background: transparent; align-items: center; }
+.pf-intro-opt-ghost .pf-intro-opt-title { color: var(--pf-ink-2); }
+.pf-intro-opt-ghost:hover { border-color: var(--pf-line-2); transform: none; box-shadow: none; background: rgba(244, 240, 232, 0.04); }
+@keyframes pf-orb-pulse { 0%, 100% { transform: scale(0.92); opacity: 0.75; } 50% { transform: scale(1.08); opacity: 1; } }
 
 /* ===== Marquee divider ===== */
 .pf-marquee { overflow: hidden; border-top: 1px solid var(--pf-line); border-bottom: 1px solid var(--pf-line); background: var(--pf-bg-card); }
@@ -630,7 +654,7 @@ body.pf-loading { overflow: hidden; }
   .pf-loader, .pf-intro { display: none !important; }
   .pf-marquee-track,
   .pf-webgl::before,
-  .pf-halo, .pf-halo::after, .pf-ping, .pf-mote { animation: none !important; }
+  .pf-halo, .pf-halo::after, .pf-ping, .pf-mote, .pf-intro-orb-glow { animation: none !important; }
   .pf-ping, .pf-mote { opacity: 0 !important; }
   .pf-shot { transition: none !important; transform: none !important; object-position: 50% 0% !important; }
   .pf-shot-hint { display: none; }

@@ -46,17 +46,36 @@ export function PortfolioFilm() {
       </div>
 
       <div className="pf-intro" aria-hidden="true">
+        <div className="pf-intro-ambient">
+          <span className="pf-halo" />
+          <span className="pf-ping pf-ping-1" />
+          <span className="pf-ping pf-ping-2" />
+        </div>
         <div className="pf-intro-inner">
-          <p className="pf-intro-eyebrow">Hi, I&apos;m Hitesh</p>
-          <p className="pf-intro-bio">
-            Product manager who took a product to 280M users at Jio, then built two
-            of his own — smriti and bolodb — from zero. You&apos;re looking at his portfolio.
-          </p>
-          <p className="pf-intro-question">What brings you here?</p>
+          <div className="pf-intro-orb">
+            <span className="pf-intro-orb-glow" />
+            <span className="pf-intro-orb-photo">
+              <img src="/hitesh-round.jpg" alt="Hitesh Agrawal" width={88} height={88} />
+            </span>
+          </div>
+          <p className="pf-intro-eyebrow">Welcome, glad you&apos;re here</p>
+          <h2 className="pf-intro-bio">
+            Hi, I&apos;m Hitesh — a product manager who took one product to 280M
+            users, then built two more of my own <em>from zero</em>.
+          </h2>
+          <p className="pf-intro-question">What brings you here today?</p>
           <div className="pf-intro-options">
-            <button type="button" data-pf-intro="work">See the work</button>
-            <button type="button" data-pf-intro="projects">See what he&apos;s building</button>
-            <button type="button" data-pf-intro="skip">Just exploring</button>
+            <button type="button" className="pf-intro-opt" data-pf-intro="work">
+              <span className="pf-intro-opt-title">See the work</span>
+              <span className="pf-intro-opt-sub">Case studies &amp; impact</span>
+            </button>
+            <button type="button" className="pf-intro-opt" data-pf-intro="projects">
+              <span className="pf-intro-opt-title">See what he&apos;s building</span>
+              <span className="pf-intro-opt-sub">Live products, 0→1</span>
+            </button>
+            <button type="button" className="pf-intro-opt pf-intro-opt-ghost" data-pf-intro="skip">
+              <span className="pf-intro-opt-title">Just exploring</span>
+            </button>
           </div>
         </div>
       </div>
