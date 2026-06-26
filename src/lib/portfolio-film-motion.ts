@@ -334,6 +334,13 @@ function setupIntro(done: () => void) {
       dismiss(choice === 'work' ? '#work' : choice === 'projects' ? '#projects' : null);
     }, { once: true });
   });
+
+  // Keyboard access: move focus into the dialog so the choices are reachable,
+  // and let Escape skip straight through like the "just exploring" path.
+  intro.querySelector<HTMLButtonElement>('[data-pf-intro="work"]')?.focus();
+  intro.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') dismiss(null);
+  });
 }
 
 function setupHeroEntrance() {
@@ -644,26 +651,33 @@ function setupSceneTransitions() {
     section.prepend(cut);
     ScrollTrigger.create({
       trigger: section, start: 'top 92%', once: true,
+      // Sweep the rule across, then fade it fully out — leaving it on screen
+      // would strand a persistent gold bar at the top of pinned sections,
+      // which hold their top edge under the nav for the whole pin.
       onEnter: () => gsap.fromTo(cut,
         { scaleX: 0, opacity: 1 },
         { scaleX: 1, duration: 1.1, ease: 'expo.out',
-          onComplete: () => gsap.to(cut, { opacity: 0.35, duration: 0.8, ease: 'power2.out' }) }),
+          onComplete: () => gsap.to(cut, { opacity: 0, duration: 0.6, ease: 'power2.out', delay: 0.15 }) }),
     });
   });
 }
 
 /* Heading drift — the big section headings ride a hair slower than the
-   scroll, a parallax depth cue that makes each section feel layered. */
+   scroll, a parallax depth cue that makes each section feel layered. Kept
+   small and desktop-only so headings never ride up under the floating nav. */
 function setupHeadingParallax() {
-  if (prefersReduced()) return;
-  gsap.utils.toArray<HTMLElement>('.pf-section-head').forEach((head) => {
-    // Skip pinned-section heads — they're already choreographed by their
-    // own pin timeline, and parallax would fight the pin.
-    if (head.closest('.pf-work, .pf-proj-section, .pf-recog-section')) return;
-    gsap.fromTo(head, { y: 28 }, {
-      y: -28, ease: 'none',
-      scrollTrigger: { trigger: head.parentElement ?? head, start: 'top bottom', end: 'bottom top', scrub: true },
+  const mm = gsap.matchMedia();
+  mm.add('(min-width: 821px) and (prefers-reduced-motion: no-preference)', () => {
+    const tweens = gsap.utils.toArray<HTMLElement>('.pf-section-head').map((head) => {
+      // Skip pinned-section heads — they're already choreographed by their
+      // own pin timeline, and parallax would fight the pin.
+      if (head.closest('.pf-work, .pf-proj-section, .pf-recog-section')) return null;
+      return gsap.fromTo(head, { y: 14 }, {
+        y: -14, ease: 'none',
+        scrollTrigger: { trigger: head.parentElement ?? head, start: 'top bottom', end: 'bottom top', scrub: true },
+      });
     });
+    return () => tweens.forEach((t) => t?.scrollTrigger?.kill());
   });
 }
 
