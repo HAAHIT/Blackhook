@@ -503,9 +503,6 @@ body.pf-loading { overflow: hidden; }
 .pf-principle-body { flex: 1; min-width: 0; }
 .pf-principle h3 { font-family: var(--pf-serif); font-weight: 400; font-size: 28px; line-height: 1.15; letter-spacing: -0.01em; margin: 0 0 10px; }
 .pf-principle p { font-size: 15.5px; line-height: 1.72; color: var(--pf-ink-2); margin: 0; max-width: 50ch; }
-.pf-principle-visual { position: relative; width: 96px; height: 96px; flex-shrink: 0; display: none; }
-.pf-principle-visual-ring { position: absolute; inset: 0; border: 1px solid var(--pf-line-2); border-radius: 50%; }
-.pf-principle-visual-core { position: absolute; inset: 28%; border-radius: 50%; background: radial-gradient(circle, rgba(212, 181, 106, 0.35), transparent 70%); }
 
 /* ===== Recognition — pinned cross-fade panel, mira's "Free for Borrowers"
    layout: left a stacked checklist that swaps per item, right a credential
@@ -529,7 +526,7 @@ body.pf-loading { overflow: hidden; }
 .pf-recog-panel-list { display: flex; flex-direction: column; gap: 10px; list-style: none; margin: 0; padding: 0; }
 .pf-recog-panel-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; line-height: 1.6; color: var(--pf-ink-2); }
 .pf-recog-panel-list li svg { color: var(--pf-gold-solid); flex-shrink: 0; margin-top: 3px; }
-.pf-recog-card { position: relative; flex: 1; min-height: 280px; display: none; }
+.pf-recog-card { position: relative; flex: 1; min-height: 280px; }
 .pf-recog-card-face {
   position: absolute; inset: 0; opacity: 0; transform: scale(0.95); filter: blur(8px);
   transition: opacity 0.5s ease, transform 0.5s ease, filter 0.5s ease;
@@ -557,6 +554,15 @@ body.pf-loading { overflow: hidden; }
 .pf-contact-ctas { display: flex; flex-wrap: wrap; gap: 14px; }
 .pf-availability { display: flex; align-items: center; gap: 10px; font-family: var(--pf-mono); font-size: 12px; letter-spacing: 0.03em; color: var(--pf-ink-3); margin: 24px 0 0; }
 .pf-availability .d { width: 7px; height: 7px; border-radius: 50%; background: var(--pf-status); box-shadow: 0 0 10px var(--pf-status); flex-shrink: 0; }
+.pf-hiring-card {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 22px 24px; margin-bottom: 22px; border-radius: 18px;
+  border: 1px solid var(--pf-gold); background: linear-gradient(180deg, rgba(212, 181, 106, 0.08), transparent 60%), var(--pf-bg-card);
+  box-shadow: 0 0 50px -24px rgba(212, 181, 106, 0.35);
+}
+.pf-hiring-card .pf-badge { align-self: flex-start; }
+.pf-hiring-card strong { font-family: var(--pf-serif); font-size: 19px; font-weight: 400; }
+.pf-hiring-card span:not(.pf-badge):not(.pf-badge i) { font-size: 13.5px; color: var(--pf-ink-2); line-height: 1.5; }
 .pf-contact-rows { display: flex; flex-direction: column; gap: 0; }
 .pf-contact-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--pf-line); font-family: var(--pf-mono); font-size: 13.5px; }
 .pf-contact-row span { color: var(--pf-ink-3); }
@@ -615,12 +621,11 @@ body.pf-loading { overflow: hidden; }
   /* Principles: sticky stack still works full-width on mobile */
   .pf-principle { padding: 28px 24px; gap: 22px; }
   .pf-principle-num { font-size: 44px; }
-  .pf-principle-visual { display: none; }
 
   /* Recognition: unpin, stack text above the card face */
   .pf-recog-pin { min-height: auto; flex-direction: column; padding: 40px 0; }
   .pf-recog-stage { flex-direction: column; gap: 32px; }
-  .pf-recog-card { display: block; width: 100%; min-height: 220px; }
+  .pf-recog-card { width: 100%; min-height: 220px; }
 
   .pf-marquee-item { gap: 18px; padding: 14px 18px; }
 }
