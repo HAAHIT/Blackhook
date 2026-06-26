@@ -349,6 +349,8 @@ function setupIntro(done: () => void) {
    lift — let the final hero blink in for a frame before re-animating, which
    read as a double "flash". Returns the play() to hand to the intro. */
 function setupHeroEntrance(): () => void {
+  if (prefersReduced()) return () => {};
+
   const eyebrow = document.querySelector<HTMLElement>('.pf-hero .pf-eyebrow');
   const h1 = document.querySelector<HTMLElement>('.pf-hero h1');
   const sub = document.querySelector<HTMLElement>('.pf-hero-sub');
