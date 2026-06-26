@@ -302,8 +302,8 @@ export function PortfolioFilm() {
                 {RECOGNITION.map((r, i) => (
                   <div key={r.value} className="pf-recog-card-face" data-active={i === 0 ? 'true' : undefined}>
                     <span className="pf-recog-card-badge">★</span>
-                    <strong>{r.value}</strong>
-                    <span>{r.label}</span>
+                    <strong>{String(i + 1).padStart(2, '0')}</strong>
+                    <span>of {String(RECOGNITION.length).padStart(2, '0')} · Recognition</span>
                   </div>
                 ))}
               </div>

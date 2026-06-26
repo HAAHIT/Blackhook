@@ -573,8 +573,8 @@ body.pf-loading { overflow: hidden; }
 }
 .pf-recog-card-face[data-active='true'] { opacity: 1; transform: scale(1); filter: blur(0); }
 .pf-recog-card-badge { font-size: 28px; color: var(--pf-gold-solid); }
-.pf-recog-card-face strong { font-family: var(--pf-serif); font-size: 22px; }
-.pf-recog-card-face span:not(.pf-recog-card-badge) { font-family: var(--pf-mono); font-size: 12px; letter-spacing: 0.04em; color: var(--pf-ink-3); }
+.pf-recog-card-face strong { font-family: var(--pf-serif); font-size: 72px; line-height: 1; color: var(--pf-ink); }
+.pf-recog-card-face span:not(.pf-recog-card-badge) { font-family: var(--pf-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--pf-ink-3); }
 
 /* ===== Contact ===== */
 .pf-contact { padding: 104px 0 88px; border-top: 1px solid var(--pf-line); }
