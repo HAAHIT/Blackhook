@@ -32,10 +32,11 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { background: var(--pf-bg); -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+html { background: var(--pf-bg); -webkit-text-size-adjust: 100%; scroll-behavior: smooth; overflow-x: hidden; }
 
 body {
   margin: 0;
+  overflow-x: hidden;
   background: radial-gradient(125% 85% at 50% 0%, #242017 0%, var(--pf-bg) 58%);
   color: var(--pf-ink);
   font-family: var(--pf-sans);
