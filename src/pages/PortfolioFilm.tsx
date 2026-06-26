@@ -287,8 +287,9 @@ export function PortfolioFilm() {
                 <div className="pf-section-tag">Recognition</div>
                 <h2 className="pf-recog-heading">Worth <em>noting</em></h2>
                 <div className="pf-recog-panels">
-                  {RECOGNITION.map((r, i) => (
-                    <div key={r.value} className="pf-recog-panel" data-active={i === 0 ? 'true' : undefined}>
+                  {RECOGNITION.map((r) => (
+                    <div key={r.value} className="pf-recog-panel">
+                      <span className="pf-recog-panel-badge" aria-hidden="true">★</span>
                       <strong className="pf-recog-panel-value">{r.value}</strong>
                       <p className="pf-recog-panel-label">{r.label}</p>
                       <ul className="pf-recog-panel-list">
@@ -297,15 +298,6 @@ export function PortfolioFilm() {
                     </div>
                   ))}
                 </div>
-              </div>
-              <div className="pf-recog-card" aria-hidden="true">
-                {RECOGNITION.map((r, i) => (
-                  <div key={r.value} className="pf-recog-card-face" data-active={i === 0 ? 'true' : undefined}>
-                    <span className="pf-recog-card-badge">★</span>
-                    <strong>{String(i + 1).padStart(2, '0')}</strong>
-                    <span>of {String(RECOGNITION.length).padStart(2, '0')} · Recognition</span>
-                  </div>
-                ))}
               </div>
             </div>
           </div>

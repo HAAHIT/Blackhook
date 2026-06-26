@@ -654,28 +654,10 @@ function setupProjectsStage() {
   });
 }
 
-/* Recognition — mira's "Free for Borrowers" treatment: pin the stage and
-   cross-fade the active panel + card face as you scrub through the stats. */
+/* Recognition — all three honors sit on one page, rendered statically.
+   (No pinned scrub or reveal gating: the panels are always visible.) */
 function setupRecogStage() {
-  const pin = document.querySelector<HTMLElement>('.pf-recog-pin');
-  const panels = gsap.utils.toArray<HTMLElement>('.pf-recog-panel');
-  const faces = gsap.utils.toArray<HTMLElement>('.pf-recog-card-face');
-  if (!pin || !panels.length) return;
-
-  const setActive = (i: number) => {
-    panels.forEach((p, idx) => idx === i ? p.setAttribute('data-active', 'true') : p.removeAttribute('data-active'));
-    faces.forEach((f, idx) => idx === i ? f.setAttribute('data-active', 'true') : f.removeAttribute('data-active'));
-  };
-
-  const mm = gsap.matchMedia();
-  mm.add('(prefers-reduced-motion: no-preference)', () => {
-    const st = ScrollTrigger.create({
-      trigger: pin, start: 'top top', end: `+=${panels.length * 60}%`,
-      pin: true, scrub: 1, anticipatePin: 1,
-      onUpdate: (self) => setActive(Math.min(panels.length - 1, Math.floor(self.progress * panels.length))),
-    });
-    return () => st.kill();
-  });
+  /* intentionally empty — layout is handled in CSS */
 }
 
 /* Scene transitions — draw a gold "scene cut" rule across the top edge of

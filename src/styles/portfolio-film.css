@@ -543,38 +543,27 @@ body.pf-loading { overflow: hidden; }
    layout: left a stacked checklist that swaps per item, right a credential
    card mockup that cross-fades to match. ===== */
 .pf-recog-section { position: relative; }
-.pf-recog-pin { position: relative; min-height: 100vh; display: flex; align-items: center; }
-.pf-recog-stage { display: flex; align-items: center; gap: 6vw; width: 100%; }
-.pf-recog-text { flex: 1.1; min-width: 0; }
-.pf-recog-heading { margin: 14px 0 36px; }
-.pf-recog-panels { position: relative; min-height: 200px; }
+.pf-recog-pin { position: relative; }
+.pf-recog-stage { width: 100%; }
+.pf-recog-text { min-width: 0; }
+.pf-recog-heading { margin: 14px 0 48px; }
+.pf-recog-panels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
 .pf-recog-panel {
-  position: absolute; inset: 0; opacity: 0; transform: translateY(24px); filter: blur(6px); pointer-events: none;
-  transition: opacity 0.5s ease, transform 0.5s ease, filter 0.5s ease;
+  display: flex; flex-direction: column;
+  padding: 32px 30px;
+  border: 1px solid var(--pf-line);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(212, 181, 106, 0.05), transparent 55%), var(--pf-bg-card);
 }
-.pf-recog-panel[data-active='true'] { opacity: 1; transform: translateY(0); filter: blur(0); pointer-events: auto; }
+.pf-recog-panel-badge { font-size: 22px; color: var(--pf-gold-solid); margin-bottom: 16px; }
 .pf-recog-panel-value {
-  display: block; font-family: var(--pf-serif); font-weight: 400; font-size: clamp(2rem, 3.6vw, 2.9rem); line-height: 1.08; letter-spacing: -0.01em;
+  display: block; font-family: var(--pf-serif); font-weight: 400; font-size: clamp(1.7rem, 2.6vw, 2.2rem); line-height: 1.1; letter-spacing: -0.01em;
   background: var(--pf-gold); background-clip: text; -webkit-background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
 }
 .pf-recog-panel-label { font-family: var(--pf-mono); font-size: 12.5px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--pf-ink); margin: 10px 0 18px; }
-.pf-recog-panel-list { display: flex; flex-direction: column; gap: 10px; list-style: none; margin: 0; padding: 0; }
+.pf-recog-panel-list { display: flex; flex-direction: column; gap: 10px; list-style: none; margin: auto 0 0; padding: 0; }
 .pf-recog-panel-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; line-height: 1.6; color: var(--pf-ink-2); }
 .pf-recog-panel-list li svg { color: var(--pf-gold-solid); flex-shrink: 0; margin-top: 3px; }
-.pf-recog-card { position: relative; flex: 1; min-height: 280px; }
-.pf-recog-card-face {
-  position: absolute; inset: 0; opacity: 0; transform: scale(0.95); filter: blur(8px);
-  transition: opacity 0.5s ease, transform 0.5s ease, filter 0.5s ease;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 12px;
-  border: 1px solid var(--pf-gold); border-radius: 28px;
-  background: linear-gradient(180deg, rgba(212, 181, 106, 0.08), transparent 60%), var(--pf-bg-card);
-  box-shadow: 0 0 60px -20px rgba(212, 181, 106, 0.35);
-  padding: 0 32px;
-}
-.pf-recog-card-face[data-active='true'] { opacity: 1; transform: scale(1); filter: blur(0); }
-.pf-recog-card-badge { font-size: 28px; color: var(--pf-gold-solid); }
-.pf-recog-card-face strong { font-family: var(--pf-serif); font-size: 72px; line-height: 1; color: var(--pf-ink); }
-.pf-recog-card-face span:not(.pf-recog-card-badge) { font-family: var(--pf-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--pf-ink-3); }
 
 /* ===== Contact ===== */
 .pf-contact { padding: 104px 0 88px; border-top: 1px solid var(--pf-line); }
@@ -656,10 +645,10 @@ body.pf-loading { overflow: hidden; }
   .pf-principle { padding: 28px 24px; gap: 22px; }
   .pf-principle-num { font-size: 44px; }
 
-  /* Recognition: unpin, stack text above the card face */
-  .pf-recog-pin { min-height: auto; flex-direction: column; padding: 40px 0; }
-  .pf-recog-stage { flex-direction: column; gap: 32px; }
-  .pf-recog-card { width: 100%; min-height: 220px; }
+  /* Recognition: stack the three panels in a single column */
+  .pf-recog-heading { margin: 14px 0 32px; }
+  .pf-recog-panels { grid-template-columns: 1fr; gap: 18px; }
+  .pf-recog-panel { padding: 26px 24px; }
 
   .pf-marquee-item { gap: 18px; padding: 14px 18px; }
 }
