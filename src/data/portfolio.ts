@@ -310,23 +310,6 @@ export const CASE_STUDIES: CaseStudy[] = [
     ],
     link: { href: 'https://care-ops-central.vercel.app', label: 'care-ops-central' },
   },
-  {
-    kicker: 'Independent · AI-native product',
-    title: 'Building and shipping an AI product,',
-    accent: 'solo',
-    subtitle: 'One extension archiving Claude, ChatGPT and Gemini into a local index, with an MCP server feeding it all back into context.',
-    challenge:
-      'Every AI conversation — Claude, ChatGPT, Gemini — is lost the moment it ends, locked in separate silos.',
-    approach:
-      'Shipped smriti solo: an extension that archives all three, local search, and an MCP server that feeds history back to Claude.',
-    outcome:
-      'Three distribution layers, one product, no team. The same approach now powers bolodb.',
-    metrics: [
-      { value: '3', label: 'Distribution layers' },
-      { value: '0', label: 'Engineers hired' },
-    ],
-    link: { href: 'https://github.com/HAAHIT/smriti', label: 'github.com/HAAHIT/smriti' },
-  },
 ];
 
 export interface Principle {

@@ -343,23 +343,35 @@ function setupIntro(done: () => void) {
   });
 }
 
-function setupHeroEntrance() {
-  const tl = gsap.timeline({ delay: 0.05 });
+/* Hero entrance, split into arm + play so it never flashes. We hide the hero
+   the instant the page boots (while the loader/intro still cover it), then
+   play the reveal only when the intro curtain lifts. Arming late — at curtain
+   lift — let the final hero blink in for a frame before re-animating, which
+   read as a double "flash". Returns the play() to hand to the intro. */
+function setupHeroEntrance(): () => void {
   const eyebrow = document.querySelector<HTMLElement>('.pf-hero .pf-eyebrow');
   const h1 = document.querySelector<HTMLElement>('.pf-hero h1');
   const sub = document.querySelector<HTMLElement>('.pf-hero-sub');
   const ctas = document.querySelector<HTMLElement>('.pf-hero-ctas');
   const facts = document.querySelectorAll<HTMLElement>('.pf-fact');
+  const words = h1 ? splitWords(h1) : [];
 
-  if (eyebrow) { gsap.set(eyebrow, { y: 14, opacity: 0, scale: 0.9, filter: 'blur(8px)' }); tl.to(eyebrow, { y: 0, opacity: 1, scale: 1, filter: 'blur(0px)', duration: 0.8, ease: EASE_CINE }, 0); }
-  if (h1) {
-    const words = splitWords(h1);
-    gsap.set(words, { yPercent: 115, opacity: 0, filter: 'blur(6px)' });
-    tl.to(words, { yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 1.1, ease: EASE_CINE, stagger: 0.06 }, 0.1);
-  }
-  if (sub) { gsap.set(sub, { y: 24, opacity: 0, filter: 'blur(8px)' }); tl.to(sub, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.95, ease: EASE_CINE }, 0.55); }
-  if (ctas) { gsap.set(Array.from(ctas.children), { y: 16, opacity: 0, filter: 'blur(5px)' }); tl.to(ctas.children, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: EASE_CINE, stagger: 0.1 }, 0.7); }
-  if (facts.length) { gsap.set(facts, { y: 14, opacity: 0, filter: 'blur(5px)' }); tl.to(facts, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: EASE_CINE, stagger: 0.08 }, 0.85); }
+  // Arm: hide everything now, before the curtain ever lifts.
+  if (eyebrow) gsap.set(eyebrow, { y: 14, opacity: 0, scale: 0.9, filter: 'blur(8px)' });
+  if (words.length) gsap.set(words, { yPercent: 115, opacity: 0, filter: 'blur(6px)' });
+  if (sub) gsap.set(sub, { y: 24, opacity: 0, filter: 'blur(8px)' });
+  if (ctas) gsap.set(Array.from(ctas.children), { y: 16, opacity: 0, filter: 'blur(5px)' });
+  if (facts.length) gsap.set(facts, { y: 14, opacity: 0, filter: 'blur(5px)' });
+
+  // Play: the staggered cinematic reveal, fired when the intro dismisses.
+  return () => {
+    const tl = gsap.timeline({ delay: 0.05 });
+    if (eyebrow) tl.to(eyebrow, { y: 0, opacity: 1, scale: 1, filter: 'blur(0px)', duration: 0.8, ease: EASE_CINE }, 0);
+    if (words.length) tl.to(words, { yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 1.1, ease: EASE_CINE, stagger: 0.06 }, 0.1);
+    if (sub) tl.to(sub, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.95, ease: EASE_CINE }, 0.55);
+    if (ctas) tl.to(ctas.children, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: EASE_CINE, stagger: 0.1 }, 0.7);
+    if (facts.length) tl.to(facts, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.7, ease: EASE_CINE, stagger: 0.08 }, 0.85);
+  };
 }
 
 
@@ -642,7 +654,7 @@ function setupRecogStage() {
 function setupSceneTransitions() {
   if (prefersReduced()) return;
   const sections = gsap.utils.toArray<HTMLElement>(
-    '.pf-work, .pf-proj-section, #skills, .pf-principles-section, .pf-recog-section, .pf-contact'
+    '.pf-work, .pf-proj-section, .pf-principles-section, .pf-recog-section, .pf-contact'
   );
   sections.forEach((section) => {
     const cut = document.createElement('span');
@@ -727,10 +739,13 @@ export function initPortfolioMotion() {
     ScrollTrigger.refresh();
     kickVisibleCounters();
     kickPassedReveals();
-    // Hold the hero hidden until the intro curtain lifts, so its entrance
-    // doubles as the title-sequence reveal. If the intro is absent (reduced
-    // motion / already dismissed), setupIntro fires the callback immediately.
-    setupIntro(setupHeroEntrance);
+    // Arm the hero hidden *now* (it's still behind the loader/intro), then
+    // play it only when the intro curtain lifts — so the entrance doubles as
+    // the title-sequence reveal with no flash of the final hero beforehand.
+    // If the intro is absent (reduced motion / already dismissed), setupIntro
+    // fires the play callback immediately.
+    const playHero = setupHeroEntrance();
+    setupIntro(playHero);
   });
 
   // Pinned/horizontal sections depend on final layout — re-measure once
