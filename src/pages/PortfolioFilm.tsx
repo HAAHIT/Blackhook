@@ -45,37 +45,112 @@ export function PortfolioFilm() {
         <div className="pf-loader-bar"><span /></div>
       </div>
 
-      <div className="pf-intro" role="dialog" aria-modal="true" aria-label="Welcome">
+      <div className="pf-intro pf-intro--coherent" role="dialog" aria-modal="true" aria-label="Welcome">
         <div className="pf-intro-ambient" aria-hidden="true">
           <span className="pf-halo" />
           <span className="pf-ping pf-ping-1" />
           <span className="pf-ping pf-ping-2" />
         </div>
         <div className="pf-intro-inner">
-          <div className="pf-intro-orb">
-            <span className="pf-intro-orb-glow" />
-            <span className="pf-intro-orb-photo">
-              <img src="/hitesh-round.jpg" alt="Hitesh Agrawal" width={88} height={88} />
-            </span>
+          <div className="pf-intro-topbar">
+            <span className="pf-intro-name">Hitesh Agrawal</span>
+            <span className="pf-intro-status"><span className="d" /> Open to senior product roles</span>
           </div>
-          <p className="pf-intro-eyebrow">Hey there</p>
-          <h2 className="pf-intro-bio">
-            Thanks for stopping by my corner of the web. A little about me —
-            I enjoy taking things, businesses, products, <em>from concept to reality</em>.
-          </h2>
-          <p className="pf-intro-question">What brings you here today?</p>
+
+          <div className="pf-intro-lead">
+            <div className="pf-intro-orb">
+              <span className="pf-intro-orb-glow" />
+              <span className="pf-intro-orb-photo">
+                <img src="/hitesh-round.jpg" alt="Hitesh Agrawal" width={142} height={142} />
+              </span>
+            </div>
+            <div className="pf-intro-lead-copy">
+              <p className="pf-intro-eyebrow"><span aria-hidden="true">👋</span> Hey there</p>
+              <h2 className="pf-intro-bio">
+                Thanks for stopping by my corner of the web. A little about me —
+                I enjoy taking things, businesses, products, <em>from concept to reality</em>.
+              </h2>
+            </div>
+          </div>
+
+          <div className="pf-intro-question">
+            <span>What brings you here today?</span>
+            <span className="pf-intro-rule" aria-hidden="true" />
+          </div>
+
           <div className="pf-intro-options">
-            <button type="button" className="pf-intro-opt" data-pf-intro="work">
-              <span className="pf-intro-opt-title">See the work</span>
-              <span className="pf-intro-opt-sub">Real work &amp; impact</span>
+            <button type="button" className="pf-intro-opt pf-intro-opt--featured" data-pf-intro="work">
+              <div className="pf-intro-opt-head">
+                <span className="pf-intro-opt-num">01</span>
+                <span className="pf-intro-opt-tag">Most visited</span>
+              </div>
+              <div className="pf-intro-opt-art" aria-hidden="true">
+                <svg width="160" height="100" viewBox="0 0 160 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="20" y="38" width="120" height="56" rx="6" fill="rgba(201,164,92,0.07)" stroke="rgba(201,164,92,0.25)" strokeWidth="1" />
+                  <rect x="10" y="28" width="120" height="56" rx="6" fill="rgba(201,164,92,0.05)" stroke="rgba(201,164,92,0.18)" strokeWidth="1" />
+                  <rect x="0" y="18" width="120" height="56" rx="6" fill="rgba(201,164,92,0.04)" stroke="rgba(201,164,92,0.12)" strokeWidth="1" />
+                  <rect x="8" y="30" width="40" height="3" rx="1.5" fill="rgba(230,200,126,0.4)" />
+                  <rect x="8" y="38" width="70" height="2" rx="1" fill="rgba(236,229,216,0.12)" />
+                  <rect x="8" y="44" width="55" height="2" rx="1" fill="rgba(236,229,216,0.08)" />
+                  <rect x="8" y="52" width="30" height="8" rx="4" fill="rgba(201,164,92,0.2)" stroke="rgba(201,164,92,0.35)" strokeWidth="0.75" />
+                  <rect x="130" y="20" width="28" height="28" rx="4" fill="rgba(201,164,92,0.12)" stroke="rgba(201,164,92,0.3)" strokeWidth="0.75" />
+                  <text x="144" y="38" fontFamily="serif" fontSize="14" fill="rgba(230,200,126,0.7)" textAnchor="middle" fontStyle="italic">+</text>
+                </svg>
+              </div>
+              <div className="pf-intro-opt-foot">
+                <h3 className="pf-intro-opt-title">See the work</h3>
+                <p className="pf-intro-opt-sub">Real work &amp; impact</p>
+                <span className="pf-intro-opt-enter">Enter →</span>
+              </div>
             </button>
+
             <button type="button" className="pf-intro-opt" data-pf-intro="projects">
-              <span className="pf-intro-opt-title">See what I&apos;m building</span>
-              <span className="pf-intro-opt-sub">Live products, 0→1</span>
+              <div className="pf-intro-opt-head">
+                <span className="pf-intro-opt-num">02</span>
+              </div>
+              <div className="pf-intro-opt-art" aria-hidden="true">
+                <svg width="160" height="100" viewBox="0 0 160 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <line x1="30" y1="50" x2="80" y2="25" stroke="rgba(201,164,92,0.2)" strokeWidth="1" />
+                  <line x1="80" y1="25" x2="130" y2="50" stroke="rgba(201,164,92,0.2)" strokeWidth="1" />
+                  <line x1="30" y1="50" x2="80" y2="75" stroke="rgba(201,164,92,0.15)" strokeWidth="1" />
+                  <line x1="80" y1="75" x2="130" y2="50" stroke="rgba(201,164,92,0.15)" strokeWidth="1" />
+                  <line x1="80" y1="25" x2="80" y2="75" stroke="rgba(201,164,92,0.1)" strokeWidth="1" strokeDasharray="3 3" />
+                  <circle cx="30" cy="50" r="5" fill="rgba(201,164,92,0.15)" stroke="rgba(201,164,92,0.5)" strokeWidth="1" />
+                  <circle cx="80" cy="25" r="7" fill="rgba(201,164,92,0.25)" stroke="rgba(201,164,92,0.7)" strokeWidth="1" />
+                  <circle cx="80" cy="25" r="3" fill="rgba(230,200,126,0.8)" />
+                  <circle cx="130" cy="50" r="5" fill="rgba(201,164,92,0.15)" stroke="rgba(201,164,92,0.4)" strokeWidth="1" />
+                  <circle cx="80" cy="75" r="5" fill="rgba(201,164,92,0.1)" stroke="rgba(201,164,92,0.3)" strokeWidth="1" />
+                  <text x="80" y="13" fontFamily="var(--pf-mono)" fontSize="8" fill="rgba(201,164,92,0.5)" textAnchor="middle" letterSpacing="1">0→1</text>
+                </svg>
+              </div>
+              <div className="pf-intro-opt-foot">
+                <h3 className="pf-intro-opt-title">See what I&apos;m building</h3>
+                <p className="pf-intro-opt-sub">Live products, 0→1</p>
+                <span className="pf-intro-opt-enter">Enter →</span>
+              </div>
             </button>
+
             <button type="button" className="pf-intro-opt" data-pf-intro="skip">
-              <span className="pf-intro-opt-title">Just exploring</span>
-              <span className="pf-intro-opt-sub">Browse at your own pace</span>
+              <div className="pf-intro-opt-head">
+                <span className="pf-intro-opt-num">03</span>
+              </div>
+              <div className="pf-intro-opt-art" aria-hidden="true">
+                <svg width="160" height="100" viewBox="0 0 160 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M 80 90 A 50 50 0 0 1 30 50" stroke="rgba(201,164,92,0.12)" strokeWidth="1" fill="none" />
+                  <path d="M 80 80 A 40 40 0 0 1 40 50" stroke="rgba(201,164,92,0.18)" strokeWidth="1" fill="none" />
+                  <path d="M 80 70 A 30 30 0 0 1 50 50" stroke="rgba(201,164,92,0.25)" strokeWidth="1" fill="none" />
+                  <path d="M 80 60 A 20 20 0 0 1 60 50" stroke="rgba(201,164,92,0.35)" strokeWidth="1.2" fill="none" />
+                  <path d="M 80 50 A 10 10 0 0 1 70 50" stroke="rgba(201,164,92,0.5)" strokeWidth="1.5" fill="none" />
+                  <path d="M 50 20 Q 90 10 120 40 T 140 80" stroke="rgba(201,164,92,0.2)" strokeWidth="1" fill="none" strokeDasharray="4 3" />
+                  <circle cx="140" cy="80" r="4" fill="rgba(201,164,92,0.4)" stroke="rgba(230,200,126,0.7)" strokeWidth="1" />
+                  <circle cx="50" cy="20" r="3" fill="rgba(201,164,92,0.25)" stroke="rgba(201,164,92,0.5)" strokeWidth="0.75" />
+                </svg>
+              </div>
+              <div className="pf-intro-opt-foot">
+                <h3 className="pf-intro-opt-title">Just exploring</h3>
+                <p className="pf-intro-opt-sub">Browse at your own pace</p>
+                <span className="pf-intro-opt-enter">Enter →</span>
+              </div>
             </button>
           </div>
         </div>
