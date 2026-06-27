@@ -255,6 +255,8 @@ body.pf-loading { overflow: hidden; }
 /* Coherent gateway — stack to a single column on narrow screens */
 @media (max-width: 860px) {
   .pf-intro-inner { gap: 28px; }
+  .pf-intro-topbar { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .pf-intro-status { max-width: 100%; }
   .pf-intro-lead { flex-direction: column; align-items: flex-start; gap: 24px; }
   .pf-intro-orb { width: 96px; height: 96px; }
   .pf-intro-bio { max-width: none; }
