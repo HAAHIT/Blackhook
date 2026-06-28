@@ -347,14 +347,19 @@ function setupIntro(done: () => void) {
 
   // Scroll-to-enter: a downward wheel or swipe lifts the curtain straight into
   // the page in its default order (hero → work → …), so the picker never traps
-  // someone who just wants to scroll.
+  // someone who just wants to scroll. But when the overlay is taller than the
+  // viewport (e.g. the stacked cards on mobile), a downward gesture must first
+  // scroll through the remaining options — only a further pull once already at
+  // the bottom enters the page. When everything fits, it's "at bottom" from the
+  // start, so the original single-swipe-to-enter behaviour is preserved.
+  const atBottom = () => intro.scrollHeight - intro.scrollTop - intro.clientHeight <= 4;
   intro.addEventListener('wheel', (e) => {
-    if (e.deltaY > 0) dismiss(null);
+    if (e.deltaY > 0 && atBottom()) dismiss(null);
   }, { passive: true });
   let touchY = 0;
   intro.addEventListener('touchstart', (e) => { touchY = e.touches[0]?.clientY ?? 0; }, { passive: true });
   intro.addEventListener('touchmove', (e) => {
-    if (touchY - (e.touches[0]?.clientY ?? 0) > 8) dismiss(null);
+    if (touchY - (e.touches[0]?.clientY ?? 0) > 8 && atBottom()) dismiss(null);
   }, { passive: true });
 
   // Keyboard access: move focus into the dialog so the choices are reachable,
