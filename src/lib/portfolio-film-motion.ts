@@ -287,6 +287,15 @@ function setupIntro(done: () => void) {
   document.body.classList.add('pf-loading');
   gsap.set(intro, { display: 'flex', opacity: 1 });
 
+  // Make everything behind the overlay inert while it's open, so a real modal
+  // contract holds: the page underneath can't be reached by Tab, pointer, or
+  // assistive tech until a choice is made. Restored when the curtain lifts.
+  const backdrop = Array.from(intro.parentElement?.children ?? []).filter(
+    (el): el is HTMLElement => el instanceof HTMLElement && el !== intro,
+  );
+  backdrop.forEach((el) => { el.inert = true; });
+  const releaseBackdrop = () => backdrop.forEach((el) => { el.inert = false; });
+
   const parts = intro.querySelectorAll<HTMLElement>(
     '.pf-intro-orb, .pf-intro-eyebrow, .pf-intro-bio, .pf-intro-question, .pf-intro-options'
   );
@@ -305,6 +314,7 @@ function setupIntro(done: () => void) {
     const tl = gsap.timeline({
       onComplete: () => {
         intro.remove();
+        releaseBackdrop();
         document.body.classList.remove('pf-loading');
         lenis?.start();
         ScrollTrigger.refresh();
@@ -351,7 +361,20 @@ function setupIntro(done: () => void) {
   // and let Escape skip straight through like the "just exploring" path.
   intro.querySelector<HTMLButtonElement>('[data-pf-intro="work"]')?.focus();
   intro.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') dismiss(null);
+    if (e.key === 'Escape') { dismiss(null); return; }
+    // Trap Tab within the overlay so focus can't slip to the (now inert) page
+    // behind it — cycle through the choices, wrapping at both ends.
+    if (e.key === 'Tab') {
+      const focusable = Array.from(
+        intro.querySelectorAll<HTMLButtonElement>('[data-pf-intro]'),
+      );
+      if (!focusable.length) return;
+      const first = focusable[0]!;
+      const last = focusable[focusable.length - 1]!;
+      const active = document.activeElement;
+      if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
+    }
   });
 }
 
