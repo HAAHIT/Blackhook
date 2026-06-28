@@ -61,7 +61,7 @@ export function PortfolioFilm() {
         <div className="pf-loader-bar"><span /></div>
       </div>
 
-      <div className="pf-intro pf-intro--coherent" role="dialog" aria-modal="true" aria-label="Welcome">
+      <div className="pf-intro pf-intro--coherent" role="dialog" aria-modal="true" aria-label="Welcome" data-lenis-prevent>
         <div className="pf-intro-ambient" aria-hidden="true">
           <span className="pf-halo" />
           <span className="pf-ping pf-ping-1" />

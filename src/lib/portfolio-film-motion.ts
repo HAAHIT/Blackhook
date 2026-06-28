@@ -301,7 +301,7 @@ function setupIntro(done: () => void) {
 
   lenis?.stop();
   document.body.classList.add('pf-loading');
-  gsap.set(intro, { display: 'flex', opacity: 1 });
+  gsap.set(intro, { display: 'block', opacity: 1 });
 
   // Make everything behind the overlay inert while it's open, so a real modal
   // contract holds: the page underneath can't be reached by Tab, pointer, or

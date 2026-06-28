@@ -171,12 +171,17 @@ body.pf-loading { overflow: hidden; }
 .pf-intro {
   display: none; position: fixed; inset: 0; z-index: 9997;
   background: radial-gradient(130% 100% at 65% -10%, #2c2113 0%, #16120b 44%, var(--pf-bg) 78%);
-  padding: 40px 24px; overflow-x: hidden; overflow-y: auto;
+  overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch;
 }
 .pf-intro-ambient { position: fixed; inset: 0; overflow: hidden; pointer-events: none; }
+/* The inner wrapper centres when the content fits and grows past the viewport
+   when it doesn't, so .pf-intro stays a plain block scroll container. Centring
+   the inner with flex margins on .pf-intro itself would trip the flexbox
+   overflow trap and make the overlay unscrollable on touch. */
 .pf-intro-inner {
-  position: relative; z-index: 1; width: 100%; max-width: 1120px; margin: auto;
-  display: flex; flex-direction: column; gap: 34px; text-align: left;
+  position: relative; z-index: 1; width: 100%; max-width: 1120px; margin: 0 auto;
+  min-height: 100%; box-sizing: border-box; padding: 40px 24px;
+  display: flex; flex-direction: column; justify-content: center; gap: 34px; text-align: left;
 }
 
 /* top bar — name + availability status */
