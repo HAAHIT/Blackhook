@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowOut, ArrowRight, GithubMark, BrainIcon, DatabaseIcon, ReceiptIcon, CheckIcon } from '@/icons';
 import { PROJECTS, CASE_STUDIES, PRINCIPLES, RECOGNITION } from '@/data/portfolio';
 import { initPortfolioMotion, destroyPortfolioMotion } from '@/lib/portfolio-film-motion';
@@ -25,10 +25,26 @@ const featuredProjects = FEATURED_NAMES
 const PROJECT_ICONS = [BrainIcon, DatabaseIcon, ReceiptIcon];
 
 export function PortfolioFilm() {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   useEffect(() => {
     initPortfolioMotion();
     return () => destroyPortfolioMotion();
   }, []);
+
+  // Close the mobile menu on Escape, and whenever the viewport grows back to
+  // desktop width (where the inline nav links take over).
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenuOpen(false); };
+    const onResize = () => { if (window.innerWidth > 820) setMenuOpen(false); };
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [menuOpen]);
 
   return (
     <>
@@ -45,7 +61,7 @@ export function PortfolioFilm() {
         <div className="pf-loader-bar"><span /></div>
       </div>
 
-      <div className="pf-intro pf-intro--coherent" role="dialog" aria-modal="true" aria-label="Welcome">
+      <div className="pf-intro pf-intro--coherent" role="dialog" aria-modal="true" aria-label="Welcome" data-lenis-prevent>
         <div className="pf-intro-ambient" aria-hidden="true">
           <span className="pf-halo" />
           <span className="pf-ping pf-ping-1" />
@@ -173,7 +189,7 @@ export function PortfolioFilm() {
         </div>
       </div>
 
-      <header className="pf-nav">
+      <header className="pf-nav" data-menu-open={menuOpen ? 'true' : undefined}>
         <div className="pf-nav-inner">
           <a href="#top" className="pf-logo">Hitesh Agrawal<b>.</b></a>
           <nav className="pf-nav-links">
@@ -182,7 +198,24 @@ export function PortfolioFilm() {
             <a href="#contact">Contact</a>
           </nav>
           <a href={RESUME} target="_blank" rel="noopener noreferrer" className="pf-nav-studio">Résumé <ArrowOut size={11} /></a>
+          <button
+            type="button"
+            className="pf-nav-toggle"
+            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={menuOpen}
+            aria-controls="pf-mobile-menu"
+            onClick={() => setMenuOpen((o) => !o)}
+          >
+            <span /><span /><span />
+          </button>
         </div>
+        <nav id="pf-mobile-menu" className="pf-nav-mobile" aria-label="Sections" hidden={!menuOpen}>
+          <a href="#work" onClick={() => setMenuOpen(false)}>Work</a>
+          <a href="#projects" onClick={() => setMenuOpen(false)}>Building</a>
+          <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
+          <a href={`mailto:${EMAIL}`} onClick={() => setMenuOpen(false)}>Email</a>
+          <a href={RESUME} target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)}>Résumé <ArrowOut size={11} /></a>
+        </nav>
       </header>
 
       <main>

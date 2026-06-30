@@ -86,6 +86,22 @@ let counters: { el: HTMLElement; run: () => void }[] = [];
 const isTouch = () => window.matchMedia('(pointer: coarse)').matches;
 const prefersReduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+/* Probe for a usable WebGL context once, before constructing any three.js
+   renderer. Without this, three.js logs a barrage of context-creation errors
+   to the console on machines/browsers where WebGL is unavailable or disabled,
+   even though we already fall back to the CSS layers. */
+let webglOk: boolean | null = null;
+const hasWebGL = () => {
+  if (webglOk !== null) return webglOk;
+  try {
+    const canvas = document.createElement('canvas');
+    webglOk = !!(canvas.getContext('webgl2') || canvas.getContext('webgl'));
+  } catch {
+    webglOk = false;
+  }
+  return webglOk;
+};
+
 function setupLenis() {
   lenis = new Lenis({
     duration: 1.2,
@@ -209,7 +225,7 @@ function setupMagnetic() {
 function setupWebGL() {
   const el = document.querySelector<HTMLElement>('.pf-webgl');
   if (!el) return;
-  if (isTouch() || prefersReduced() || window.innerWidth < 760) return;
+  if (isTouch() || prefersReduced() || window.innerWidth < 760 || !hasWebGL()) return;
   // Lazy-load three.js only on capable desktops, after first paint.
   import('./portfolio-webgl').then(({ Backdrop }) => {
     try {
@@ -285,7 +301,7 @@ function setupIntro(done: () => void) {
 
   lenis?.stop();
   document.body.classList.add('pf-loading');
-  gsap.set(intro, { display: 'flex', opacity: 1 });
+  gsap.set(intro, { display: 'block', opacity: 1 });
 
   // Make everything behind the overlay inert while it's open, so a real modal
   // contract holds: the page underneath can't be reached by Tab, pointer, or
@@ -535,7 +551,7 @@ function setupHeroParallax() {
    rippling → turbulent → swollen). Skipped on touch / reduced-motion / no-WebGL. */
 function setupSphereStage() {
   const el = document.querySelector<HTMLElement>('.pf-sphere-stage');
-  if (!el || isTouch() || prefersReduced()) return;
+  if (!el || isTouch() || prefersReduced() || !hasWebGL()) return;
   import('./portfolio-sphere').then(({ PortfolioSphere }) => {
     try { PortfolioSphere.mount(el); } catch { return; }
     pageSphere = PortfolioSphere;
