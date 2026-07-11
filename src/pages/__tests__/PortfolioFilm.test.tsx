@@ -9,7 +9,7 @@
  *   - Listeners are removed on cleanup / when menu closes
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PortfolioFilm } from '../PortfolioFilm';
