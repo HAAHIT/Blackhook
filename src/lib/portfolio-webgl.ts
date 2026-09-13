@@ -141,6 +141,7 @@ class BackdropManager {
   private pointer = new Vector2(0, 0);
   private pointerTarget = new Vector2(0, 0);
   private scrollN = 0;
+  private renderedScroll = 0;
   private field = 0;
   private fullFrameNext = true;
   private size = new Vector2();
@@ -225,8 +226,11 @@ class BackdropManager {
     u['uScroll'].value = this.scrollN;
     // Redraw alternate halves (2px overlap) each frame: the field changes <=1/255
     // per frame, so a one-frame-old half is invisible and GPU work is halved.
+    // The scroll fade can change faster than that, so a real change forces a full frame.
+    const scrollChanged = Math.abs(this.scrollN - this.renderedScroll) > 1 / 255;
+    this.renderedScroll = this.scrollN;
     const r = this.renderer;
-    if (this.fullFrameNext) {
+    if (this.fullFrameNext || scrollChanged) {
       r.setScissorTest(false);
       this.fullFrameNext = false;
     } else {
@@ -241,7 +245,12 @@ class BackdropManager {
     r.render(this.scene, this.camera);
   };
 
-  private play() { if (this.raf === null) this.tick(); }
+  private play() {
+    if (this.raf !== null) return;
+    // Time jumped while paused, so the undrawn half would be stale.
+    this.fullFrameNext = true;
+    this.tick();
+  }
   private stop() { if (this.raf !== null) { cancelAnimationFrame(this.raf); this.raf = null; } }
 
   setScroll(n: number) { this.scrollN = n; }
