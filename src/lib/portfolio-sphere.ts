@@ -74,8 +74,8 @@ class SphereManager {
   mount(el: HTMLElement) {
     this.container = el;
 
-    const renderer = new WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'low-power' });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+    const renderer = new WebGLRenderer({ antialias: false, alpha: true, powerPreference: 'low-power' });
+    renderer.setPixelRatio(1);
     el.appendChild(renderer.domElement);
 
     const scene = new Scene();
