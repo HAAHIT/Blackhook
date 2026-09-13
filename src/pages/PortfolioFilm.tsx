@@ -63,7 +63,7 @@ export function PortfolioFilm() {
 
       <div className="pf-intro pf-intro--coherent" role="dialog" aria-modal="true" aria-label="Welcome" data-lenis-prevent>
         <div className="pf-intro-ambient" aria-hidden="true">
-          <span className="pf-halo" />
+          <span className="pf-halo"><span className="pf-halo-core" /></span>
           <span className="pf-ping pf-ping-1" />
           <span className="pf-ping pf-ping-2" />
         </div>
@@ -179,7 +179,7 @@ export function PortfolioFilm() {
         {/* Ambient living layer — mira-style slow halo, radar pings and
             drifting motes. Pure CSS, sits behind all content, gold-tinted. */}
         <div className="pf-ambient">
-          <span className="pf-halo" />
+          <span className="pf-halo"><span className="pf-halo-core" /></span>
           <span className="pf-ping pf-ping-1" />
           <span className="pf-ping pf-ping-2" />
           <span className="pf-ping pf-ping-3" />

@@ -100,8 +100,9 @@ main, .pf-footer, .pf-wordmark { position: relative; z-index: 1; }
   animation: pf-halo-spin 44s linear infinite;
   will-change: transform;
 }
-/* Blur lives on a static child so it rasterizes once; a filter on the
-   spinning parent would re-blur every frame around the animated ::after. */
+/* Blurs live on static pseudo-elements so they rasterize once and the
+   animated boxes around them only transform; a filter on an element with an
+   animating descendant is re-blurred every frame. */
 .pf-halo::before {
   content: ''; position: absolute; inset: 0; border-radius: 50%;
   background: conic-gradient(from 0deg,
@@ -112,10 +113,15 @@ main, .pf-footer, .pf-wordmark { position: relative; z-index: 1; }
     rgba(212, 181, 106, 0) 360deg);
   filter: blur(36px);
 }
-.pf-halo::after {
-  content: ''; position: absolute; inset: 22%; border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 223, 164, 0.12), transparent 68%);
+.pf-halo-core {
+  position: absolute; inset: 22%;
   animation: pf-halo-breathe 9s ease-in-out infinite;
+  will-change: transform;
+}
+.pf-halo-core::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 223, 164, 0.12), transparent 68%);
+  filter: blur(36px);
 }
 
 /* Radar-ping rings that expand and fade, like mira's pulse orbs */
@@ -764,7 +770,7 @@ body.pf-loading { overflow: hidden; }
   .pf-loader, .pf-intro { display: none !important; }
   .pf-marquee-track,
   .pf-webgl::before,
-  .pf-halo, .pf-halo::after, .pf-ping, .pf-mote, .pf-intro-orb-glow { animation: none !important; }
+  .pf-halo, .pf-halo-core, .pf-ping, .pf-mote, .pf-intro-orb-glow { animation: none !important; }
   .pf-ping, .pf-mote { opacity: 0 !important; }
   .pf-shot { transition: none !important; transform: none !important; object-position: 50% 0% !important; }
   .pf-shot-hint { display: none; }

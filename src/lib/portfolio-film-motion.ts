@@ -292,10 +292,20 @@ function setupPreloader(done: () => void) {
    their choice jumps straight to the relevant section. Reduced-motion and
    no-element cases skip it instantly, same contract as the preloader. */
 function setupIntro(done: () => void) {
+  // Announces a calm moment (no scripted entrance/transition tween running)
+  // for deferred main-thread work such as the session recorder's snapshot.
+  let settledFired = false;
+  const settled = () => {
+    if (settledFired) return;
+    settledFired = true;
+    window.dispatchEvent(new Event('pf:settled'));
+  };
+
   const intro = document.querySelector<HTMLElement>('.pf-intro');
   if (!intro || prefersReduced()) {
     intro?.remove();
     done();
+    settled();
     return;
   }
 
@@ -316,7 +326,7 @@ function setupIntro(done: () => void) {
     '.pf-intro-orb, .pf-intro-eyebrow, .pf-intro-bio, .pf-intro-question, .pf-intro-options'
   );
   gsap.set(parts, { y: 16, opacity: 0, filter: 'blur(6px)' });
-  gsap.to(parts, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.8, ease: EASE_CINE, stagger: 0.08, delay: 0.1 });
+  gsap.to(parts, { y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.8, ease: EASE_CINE, stagger: 0.08, delay: 0.1, onComplete: settled });
   gsap.set('.pf-intro-orb', { scale: 0.5 });
   gsap.to('.pf-intro-orb', { scale: 1, duration: 1.1, ease: EASE_SPRING, delay: 0.1 });
 
@@ -338,6 +348,7 @@ function setupIntro(done: () => void) {
         // curtain lift IS the title-sequence reveal. If they jumped to a
         // section, the hero still arms itself for when they scroll back up.
         done();
+        settled();
         if (targetSelector) {
           const el = document.querySelector<HTMLElement>(targetSelector);
           if (el) {
