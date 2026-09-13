@@ -1,7 +1,11 @@
 import {
+  DataTexture,
+  FloatType,
   Mesh,
+  NearestFilter,
   OrthographicCamera,
   PlaneGeometry,
+  RGFormat,
   Scene,
   ShaderMaterial,
   Vector2,
@@ -18,25 +22,63 @@ const VERT = /* glsl */ `
   }
 `;
 
+/* The hash amplifies rounding differences in its per-axis steps ~4000x, so a
+   GPU that rounds them differently (Intel Macs via Metal) gets inconsistent
+   lattice values and hard square seams. Those steps depend on one axis at a
+   time, so we precompute them exactly (float32, as a conforming GPU would):
+   row 0 = (a, a * (a + 45.32)) with a = fract(i * 123.34); row 1 the same with
+   456.21. The GPU is left with only additions and one final multiply, which
+   match a conforming GPU to within 1/255. noise() fetches each lattice column
+   and row once for all four corners, which is cheaper than the original hash.
+   Coordinates wrap past +/-LUT_SIZE/2 cells, which is seamless. */
+const LUT_SIZE = 4096;
+
+function buildHashLut(): DataTexture {
+  const f = Math.fround;
+  const fract = (x: number) => f(x - Math.floor(x));
+  const data = new Float32Array(LUT_SIZE * 2 * 2);
+  for (let k = 0; k < LUT_SIZE; k++) {
+    const i = k < LUT_SIZE / 2 ? k : k - LUT_SIZE;
+    const ax = fract(f(i * f(123.34)));
+    const ay = fract(f(i * f(456.21)));
+    data[2 * k] = ax;
+    data[2 * k + 1] = f(ax * f(ax + f(45.32)));
+    data[2 * (LUT_SIZE + k)] = ay;
+    data[2 * (LUT_SIZE + k) + 1] = f(ay * f(ay + f(45.32)));
+  }
+  const tex = new DataTexture(data, LUT_SIZE, 2, RGFormat, FloatType);
+  tex.minFilter = NearestFilter;
+  tex.magFilter = NearestFilter;
+  tex.needsUpdate = true;
+  return tex;
+}
+
 const FRAG = /* glsl */ `
   precision highp float;
   uniform float uTime;
   uniform vec2 uRes;
   uniform vec2 uPointer;
   uniform float uScroll;
+  uniform highp sampler2D uHashLut;
 
-  float hash(vec2 p) {
-    p = fract(p * vec2(123.34, 456.21));
-    p += dot(p, p + 45.32);
+  float hash(vec2 col, vec2 row) {
+    vec2 p = vec2(col.r, row.r);
+    p += col.g + row.g;
     return fract(p.x * p.y);
   }
   float noise(vec2 p) {
     vec2 i = floor(p);
     vec2 f = fract(p);
-    float a = hash(i);
-    float b = hash(i + vec2(1.0, 0.0));
-    float c = hash(i + vec2(0.0, 1.0));
-    float d = hash(i + vec2(1.0, 1.0));
+    ivec2 c0 = ivec2(i) & ${LUT_SIZE - 1};
+    ivec2 c1 = (c0 + 1) & ${LUT_SIZE - 1};
+    vec2 x0 = texelFetch(uHashLut, ivec2(c0.x, 0), 0).rg;
+    vec2 x1 = texelFetch(uHashLut, ivec2(c1.x, 0), 0).rg;
+    vec2 y0 = texelFetch(uHashLut, ivec2(c0.y, 1), 0).rg;
+    vec2 y1 = texelFetch(uHashLut, ivec2(c1.y, 1), 0).rg;
+    float a = hash(x0, y0);
+    float b = hash(x1, y0);
+    float c = hash(x0, y1);
+    float d = hash(x1, y1);
     vec2 u = f * f * (3.0 - 2.0 * f);
     return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
   }
@@ -99,6 +141,10 @@ class BackdropManager {
   private pointer = new Vector2(0, 0);
   private pointerTarget = new Vector2(0, 0);
   private scrollN = 0;
+  private renderedScroll = 0;
+  private field = 0;
+  private fullFrameNext = true;
+  private size = new Vector2();
   private onResize: (() => void) | null = null;
   private onPointer: ((e: PointerEvent) => void) | null = null;
   private onVis: (() => void) | null = null;
@@ -106,7 +152,13 @@ class BackdropManager {
   mount(el: HTMLElement) {
     this.container = el;
 
-    const renderer = new WebGLRenderer({ antialias: false, alpha: false, powerPreference: 'high-performance' });
+    const renderer = new WebGLRenderer({ antialias: false, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: true });
+    renderer.autoClear = false;
+    // The shader needs GLSL ES 3.00 (texelFetch, integer ops); throwing keeps the CSS aurora fallback.
+    if (!renderer.capabilities.isWebGL2) {
+      renderer.dispose();
+      throw new Error('WebGL2 unavailable');
+    }
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5) * this.renderScale);
     renderer.setClearColor(0x17171b, 1);
     el.appendChild(renderer.domElement);
@@ -123,6 +175,7 @@ class BackdropManager {
         uRes: { value: new Vector2(1, 1) },
         uPointer: { value: new Vector2(0, 0) },
         uScroll: { value: 0 },
+        uHashLut: { value: buildHashLut() },
       },
     });
     scene.add(new Mesh(new PlaneGeometry(2, 2), material));
@@ -138,6 +191,7 @@ class BackdropManager {
       const w = this.container.clientWidth;
       const h = this.container.clientHeight;
       this.renderer.setSize(w, h, false);
+      this.fullFrameNext = true;
       const dpr = this.renderer.getPixelRatio();
       (this.material.uniforms['uRes'].value as Vector2).set(w * dpr, h * dpr);
     };
@@ -170,10 +224,33 @@ class BackdropManager {
     u['uTime'].value = time;
     (u['uPointer'].value as Vector2).copy(this.pointer);
     u['uScroll'].value = this.scrollN;
-    this.renderer.render(this.scene, this.camera);
+    // Redraw alternate halves (2px overlap) each frame: the field changes <=1/255
+    // per frame, so a one-frame-old half is invisible and GPU work is halved.
+    // The scroll fade can change faster than that, so a real change forces a full frame.
+    const scrollChanged = Math.abs(this.scrollN - this.renderedScroll) > 1 / 255;
+    this.renderedScroll = this.scrollN;
+    const r = this.renderer;
+    if (this.fullFrameNext || scrollChanged) {
+      r.setScissorTest(false);
+      this.fullFrameNext = false;
+    } else {
+      const size = r.getSize(this.size);
+      const half = Math.floor(size.y / 2);
+      r.setScissorTest(true);
+      // three floors scissor rects to device pixels, so over-extend past the edges.
+      if (this.field === 0) r.setScissor(0, 0, size.x + 4, half + 2);
+      else r.setScissor(0, half - 2, size.x + 4, size.y);
+      this.field ^= 1;
+    }
+    r.render(this.scene, this.camera);
   };
 
-  private play() { if (this.raf === null) this.tick(); }
+  private play() {
+    if (this.raf !== null) return;
+    // Time jumped while paused, so the undrawn half would be stale.
+    this.fullFrameNext = true;
+    this.tick();
+  }
   private stop() { if (this.raf !== null) { cancelAnimationFrame(this.raf); this.raf = null; } }
 
   setScroll(n: number) { this.scrollN = n; }
@@ -183,6 +260,7 @@ class BackdropManager {
     if (this.onResize) window.removeEventListener('resize', this.onResize);
     if (this.onPointer) window.removeEventListener('pointermove', this.onPointer);
     if (this.onVis) document.removeEventListener('visibilitychange', this.onVis);
+    (this.material?.uniforms['uHashLut'].value as DataTexture | undefined)?.dispose();
     this.material?.dispose();
     this.renderer?.dispose();
     this.renderer?.domElement.remove();
