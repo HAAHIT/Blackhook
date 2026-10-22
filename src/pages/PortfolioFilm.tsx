@@ -173,9 +173,20 @@ export function PortfolioFilm() {
       </div>
 
       <div className="pf-progress" aria-hidden="true"><span /></div>
-      <div className="pf-sphere-stage" aria-hidden="true" />
 
       <div className="pf-webgl" aria-hidden="true">
+        {/* The smoke field's first frame: what every device shows until (and
+            unless) the live WebGL field fades in over it. */}
+        <picture className="pf-smoke-poster">
+          <source srcSet="/smoke-poster.avif" type="image/avif" />
+          <img
+            src="/smoke-poster.webp"
+            alt=""
+            decoding="async"
+            onLoad={(e) => e.currentTarget.classList.add('is-loaded')}
+          />
+        </picture>
+        <div className="pf-smoke-dim" />
         {/* Ambient living layer — mira-style slow halo, radar pings and
             drifting motes. Pure CSS, sits behind all content, gold-tinted. */}
         <div className="pf-ambient">
@@ -188,6 +199,8 @@ export function PortfolioFilm() {
           ))}
         </div>
       </div>
+      {/* After the smoke: the sphere glows over the backdrop, under the content. */}
+      <div className="pf-sphere-stage" aria-hidden="true" />
 
       <header className="pf-nav" data-menu-open={menuOpen ? 'true' : undefined}>
         <div className="pf-nav-inner">

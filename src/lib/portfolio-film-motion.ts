@@ -86,21 +86,35 @@ let counters: { el: HTMLElement; run: () => void }[] = [];
 const isTouch = () => window.matchMedia('(pointer: coarse)').matches;
 const prefersReduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* Probe for a usable WebGL context once, before constructing any three.js
-   renderer. Without this, three.js logs a barrage of context-creation errors
-   to the console on machines/browsers where WebGL is unavailable or disabled,
-   even though we already fall back to the CSS layers. */
-let webglOk: boolean | null = null;
-const hasWebGL = () => {
-  if (webglOk !== null) return webglOk;
-  try {
-    const canvas = document.createElement('canvas');
-    webglOk = !!(canvas.getContext('webgl2') || canvas.getContext('webgl'));
-  } catch {
-    webglOk = false;
-  }
-  return webglOk;
+/* Probe for a usable, hardware-accelerated WebGL context once, before
+   constructing any three.js renderer. Without this, three.js logs a barrage of
+   context-creation errors to the console where WebGL is unavailable or
+   disabled, even though we already fall back to the CSS layers. Software
+   rendering (GPU blocklisted, hardware acceleration off) counts as unavailable:
+   the shaders would crawl there and drag the whole page down with them. The
+   probe context is released straight away so it doesn't hold a GPU slot. */
+let webglSupport: { webgl2: boolean; any: boolean } | null = null;
+const probeWebGL = () => {
+  if (webglSupport) return webglSupport;
+  const opts = { failIfMajorPerformanceCaveat: true };
+  const tryContext = (type: 'webgl2' | 'webgl') => {
+    try {
+      const gl = document.createElement('canvas').getContext(type, opts) as WebGLRenderingContext | null;
+      if (!gl) return false;
+      if (typeof gl.getExtension === 'function') gl.getExtension('WEBGL_lose_context')?.loseContext();
+      return true;
+    } catch {
+      return false;
+    }
+  };
+  const webgl2 = tryContext('webgl2');
+  webglSupport = { webgl2, any: webgl2 || tryContext('webgl') };
+  return webglSupport;
 };
+const hasWebGL = () => probeWebGL().any;
+const hasWebGL2 = () => probeWebGL().webgl2;
+// The visitor asked the browser to save data: skip the three.js download.
+const saveData = () => !!(navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
 
 function setupLenis() {
   lenis = new Lenis({
@@ -161,9 +175,13 @@ function setupCursor() {
   window.addEventListener('pointerup', () => el.classList.remove('press'));
 
   // The ring trails the cursor; in label/disc modes it settles faster so
-  // the text feels "attached" rather than lagging behind.
-  const tick = () => {
-    const ease = el.classList.contains('label') ? 0.22 : 0.14;
+  // the text feels "attached" rather than lagging behind. The per-frame ease is
+  // scaled by frame time so the trail feels the same at 60Hz and 120Hz.
+  let last = 0;
+  const tick = (now: number) => {
+    const frames = last ? Math.min(now - last, 100) / (1000 / 60) : 1;
+    last = now;
+    const ease = 1 - Math.pow(1 - (el.classList.contains('label') ? 0.22 : 0.14), frames);
     rx += (tx - rx) * ease; ry += (ty - ry) * ease;
     if (ring) ring.style.transform = `translate3d(${rx}px,${ry}px,0) translate(-50%,-50%)`;
     requestAnimationFrame(tick);
@@ -220,26 +238,41 @@ function setupMagnetic() {
   });
 }
 
-/* WebGL hero backdrop — desktop, motion-on, sized-up screens only.
-   Everything else keeps the CSS aurora fallback (see .pf-webgl::before). */
+/* Smoke backdrop — one look on every device, served at the best tier it can run:
+     · live    WebGL2 on a hardware GPU (desktop, tablet or phone): the animated
+               field, which sizes itself and steps its resolution down if the
+               device can't keep up (see portfolio-webgl.ts)
+     · drift   no usable WebGL2, Save-Data on, or the live field gave up: the
+               field's first frame as a poster, slowly drifting
+     · still   reduced motion: the same poster, motionless
+   The poster is in the markup from the first paint, so every tier starts on the
+   same smoke and the live canvas fades in over it without a visible change. */
 function setupWebGL() {
   const el = document.querySelector<HTMLElement>('.pf-webgl');
   if (!el) return;
-  if (isTouch() || prefersReduced() || window.innerWidth < 760 || !hasWebGL()) return;
-  // Lazy-load three.js only on capable desktops, after first paint.
+
+  // The hero's scroll fade dims whichever tier is showing, identically.
+  const dim = el.querySelector<HTMLElement>('.pf-smoke-dim');
+  if (dim) {
+    ScrollTrigger.create({
+      trigger: '.pf-hero', start: 'top top', end: 'bottom top',
+      onUpdate: (self) => { dim.style.opacity = String(self.progress * 0.55); },
+    });
+  }
+
+  if (prefersReduced()) return;
+  const drift = () => { el.dataset['smoke'] = 'drift'; };
+  if (saveData() || !hasWebGL2()) { drift(); return; }
+  // Lazy-load three.js after first paint; the poster covers the wait.
   import('./portfolio-webgl').then(({ Backdrop }) => {
     try {
       Backdrop.mount(el);
     } catch {
+      drift();
       return;
     }
     backdrop = Backdrop;
-    requestAnimationFrame(() => el.classList.add('on'));
-    ScrollTrigger.create({
-      trigger: '.pf-hero', start: 'top top', end: 'bottom top',
-      onUpdate: (self) => Backdrop.setScroll(self.progress),
-    });
-  }).catch(() => { /* WebGL unavailable — CSS aurora fallback stays */ });
+  }).catch(drift);
 }
 
 function setupProgress() {
@@ -447,10 +480,13 @@ function setupHeroEntrance(): () => void {
 function setupReveals() {
   reveals = [];
   revealed = new WeakSet();
+  // Reduced motion: content is simply there. (The .pf-reveal CSS override only
+  // freezes elements carrying that class, not split words, tags or rows.)
+  if (prefersReduced()) return;
 
   // Big serif headings keep the masked word-rise (our most premium move),
   // now timed on mira's cine curve with a faint blur clearing per word.
-  document.querySelectorAll<HTMLElement>('.pf-section-head h2, .pf-work-head h2, .pf-contact h2').forEach((h) => {
+  document.querySelectorAll<HTMLElement>('.pf-section-head h2, .pf-work-head h2, .pf-recog-heading, .pf-contact h2').forEach((h) => {
     const words = splitWords(h);
     gsap.set(words, { yPercent: 115, opacity: 0, filter: 'blur(5px)' });
     const play = makeReveal(h, () => gsap.to(words, { yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 1.0, ease: EASE_CINE, stagger: 0.05 }));
@@ -545,24 +581,33 @@ function setupWordmark() {
 }
 
 /* Hero copy drifts up and dims as you scroll into the film. Copy column
-   only — the portrait keeps its own hover transform untouched. */
+   only — the portrait keeps its own hover transform untouched. Follows the
+   desktop layout (tablets included) rather than the input type: on the stacked
+   phone layout the hero is taller than the screen, and the CTAs would dim while
+   still being read. */
 function setupHeroParallax() {
-  if (prefersReduced() || isTouch()) return;
   const copy = document.querySelector<HTMLElement>('.pf-hero-copy');
   if (!copy) return;
-  gsap.to(copy, {
-    yPercent: -16, opacity: 0.15, ease: 'none',
-    scrollTrigger: { trigger: '.pf-hero', start: 'top top', end: 'bottom top', scrub: true },
+  const mm = gsap.matchMedia();
+  mm.add('(min-width: 821px) and (prefers-reduced-motion: no-preference)', () => {
+    const tween = gsap.to(copy, {
+      yPercent: -16, opacity: 0.15, ease: 'none',
+      scrollTrigger: { trigger: '.pf-hero', start: 'top top', end: 'bottom top', scrub: true },
+    });
+    return () => { tween.scrollTrigger?.kill(); tween.kill(); };
   });
 }
 
 /* One persistent gold particle sphere lives in a fixed stage behind all
    content and morphs as you scroll the site (mira-style): each major section
    sets a discrete morph state, and the sphere eases between forms (calm →
-   rippling → turbulent → swollen). Skipped on touch / reduced-motion / no-WebGL. */
+   rippling → turbulent → swollen). Runs on any device with hardware WebGL —
+   it's a few thousand points, cheap even on phones. Skipped on reduced motion,
+   where the stage is hidden, without WebGL, and with Save-Data (it's the only
+   other thing that would pull in three.js). */
 function setupSphereStage() {
   const el = document.querySelector<HTMLElement>('.pf-sphere-stage');
-  if (!el || isTouch() || prefersReduced() || !hasWebGL()) return;
+  if (!el || prefersReduced() || saveData() || !hasWebGL()) return;
   import('./portfolio-sphere').then(({ PortfolioSphere }) => {
     try { PortfolioSphere.mount(el); } catch { return; }
     pageSphere = PortfolioSphere;
@@ -657,7 +702,7 @@ function setupHorizontalWork() {
     return () => { cleanups.forEach((c) => c()); st.kill(); tween.kill(); };
   });
 
-  mm.add('(max-width: 820px)', () => {
+  mm.add('(max-width: 820px) and (prefers-reduced-motion: no-preference)', () => {
     const panels = gsap.utils.toArray<HTMLElement>('.pf-wpanel');
     panels.forEach((p) => {
       gsap.set(p, { y: 36, opacity: 0 });
@@ -765,7 +810,7 @@ function setupHeadingParallax() {
 function setupNav() {
   const nav = document.querySelector<HTMLElement>('.pf-nav');
   if (!nav) return;
-  gsap.from(nav, { y: -40, opacity: 0, duration: 1.0, delay: 0.05, ease: 'expo.out' });
+  if (!prefersReduced()) gsap.from(nav, { y: -40, opacity: 0, duration: 1.0, delay: 0.05, ease: 'expo.out' });
   ScrollTrigger.create({ start: 'top -40', end: 'max',
     onUpdate: (self) => nav.classList.toggle('scrolled', self.scroll() > 40) });
 

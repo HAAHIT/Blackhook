@@ -71,27 +71,43 @@ img, svg { display: block; }
 /* ===== Stacking: content above the WebGL backdrop ===== */
 main, .pf-footer, .pf-wordmark { position: relative; z-index: 1; }
 
-/* ===== WebGL backdrop + CSS aurora fallback ===== */
+/* ===== Smoke backdrop + particle sphere =====
+   Both are fixed, full-screen layers sized to the large viewport (100lvh), so
+   mobile toolbars collapsing mid-scroll don't resize them — that would clear
+   the canvases and rescale the field. Stacking, bottom to top: smoke poster,
+   live smoke canvas, scroll dim, ambient halo/pings/motes, sphere, content. */
+.pf-webgl, .pf-sphere-stage { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; height: 100lvh; z-index: 0; pointer-events: none; }
+.pf-webgl { overflow: hidden; }
+
 /* Persistent morphing particle sphere — a fixed centerpiece behind all
-   content that changes form as you scroll (driven from JS by section). */
-.pf-sphere-stage { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.5; }
+   content that changes form as you scroll (driven from JS by section). Sits
+   after .pf-webgl in the DOM so it glows over the smoke, not under it. */
+.pf-sphere-stage { opacity: 0.5; }
 .pf-sphere-stage canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; display: block; }
 
-.pf-webgl { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-.pf-webgl::before {
-  content: ''; position: absolute; inset: -20%;
-  background:
-    radial-gradient(38% 38% at 30% 24%, rgba(212, 181, 106, 0.13), transparent 70%),
-    radial-gradient(42% 42% at 78% 66%, rgba(200, 202, 206, 0.07), transparent 72%);
-  animation: pf-aurora 22s ease-in-out infinite alternate;
-  transition: opacity 1.2s ease;
-}
+/* The poster is the live field's first frame. Every tier starts on it; the
+   live canvas fades in over it (identical pixels, so no visible change), and
+   tiers that can't run the shader keep it — still, or drifting slowly. */
+.pf-smoke-poster, .pf-smoke-poster img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.pf-smoke-poster img { object-fit: cover; object-position: 50% 50%; opacity: 0; transition: opacity 0.6s ease; }
+.pf-smoke-poster img.is-loaded { opacity: 1; }
+/* Hidden once the canvas has fully faded in, so it isn't composited underneath;
+   shown again at once if the canvas goes away (context loss, fallback). */
+.pf-webgl.on .pf-smoke-poster { visibility: hidden; transition: visibility 0s linear 1.3s; }
+.pf-webgl[data-smoke='drift'] .pf-smoke-poster img { animation: pf-smoke-drift 28s ease-in-out infinite alternate; will-change: transform; }
 .pf-webgl canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; display: block; opacity: 0; transition: opacity 1.2s ease; }
-.pf-webgl.on::before { opacity: 0; }
 .pf-webgl.on canvas { opacity: 1; }
+/* Black at opacity k multiplies the smoke by (1 - k): the hero's scroll fade,
+   applied the same way to the live canvas and the poster (driven from JS). */
+.pf-smoke-dim { position: absolute; inset: 0; z-index: 1; background: #000; opacity: 0; will-change: opacity; }
+/* Scale stays above 1 throughout so the drifting poster never uncovers an edge. */
+@keyframes pf-smoke-drift {
+  from { transform: scale(1.06) translate3d(-1.2%, -0.8%, 0); }
+  to   { transform: scale(1.12) translate3d(1.2%, 1%, 0); }
+}
 
 /* ===== Ambient living layer (mira-style) ===== */
-.pf-ambient { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 1; }
+.pf-ambient { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 2; }
 
 /* Slow conic gold halo, drifting top-right — the "AI orb" energy */
 .pf-halo {
@@ -290,7 +306,6 @@ body.pf-loading { overflow: hidden; }
 .pf-marquee-item { display: inline-flex; align-items: center; gap: 26px; padding: 18px 26px; font-family: var(--pf-serif); font-style: italic; font-size: clamp(18px, 2.4vw, 26px); color: var(--pf-ink-2); white-space: nowrap; }
 .pf-marquee-item .s { font-style: normal; font-size: 9px; color: var(--pf-gold-solid); }
 
-@keyframes pf-aurora { from { transform: translate3d(-3%, -2%, 0) scale(1.05); } to { transform: translate3d(3%, 4%, 0) scale(1.16); } }
 @keyframes pf-marq { to { transform: translateX(-50%); } }
 
 /* ===== Cursor ===== */
@@ -344,15 +359,20 @@ body.pf-loading { overflow: hidden; }
   position: fixed; top: 16px; left: 0; right: 0; margin-inline: auto; z-index: 50;
   width: calc(100% - 32px); max-width: 720px;
   border-radius: 100px;
+  /* Pre-mixed fallbacks for browsers without color-mix() (Safari < 16.2). */
+  background: rgba(23, 23, 27, 0.56);
   background: color-mix(in srgb, var(--pf-bg) 56%, transparent);
-  backdrop-filter: blur(16px) saturate(1.5);
+  /* Prefixed first, standard last: the CSS minifier keeps only the later of
+     the pair, and Chrome/Firefox ignore the -webkit- form. */
   -webkit-backdrop-filter: blur(16px) saturate(1.5);
+  backdrop-filter: blur(16px) saturate(1.5);
   border: 1px solid var(--pf-line);
   box-shadow: 0 18px 50px -30px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(245, 223, 164, 0.08);
   transition: max-width 0.5s cubic-bezier(0.25, 0.1, 0.35, 1), background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 .pf-nav.scrolled {
   max-width: 580px;
+  background: rgba(23, 23, 27, 0.8);
   background: color-mix(in srgb, var(--pf-bg) 80%, transparent);
   border-color: var(--pf-line-2);
   box-shadow: 0 18px 50px -26px rgba(0, 0, 0, 0.95), inset 0 1px 0 rgba(245, 223, 164, 0.12);
@@ -389,8 +409,9 @@ body.pf-loading { overflow: hidden; }
   position: absolute; top: calc(100% + 8px); left: 0; right: 0;
   padding: 8px; border-radius: 18px;
   border: 1px solid var(--pf-line-2);
+  background: rgba(29, 29, 34, 0.92);
   background: color-mix(in srgb, var(--pf-bg-card) 92%, transparent);
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
   box-shadow: 0 20px 50px -24px rgba(0, 0, 0, 0.7);
 }
 .pf-nav-mobile a {
@@ -412,7 +433,7 @@ body.pf-loading { overflow: hidden; }
 .pf-magnetic { display: inline-flex; }
 .pf-btn svg { transition: transform 0.35s cubic-bezier(0.65, 0, 0.2, 1); }
 .pf-btn-primary { background: var(--pf-ink); color: var(--pf-bg); }
-.pf-btn-primary:hover { background: color-mix(in srgb, var(--pf-ink) 82%, var(--pf-bg)); box-shadow: 0 10px 30px -10px rgba(212, 181, 106, 0.45); }
+.pf-btn-primary:hover { background: #ccc9c3; background: color-mix(in srgb, var(--pf-ink) 82%, var(--pf-bg)); box-shadow: 0 10px 30px -10px rgba(212, 181, 106, 0.45); }
 .pf-btn-primary:hover svg { transform: translateX(4px); }
 .pf-btn-ghost { background: transparent; color: var(--pf-ink); border: 1px solid var(--pf-line-2); }
 .pf-btn-ghost:hover { border-color: var(--pf-ink); background: var(--pf-bg-card); }
@@ -463,8 +484,10 @@ body.pf-loading { overflow: hidden; }
   box-shadow: 0 0 10px rgba(212, 181, 106, 0.9);
 }
 .pf-section-head { margin-bottom: 56px; }
-.pf-section-head h2 { font-family: var(--pf-serif); font-weight: 400; font-size: clamp(2rem, 3.6vw, 2.9rem); line-height: 1.08; letter-spacing: -0.018em; margin: 18px 0 0; }
-.pf-section-head h2 em, .pf-section-head h2 em .pf-word-i {
+/* .pf-recog-heading sits outside a .pf-section-head but is the same kind of heading. */
+.pf-section-head h2, .pf-recog-heading { font-family: var(--pf-serif); font-weight: 400; font-size: clamp(2rem, 3.6vw, 2.9rem); line-height: 1.08; letter-spacing: -0.018em; margin: 18px 0 0; }
+.pf-section-head h2 em, .pf-section-head h2 em .pf-word-i,
+.pf-recog-heading em, .pf-recog-heading em .pf-word-i {
   font-style: italic;
   background: var(--pf-gold);
   background-clip: text; -webkit-background-clip: text;
@@ -553,7 +576,9 @@ body.pf-loading { overflow: hidden; }
 }
 .pf-work-head { position: absolute; top: 92px; left: 0; right: 0; z-index: 3; max-width: var(--pf-max); margin: 0 auto; padding: 0 28px; pointer-events: none; }
 .pf-work-head h2 { font-family: var(--pf-serif); font-weight: 400; font-size: clamp(2rem, 3.6vw, 2.9rem); line-height: 1.08; letter-spacing: -0.018em; margin: 14px 0 0; }
-.pf-work-head h2 em { font-style: italic; background: var(--pf-gold); background-clip: text; -webkit-background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
+/* Split words are transformed inline-blocks, which background-clip:text on the
+   em doesn't reach — each word needs its own gradient or it renders invisible. */
+.pf-work-head h2 em, .pf-work-head h2 em .pf-word-i { font-style: italic; background: var(--pf-gold); background-clip: text; -webkit-background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }
 .pf-work-track { position: relative; z-index: 2; display: flex; height: 100vh; width: max-content; will-change: transform; }
 .pf-wpanel {
   position: relative; flex-shrink: 0; width: 100vw; height: 100vh;
@@ -731,9 +756,13 @@ body.pf-loading { overflow: hidden; }
   .pf-wpanel-num { position: static; font-size: 4rem; color: rgba(244, 240, 232, 0.08); display: block; margin-bottom: 8px; }
   .pf-wpanel-metrics { flex-direction: column; align-items: flex-start; gap: 18px; justify-content: flex-start; }
   .pf-cs-link { margin-left: 0; }
-  .pf-work-dots, .pf-work-side-label, .pf-sphere-stage { display: none; }
-  .pf-wpanel { text-align: left; }
+  .pf-work-dots, .pf-work-side-label { display: none; }
+  /* Stack the index number above the body, both on the heading's left edge:
+     .pf-wpanel is a flex row on desktop, which put the number beside the body
+     and pushed every case study in from the heading. */
+  .pf-wpanel { text-align: left; flex-direction: column; align-items: flex-start; justify-content: flex-start; }
   .pf-wpanel-body { align-items: flex-start; max-width: none; }
+  .pf-wpanel-sub { margin: 0; }
 
   .pf-section-vlabel { display: none; }
 
@@ -769,7 +798,7 @@ body.pf-loading { overflow: hidden; }
   .pf-reveal { opacity: 1 !important; transform: none !important; filter: none !important; }
   .pf-loader, .pf-intro { display: none !important; }
   .pf-marquee-track,
-  .pf-webgl::before,
+  .pf-smoke-poster img,
   .pf-halo, .pf-halo-core, .pf-ping, .pf-mote, .pf-intro-orb-glow { animation: none !important; }
   .pf-ping, .pf-mote { opacity: 0 !important; }
   .pf-shot { transition: none !important; transform: none !important; object-position: 50% 0% !important; }
@@ -786,6 +815,7 @@ body.pf-loading { overflow: hidden; }
   .pf-wpanel + .pf-wpanel { border-left: none; border-top: 1px solid var(--pf-line); }
   .pf-wpanel-num { position: static; display: block; margin-bottom: 8px; font-size: 4rem; }
   .pf-work-dots, .pf-work-side-label, .pf-sphere-stage { display: none; }
-  .pf-wpanel { text-align: left; }
+  .pf-wpanel { text-align: left; flex-direction: column; align-items: flex-start; justify-content: flex-start; }
   .pf-wpanel-body { align-items: flex-start; max-width: none; }
+  .pf-wpanel-sub { margin: 0; }
 }

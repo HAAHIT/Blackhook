@@ -143,10 +143,14 @@ function setupWebGL() {
       return;
     }
     backdrop = Backdrop;
-    requestAnimationFrame(() => el.classList.add('on'));
+    // The backdrop fades its canvas in (adds .on) itself. The scroll fade is a
+    // black layer over the canvas: opacity k multiplies the field by (1 - k).
+    const dim = document.createElement('div');
+    dim.style.cssText = 'position:absolute;inset:0;background:#000;opacity:0;pointer-events:none';
+    el.appendChild(dim);
     ScrollTrigger.create({
       trigger: '.pf-hero', start: 'top top', end: 'bottom top',
-      onUpdate: (self) => Backdrop.setScroll(self.progress),
+      onUpdate: (self) => { dim.style.opacity = String(self.progress * 0.55); },
     });
   }).catch(() => { /* WebGL unavailable — CSS aurora fallback stays */ });
 }
