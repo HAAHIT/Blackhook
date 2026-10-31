@@ -15,6 +15,8 @@
    served by Vite) in headless Chromium on SwiftShader, which matches GPUs to
    within 1/255 thanks to the exact hash LUT. */
 
+import { Buffer } from 'node:buffer';
+import process from 'node:process';
 import { writeFile, rm, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';

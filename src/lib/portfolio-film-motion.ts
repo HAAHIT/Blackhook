@@ -82,6 +82,9 @@ let lenis: Lenis | null = null;
 let lenisRaf: number | null = null;
 let backdrop: { destroy: () => void } | null = null;
 let pageSphere: { setMorphState: (n: number) => void; setProgress: (n: number) => void; destroy: () => void } | null = null;
+// Bumped on teardown, so a lazy three.js import that resolves after the page
+// has gone doesn't start a renderer nobody will ever destroy.
+let lifecycle = 0;
 let counters: { el: HTMLElement; run: () => void }[] = [];
 const isTouch = () => window.matchMedia('(pointer: coarse)').matches;
 const prefersReduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -261,10 +264,12 @@ function setupWebGL() {
   }
 
   if (prefersReduced()) return;
-  const drift = () => { el.dataset['smoke'] = 'drift'; };
+  const live = lifecycle;
+  const drift = () => { if (live === lifecycle) el.dataset['smoke'] = 'drift'; };
   if (saveData() || !hasWebGL2()) { drift(); return; }
   // Lazy-load three.js after first paint; the poster covers the wait.
   import('./portfolio-webgl').then(({ Backdrop }) => {
+    if (live !== lifecycle) return;
     try {
       Backdrop.mount(el);
     } catch {
@@ -608,7 +613,9 @@ function setupHeroParallax() {
 function setupSphereStage() {
   const el = document.querySelector<HTMLElement>('.pf-sphere-stage');
   if (!el || prefersReduced() || saveData() || !hasWebGL()) return;
+  const live = lifecycle;
   import('./portfolio-sphere').then(({ PortfolioSphere }) => {
+    if (live !== lifecycle) return;
     try { PortfolioSphere.mount(el); } catch { return; }
     pageSphere = PortfolioSphere;
     setupSphereMorph();
@@ -869,6 +876,7 @@ export function initPortfolioMotion() {
 }
 
 export function destroyPortfolioMotion() {
+  lifecycle++;
   if (lenisRaf !== null) { cancelAnimationFrame(lenisRaf); lenisRaf = null; }
   lenis?.destroy(); lenis = null;
   if (backdrop) { backdrop.destroy(); backdrop = null; }

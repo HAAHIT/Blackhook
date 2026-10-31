@@ -372,3 +372,49 @@ describe('destroyPortfolioMotion', () => {
     expect(() => destroyPortfolioMotion()).not.toThrow();
   });
 });
+
+// ---------------------------------------------------------------------------
+// Lazy three.js mounts vs teardown
+// ---------------------------------------------------------------------------
+
+describe('lazy WebGL mounts vs teardown', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    setupMinimalDom();
+    setViewportWidth(1200);
+    installMatchMedia();
+    mockCanvasGetContext({});
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    teardownDom();
+  });
+
+  it('mounts the smoke backdrop and the sphere once their imports resolve', async () => {
+    const { Backdrop } = await import('../portfolio-webgl');
+    const { PortfolioSphere } = await import('../portfolio-sphere');
+    const smoke = vi.spyOn(Backdrop, 'mount');
+    const sphere = vi.spyOn(PortfolioSphere, 'mount');
+    const { initPortfolioMotion } = await import('../portfolio-film-motion');
+    initPortfolioMotion();
+    await vi.waitFor(() => {
+      expect(smoke).toHaveBeenCalledTimes(1);
+      expect(sphere).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('starts neither renderer when the page is torn down before the imports resolve', async () => {
+    const { Backdrop } = await import('../portfolio-webgl');
+    const { PortfolioSphere } = await import('../portfolio-sphere');
+    const smoke = vi.spyOn(Backdrop, 'mount');
+    const sphere = vi.spyOn(PortfolioSphere, 'mount');
+    const { initPortfolioMotion, destroyPortfolioMotion } = await import('../portfolio-film-motion');
+    initPortfolioMotion();
+    destroyPortfolioMotion();
+    // Well past when the imports resolve (the test above sees mounts within this).
+    await new Promise((r) => setTimeout(r, 50));
+    expect(smoke).not.toHaveBeenCalled();
+    expect(sphere).not.toHaveBeenCalled();
+  });
+});
