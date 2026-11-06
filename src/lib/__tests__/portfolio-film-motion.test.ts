@@ -378,6 +378,9 @@ describe('destroyPortfolioMotion', () => {
 // ---------------------------------------------------------------------------
 
 describe('lazy WebGL mounts vs teardown', () => {
+  // Stops the instance a test started, so its rAF loop doesn't outlive the test.
+  let destroyMotion: (() => void) | undefined;
+
   beforeEach(() => {
     vi.resetModules();
     setupMinimalDom();
@@ -387,6 +390,8 @@ describe('lazy WebGL mounts vs teardown', () => {
   });
 
   afterEach(() => {
+    destroyMotion?.();
+    destroyMotion = undefined;
     vi.restoreAllMocks();
     teardownDom();
   });
@@ -396,7 +401,8 @@ describe('lazy WebGL mounts vs teardown', () => {
     const { PortfolioSphere } = await import('../portfolio-sphere');
     const smoke = vi.spyOn(Backdrop, 'mount');
     const sphere = vi.spyOn(PortfolioSphere, 'mount');
-    const { initPortfolioMotion } = await import('../portfolio-film-motion');
+    const { initPortfolioMotion, destroyPortfolioMotion } = await import('../portfolio-film-motion');
+    destroyMotion = destroyPortfolioMotion;
     initPortfolioMotion();
     await vi.waitFor(() => {
       expect(smoke).toHaveBeenCalledTimes(1);
