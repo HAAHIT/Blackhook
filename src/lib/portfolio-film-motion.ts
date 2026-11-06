@@ -280,6 +280,19 @@ function setupWebGL() {
   }).catch(drift);
 }
 
+function jumpTo(el: HTMLElement) {
+  // Respect scroll-margin-top (set where the floating nav would cover a section).
+  const margin = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+  const y = el.getBoundingClientRect().top + window.scrollY - margin;
+  // Lenis caches the page height and clamps to it; pin spacers added by the
+  // last refresh would otherwise leave later sections out of reach.
+  lenis?.resize();
+  if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
+  else window.scrollTo(0, y);
+  ScrollTrigger.update();
+  kickPassedReveals();
+}
+
 function setupProgress() {
   const bar = document.querySelector<HTMLElement>('.pf-progress span');
   if (!bar) return;
@@ -289,11 +302,43 @@ function setupProgress() {
   });
 }
 
-/* Intro preloader — counts to 100, then curtains up and hands off to
-   the hero entrance. On reduced-motion it's removed instantly. */
-function setupPreloader(done: () => void) {
+/* Who is arriving decides how much ceremony they get. The loader and intro
+   picker are a first-visit welcome: someone coming back, or following a link
+   to a section (#work), goes straight to the content. */
+const INTRO_SEEN_KEY = 'pf-intro-seen';
+const introSeen = () => {
+  try { return localStorage.getItem(INTRO_SEEN_KEY) === '1'; } catch { return false; }
+};
+const markIntroSeen = () => {
+  try { localStorage.setItem(INTRO_SEEN_KEY, '1'); } catch { /* private mode: show it again next time */ }
+};
+// The section a #hash link points at, if it exists on the page.
+const hashTarget = (): HTMLElement | null => {
+  const id = location.hash.slice(1);
+  if (!id) return null;
+  try { return document.getElementById(decodeURIComponent(id)); } catch { return null; }
+};
+
+/* Resolves once the webfonts are in (or after `cap` ms), so the curtain never
+   lifts onto fallback type. The Google Fonts stylesheet loads non-blocking, so
+   wait for it before asking for the faces it declares. */
+function webfontsReady(cap: number): Promise<void> {
+  const css = document.querySelector<HTMLLinkElement>('link[rel="stylesheet"][href*="fonts.googleapis.com"]');
+  const cssReady = !css || css.media !== 'print'
+    ? Promise.resolve()
+    : new Promise<void>((resolve) => css.addEventListener('load', () => resolve(), { once: true }));
+  const faces = cssReady
+    .then(() => Promise.all(['1em "Instrument Serif"', '1em "Geist"', '1em "Geist Mono"'].map((f) => document.fonts?.load(f))))
+    .then(() => undefined, () => undefined);
+  return Promise.race([faces, new Promise<void>((resolve) => setTimeout(resolve, cap))]);
+}
+
+/* Intro preloader — counts up while the webfonts arrive (never longer than it
+   takes, capped at 1.5s), then curtains up and hands off to the intro. Skipped
+   for return visits, section links and reduced motion. */
+function setupPreloader(skip: boolean, done: () => void) {
   const loader = document.querySelector<HTMLElement>('.pf-loader');
-  if (!loader || prefersReduced()) {
+  if (!loader || skip || prefersReduced()) {
     loader?.remove();
     done();
     return;
@@ -305,31 +350,34 @@ function setupPreloader(done: () => void) {
   document.body.classList.add('pf-loading');
 
   const counter = { v: 0 };
-  const tl = gsap.timeline();
-  tl.to(counter, {
-    v: 100, duration: 1.15, ease: 'power2.inOut',
+  const count = gsap.to(counter, {
+    v: 100, duration: 0.7, ease: 'power2.inOut',
     onUpdate: () => {
       if (num) num.textContent = String(Math.round(counter.v));
       if (bar) bar.style.transform = `scaleX(${counter.v / 100})`;
     },
   });
-  tl.to('.pf-loader-inner', { y: -24, opacity: 0, duration: 0.5, ease: 'power2.in' }, '+=0.12');
-  tl.to(loader, {
-    yPercent: -100, duration: 0.95, ease: 'expo.inOut',
-    onComplete: () => loader.remove(),
-  }, '<0.05');
-  tl.add(() => {
-    document.body.classList.remove('pf-loading');
-    lenis?.start();
-    done();
-  }, '<0.18');
+  Promise.all([webfontsReady(1500), count.then()]).then(() => {
+    const tl = gsap.timeline();
+    tl.to('.pf-loader-inner', { y: -24, opacity: 0, duration: 0.4, ease: 'power2.in' });
+    tl.to(loader, {
+      yPercent: -100, duration: 0.8, ease: 'expo.inOut',
+      onComplete: () => loader.remove(),
+    }, '<0.05');
+    tl.add(() => {
+      document.body.classList.remove('pf-loading');
+      lenis?.start();
+      done();
+    }, '<0.15');
+  });
 }
 
 /* Intent picker — a one-off "what brings you here" step shown right after
    the loader curtain lifts. A brief bio orients first-time visitors, then
-   their choice jumps straight to the relevant section. Reduced-motion and
-   no-element cases skip it instantly, same contract as the preloader. */
-function setupIntro(done: () => void) {
+   their choice jumps straight to the relevant section. Shown once: return
+   visits, section links, reduced motion and no-element cases skip it
+   instantly, same contract as the preloader. */
+function setupIntro(skip: boolean, done: () => void) {
   // Announces a calm moment (no scripted entrance/transition tween running)
   // for deferred main-thread work such as the session recorder's snapshot.
   let settledFired = false;
@@ -340,7 +388,7 @@ function setupIntro(done: () => void) {
   };
 
   const intro = document.querySelector<HTMLElement>('.pf-intro');
-  if (!intro || prefersReduced()) {
+  if (!intro || skip || prefersReduced()) {
     intro?.remove();
     done();
     settled();
@@ -374,6 +422,7 @@ function setupIntro(done: () => void) {
   const dismiss = (targetSelector: string | null) => {
     if (dismissing) return;
     dismissing = true;
+    markIntroSeen();
 
     const tl = gsap.timeline({
       onComplete: () => {
@@ -427,9 +476,11 @@ function setupIntro(done: () => void) {
     if (touchY - (e.touches[0]?.clientY ?? 0) > 8 && atBottom()) dismiss(null);
   }, { passive: true });
 
-  // Keyboard access: move focus into the dialog so the choices are reachable,
-  // and let Escape skip straight through like the "just exploring" path.
-  intro.querySelector<HTMLButtonElement>('[data-pf-intro="work"]')?.focus();
+  // Keyboard access: move focus into the dialog so the choices are one Tab
+  // away, and let Escape skip straight through like the "just exploring" path.
+  // Focusing the dialog itself (not the first card) avoids painting a focus
+  // ring on load and, on phones, scrolling the name bar out of view.
+  intro.focus({ preventScroll: true });
   intro.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') { dismiss(null); return; }
     // Trap Tab within the overlay so focus can't slip to the (now inert) page
@@ -442,7 +493,7 @@ function setupIntro(done: () => void) {
       const first = focusable[0]!;
       const last = focusable[focusable.length - 1]!;
       const active = document.activeElement;
-      if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); }
+      if (e.shiftKey && (active === first || active === intro)) { e.preventDefault(); last.focus(); }
       else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
     }
   });
@@ -706,6 +757,26 @@ function setupHorizontalWork() {
       }
     });
 
+    // Keyboard focus moving into a panel that is off to the side: scroll to
+    // that panel's point in the pin and show its content. (.pf-work clips its
+    // overflow, so the browser can't scroll the track sideways itself, which
+    // used to blank the section and leave focus on an invisible link.)
+    const panels = gsap.utils.toArray<HTMLElement>('.pf-wpanel');
+    const onFocusIn = (e: FocusEvent) => {
+      const panel = (e.target as HTMLElement).closest<HTMLElement>('.pf-wpanel');
+      if (!panel) return;
+      const y = st.start + (panels.indexOf(panel) / Math.max(1, panels.length - 1)) * (st.end - st.start);
+      lenis?.resize();
+      if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
+      else window.scrollTo(0, y);
+      ScrollTrigger.update();
+      st.getTween()?.progress(1); // skip the scrub lag so the panel is there now
+      const body = panel.querySelector<HTMLElement>('.pf-wpanel-body');
+      if (body) gsap.to(body, { opacity: 1, y: 0, rotateX: 0, filter: 'blur(0px)', duration: 0.35, ease: EASE_CINE, overwrite: true });
+    };
+    section.addEventListener('focusin', onFocusIn);
+    cleanups.push(() => section.removeEventListener('focusin', onFocusIn));
+
     return () => { cleanups.forEach((c) => c()); st.kill(); tween.kill(); };
   });
 
@@ -853,7 +924,16 @@ export function initPortfolioMotion() {
   setupRecogStage();
   setupSceneTransitions();
   setupHeadingParallax();
-  setupPreloader(() => {
+  const target = hashTarget();
+  const skipWelcome = !!target || introSeen();
+  // Until the visitor scrolls on their own, keep a section link's target in
+  // place, including through the late re-measures at the end. Declared before
+  // setupPreloader, which calls back synchronously when the intro is skipped.
+  let pendingJump = target;
+  const cancelJump = () => { pendingJump = null; };
+  ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach((ev) =>
+    window.addEventListener(ev, cancelJump, { once: true, passive: true }));
+  setupPreloader(skipWelcome, () => {
     // Re-measure against the now-unlocked layout so reveals + pins fire
     // correctly, then explicitly kick any in-view counters and force-reveal
     // anything already scrolled past (deep-link / scroll restoration).
@@ -863,16 +943,20 @@ export function initPortfolioMotion() {
     // Arm the hero hidden *now* (it's still behind the loader/intro), then
     // play it only when the intro curtain lifts — so the entrance doubles as
     // the title-sequence reveal with no flash of the final hero beforehand.
-    // If the intro is absent (reduced motion / already dismissed), setupIntro
-    // fires the play callback immediately.
+    // If the intro is skipped (seen before, section link, reduced motion),
+    // setupIntro fires the play callback immediately.
     const playHero = setupHeroEntrance();
-    setupIntro(playHero);
+    setupIntro(skipWelcome, playHero);
+    // A link to a section lands on it. The page renders after the browser has
+    // already tried to jump to the anchor, so jump here, once pins are measured.
+    if (pendingJump) jumpTo(pendingJump);
   });
 
   // Pinned/horizontal sections depend on final layout — re-measure once
   // images and webfonts have settled.
-  window.addEventListener('load', () => ScrollTrigger.refresh());
-  document.fonts?.ready.then(() => ScrollTrigger.refresh());
+  const remeasure = () => { ScrollTrigger.refresh(); if (pendingJump) jumpTo(pendingJump); };
+  window.addEventListener('load', remeasure);
+  document.fonts?.ready.then(remeasure);
 }
 
 export function destroyPortfolioMotion() {

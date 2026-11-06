@@ -61,7 +61,7 @@ export function PortfolioFilm() {
         <div className="pf-loader-bar"><span /></div>
       </div>
 
-      <div className="pf-intro pf-intro--coherent" role="dialog" aria-modal="true" aria-label="Welcome" data-lenis-prevent>
+      <div className="pf-intro pf-intro--coherent" role="dialog" aria-modal="true" aria-label="Welcome" tabIndex={-1} data-lenis-prevent>
         <div className="pf-intro-ambient" aria-hidden="true">
           <span className="pf-halo"><span className="pf-halo-core" /></span>
           <span className="pf-ping pf-ping-1" />
@@ -98,7 +98,7 @@ export function PortfolioFilm() {
             <button type="button" className="pf-intro-opt pf-intro-opt--featured" data-pf-intro="work">
               <div className="pf-intro-opt-head">
                 <span className="pf-intro-opt-num">01</span>
-                <span className="pf-intro-opt-tag">Most visited</span>
+                <span className="pf-intro-opt-tag">Start here</span>
               </div>
               <div className="pf-intro-opt-art" aria-hidden="true">
                 <svg width="160" height="100" viewBox="0 0 160 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -280,22 +280,29 @@ export function PortfolioFilm() {
                 <article key={cs.title} className="pf-wpanel">
                   <span className="pf-wpanel-num">{String(i + 1).padStart(2, '0')}</span>
                   <div className="pf-wpanel-body">
-                    <div className="pf-wpanel-kicker">{cs.kicker}</div>
-                    <h3 className="pf-wpanel-title">{cs.title} <em>{cs.accent}</em></h3>
-                    <p className="pf-wpanel-sub">{cs.subtitle}</p>
-                    <div className="pf-wpanel-metrics">
-                      {cs.metrics.map((m) => (
-                        <div key={m.label} className="pf-wpanel-metric">
-                          <strong>{m.value}</strong>
-                          <span>{m.label}</span>
-                        </div>
-                      ))}
-                      {cs.link && (
-                        <a href={cs.link.href} target="_blank" rel="noopener noreferrer" className="pf-cs-link" data-cursor="Open">
-                          {cs.link.label} <ArrowOut size={11} />
-                        </a>
-                      )}
+                    <div className="pf-wpanel-lead">
+                      <div className="pf-wpanel-kicker">{cs.kicker}</div>
+                      <h3 className="pf-wpanel-title">{cs.title} <em>{cs.accent}</em></h3>
+                      <div className="pf-wpanel-metrics">
+                        {cs.metrics.map((m) => (
+                          <div key={m.label} className="pf-wpanel-metric">
+                            <strong>{m.value}</strong>
+                            <span>{m.label}</span>
+                          </div>
+                        ))}
+                        {cs.link && (
+                          <a href={cs.link.href} target="_blank" rel="noopener noreferrer" className="pf-cs-link" data-cursor="Open">
+                            {cs.link.label} <ArrowOut size={11} />
+                          </a>
+                        )}
+                      </div>
                     </div>
+                    {/* How the result was reached — what hiring managers read a case study for. */}
+                    <dl className="pf-wpanel-story">
+                      <div><dt>Challenge</dt><dd>{cs.challenge}</dd></div>
+                      <div><dt>Approach</dt><dd>{cs.approach}</dd></div>
+                      <div><dt>Outcome</dt><dd>{cs.outcome}</dd></div>
+                    </dl>
                   </div>
                 </article>
               ))}

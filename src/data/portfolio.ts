@@ -248,8 +248,7 @@ export interface CaseStudy {
   title: string;
   /** Italic-serif accent word that closes the headline (mira-style emphasis). */
   accent: string;
-  /** Condensed problem → approach → outcome, as one cinematic line. */
-  subtitle: string;
+  /** The story beside the headline: what was hard, what you did, what happened. */
   challenge: string;
   approach: string;
   outcome: string;
@@ -262,7 +261,6 @@ export const CASE_STUDIES: CaseStudy[] = [
     kicker: 'Jio Loyalty · Jio Platforms Limited',
     title: 'Jio Loyalty: 280M+ customers onboarded, zero',
     accent: 'downtime',
-    subtitle: 'A custom onboarding gateway, phased rollouts and a 22-partner playbook — moved an entire base without breaking a single login.',
     challenge:
       'Move 280M+ customers and their enterprise partners onto a brand-new loyalty platform — business live, zero room for a broken login.',
     approach:
@@ -279,7 +277,6 @@ export const CASE_STUDIES: CaseStudy[] = [
     kicker: 'BlackHook · B2B commodity SaaS',
     title: 'The customer paid before the product',
     accent: 'existed',
-    subtitle: 'Sat with sceptical traders first, scoped the MVP around their workflow, and closed a paying pilot before writing a line of code.',
     challenge:
       'The edible-oil and cement trade runs on phone calls and notebooks — sceptical of software, allergic to subscriptions.',
     approach:
@@ -296,7 +293,6 @@ export const CASE_STUDIES: CaseStudy[] = [
     kicker: 'BlackHook · Healthcare at home',
     title: 'Taking on the P&L, not just the',
     accent: 'roadmap',
-    subtitle: 'Built the ops platform and ran the business behind it — scheduling, payouts and billing, profitable from the first quarter.',
     challenge:
       'Home healthcare is an operations business — unit economics, not software, decide survival.',
     approach:

@@ -31,10 +31,12 @@ vi.mock('gsap', () => {
     t.set = function () { return t; };
     return t;
   }
+  // Real tweens are thenable; the loader awaits one.
+  function to() { return { then: (resolve?: () => void) => Promise.resolve().then(resolve) }; }
   const stub = {
     registerPlugin: noop,
     set: noop,
-    to: noop,
+    to,
     from: noop,
     fromTo: noop,
     timeline,
@@ -71,6 +73,7 @@ vi.mock('lenis', () => {
   MockLenis.prototype.stop = function () {};
   MockLenis.prototype.start = function () {};
   MockLenis.prototype.scrollTo = function () {};
+  MockLenis.prototype.resize = function () {};
   MockLenis.prototype.raf = function () {};
   return { default: MockLenis };
 });
@@ -422,5 +425,63 @@ describe('lazy WebGL mounts vs teardown', () => {
     await new Promise((r) => setTimeout(r, 50));
     expect(smoke).not.toHaveBeenCalled();
     expect(sphere).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// First-visit welcome: loader + intro picker
+// ---------------------------------------------------------------------------
+
+describe('welcome (loader + intro) is a first-visit thing', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    document.body.innerHTML = `
+      <div class="pf-loader"><div class="pf-loader-inner"></div></div>
+      <div class="pf-intro"></div>
+      <section id="contact"></section>
+    `;
+    setViewportWidth(1200);
+    installMatchMedia();
+    mockCanvasGetContext(null, null);
+    localStorage.clear();
+    history.replaceState(null, '', '/hitesh');
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    teardownDom();
+    localStorage.clear();
+    history.replaceState(null, '', '/hitesh');
+  });
+
+  it('shows the loader and intro on a first visit', async () => {
+    const { initPortfolioMotion } = await import('../portfolio-film-motion');
+    initPortfolioMotion();
+    await Promise.resolve();
+    expect(document.querySelector('.pf-loader')).not.toBeNull();
+    expect(document.querySelector('.pf-intro')).not.toBeNull();
+  });
+
+  it('skips both for a visitor who has seen the intro', async () => {
+    localStorage.setItem('pf-intro-seen', '1');
+    const { initPortfolioMotion } = await import('../portfolio-film-motion');
+    initPortfolioMotion();
+    expect(document.querySelector('.pf-loader')).toBeNull();
+    expect(document.querySelector('.pf-intro')).toBeNull();
+  });
+
+  it('skips both when arriving on a link to a section', async () => {
+    history.replaceState(null, '', '/hitesh#contact');
+    const { initPortfolioMotion } = await import('../portfolio-film-motion');
+    initPortfolioMotion();
+    expect(document.querySelector('.pf-loader')).toBeNull();
+    expect(document.querySelector('.pf-intro')).toBeNull();
+  });
+
+  it('still shows them for a hash that matches no section', async () => {
+    history.replaceState(null, '', '/hitesh#nope');
+    const { initPortfolioMotion } = await import('../portfolio-film-motion');
+    initPortfolioMotion();
+    expect(document.querySelector('.pf-loader')).not.toBeNull();
   });
 });
