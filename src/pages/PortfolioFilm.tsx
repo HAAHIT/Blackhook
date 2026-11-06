@@ -184,6 +184,8 @@ export function PortfolioFilm() {
             alt=""
             decoding="async"
             onLoad={(e) => e.currentTarget.classList.add('is-loaded')}
+            // A prerendered image can finish loading before hydration attaches onLoad.
+            ref={(img) => { if (img?.complete && img.naturalWidth) img.classList.add('is-loaded'); }}
           />
         </picture>
         <div className="pf-smoke-dim" />

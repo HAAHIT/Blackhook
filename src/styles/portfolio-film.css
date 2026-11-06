@@ -92,6 +92,8 @@ main, .pf-footer, .pf-wordmark { position: relative; z-index: 1; }
 .pf-smoke-poster, .pf-smoke-poster img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 .pf-smoke-poster img { object-fit: cover; object-position: 50% 50%; opacity: 0; transition: opacity 0.6s ease; }
 .pf-smoke-poster img.is-loaded { opacity: 1; }
+/* Without JavaScript nothing adds .is-loaded; show the poster straight away. */
+html:not(.pf-js) .pf-smoke-poster img { opacity: 1; }
 /* Hidden once the canvas has fully faded in, so it isn't composited underneath;
    shown again at once if the canvas goes away (context loss, fallback). */
 .pf-webgl.on .pf-smoke-poster { visibility: hidden; transition: visibility 0s linear 1.3s; }
@@ -199,6 +201,16 @@ main, .pf-footer, .pf-wordmark { position: relative; z-index: 1; }
 
 /* ===== Preloader ===== */
 .pf-loader { position: fixed; inset: 0; z-index: 9998; background: #121216; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+/* The page is prerendered. html.pf-js (set by an inline script in
+   hitesh.html) holds the content back until the motion system has armed its
+   entrance and adds .pf-ready; without JavaScript it shows as is. The loader
+   is a JS welcome: never without JS, never for return visits or #links. */
+html.pf-js:not(.pf-ready) .pf-nav,
+html.pf-js:not(.pf-ready) main,
+html.pf-js:not(.pf-ready) .pf-wordmark,
+html.pf-js:not(.pf-ready) .pf-footer { visibility: hidden; }
+html:not(.pf-js) .pf-loader,
+html.pf-skip-welcome .pf-loader { display: none; }
 .pf-loader-inner { display: flex; flex-direction: column; align-items: center; gap: 16px; }
 .pf-loader-name { font-family: var(--pf-serif); font-weight: 400; font-size: clamp(30px, 6vw, 56px); letter-spacing: -0.02em; color: var(--pf-ink); }
 .pf-loader-name i { font-style: italic; background: var(--pf-gold); background-clip: text; -webkit-background-clip: text; color: transparent; -webkit-text-fill-color: transparent; }

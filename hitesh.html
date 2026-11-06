@@ -43,6 +43,23 @@
         ]
       }
     </script>
+    <script>
+      // Before first paint. The page arrives prerendered: mark JS as on so the
+      // content waits for the motion system to arm its entrance (instead of
+      // showing, then hiding to animate in), and skip the welcome loader for
+      // return visits and #section links. If the app hasn't started within
+      // 6s, show the content as it is.
+      (function () {
+        var d = document.documentElement;
+        d.classList.add('pf-js');
+        try {
+          if (location.hash.length > 1 || localStorage.getItem('pf-intro-seen') === '1') d.classList.add('pf-skip-welcome');
+        } catch (e) {}
+        setTimeout(function () {
+          if (!d.classList.contains('pf-booted')) d.classList.add('pf-ready', 'pf-skip-welcome');
+        }, 6000);
+      })();
+    </script>
     <style>html,body{background:#17171b;margin:0}</style>
     <!-- Smoke backdrop poster: the first thing every device shows behind the page. -->
     <link rel="preload" href="/smoke-poster.avif" as="image" type="image/avif" />

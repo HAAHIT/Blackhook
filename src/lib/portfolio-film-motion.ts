@@ -906,6 +906,9 @@ function setupNav() {
 }
 
 export function initPortfolioMotion() {
+  // Tells the inline boot script in hitesh.html the app is running, so its
+  // fallback (show the content as is) stands down.
+  document.documentElement.classList.add('pf-booted');
   setupLenis();
   setupCursor();
   setupNav();
@@ -947,6 +950,8 @@ export function initPortfolioMotion() {
     // setupIntro fires the play callback immediately.
     const playHero = setupHeroEntrance();
     setupIntro(skipWelcome, playHero);
+    // Entrance armed: let the prerendered content show (see .pf-ready).
+    document.documentElement.classList.add('pf-ready');
     // A link to a section lands on it. The page renders after the browser has
     // already tried to jump to the anchor, so jump here, once pins are measured.
     if (pendingJump) jumpTo(pendingJump);
