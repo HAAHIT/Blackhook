@@ -124,6 +124,11 @@ function setupLenis() {
     duration: 1.2,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     smoothWheel: true,
+    // Route in-page links (#career etc.) through Lenis. Otherwise a link
+    // clicked while a wheel or trackpad glide is still running jumps to the
+    // section, and the rest of the glide then carries the page on past it.
+    // With reduced motion the jump stays instant, as the browser's own was.
+    anchors: prefersReduced() ? { immediate: true } : true,
   });
   lenis.on('scroll', () => ScrollTrigger.update());
   const tick = (t: number) => { lenis!.raf(t); lenisRaf = requestAnimationFrame(tick); };
@@ -131,7 +136,11 @@ function setupLenis() {
 }
 
 function splitWords(el: HTMLElement): HTMLElement[] {
-  if (!el || el.dataset['split'] === '1') return [];
+  if (!el) return [];
+  // Already split by an earlier start of the motion system (a remount, or
+  // React's dev-mode double effect): hand back the same words so they are
+  // animated again, rather than left hidden by the first start's set().
+  if (el.dataset['split'] === '1') return Array.from(el.querySelectorAll<HTMLElement>('.pf-word-i'));
   el.dataset['split'] = '1';
   const tmp = document.createElement('div');
   tmp.innerHTML = el.innerHTML;
@@ -554,10 +563,13 @@ function setupReveals() {
     revealLift(el, { y: 16, blur: 6, duration: 0.85, start: 'top 90%' });
   });
 
-  // Experience rows — gentle flip so the timeline feels like turning pages.
-  document.querySelectorAll<HTMLElement>('.pf-xp').forEach((el) => {
-    revealLift(el, { y: 34, rotateX: 12, blur: 8, duration: 1.0 });
+  // Career timeline: each entry's lines rise in turn. The node stays put on the
+  // rail (setupCareer lights it), so only the text moves.
+  document.querySelectorAll<HTMLElement>('.pf-tl-item').forEach((item) => {
+    revealLift(Array.from(item.querySelectorAll<HTMLElement>(':scope > :not(.pf-tl-node)')),
+      { y: 22, blur: 6, duration: 0.9, stagger: 0.06, start: 'top 86%' });
   });
+  revealLift(document.querySelector<HTMLElement>('.pf-tl-resume'), { y: 16, blur: 6, duration: 0.85 });
 
   // Card surfaces get the full mira fingerprint: rise + hard 3D flip +
   // scale-up + blur-to-sharp, landing on a spring overshoot.
@@ -679,6 +691,7 @@ function setupSphereMorph() {
   const stages: Array<[string, number]> = [
     ['#top', 0],          // hero — calm, faint wave
     ['#work', 1],         // selected work — rippling
+    ['#career', 2],       // career — turbulent
     ['#projects', 2],     // building — turbulent
     ['#skills', 3],       // skills — swollen scatter
     ['#principles', 3],   // principles — swollen scatter
@@ -790,6 +803,58 @@ function setupHorizontalWork() {
   });
 }
 
+/* Career timeline — the gold rail draws down with the scroll and each node
+   lights as the line reaches it, so the path fills in as you read it. The
+   line's leading edge rides a fixed point on screen (LINE), and the lit state
+   is worked out from the same progress, so the two never drift apart. Reduced
+   motion skips all of it: the CSS default is the finished state. */
+function setupCareer() {
+  const tl = document.querySelector<HTMLElement>('.pf-tl');
+  const rail = tl?.querySelector<HTMLElement>('.pf-tl-rail');
+  const fill = tl?.querySelector<HTMLElement>('.pf-tl-rail-fill');
+  const spark = tl?.querySelector<HTMLElement>('.pf-tl-spark');
+  const items = gsap.utils.toArray<HTMLElement>('.pf-tl-item');
+  if (!tl || !rail || !fill || !items.length) return;
+
+  const mm = gsap.matchMedia();
+  mm.add('(prefers-reduced-motion: no-preference)', () => {
+    const LINE = '62%';
+    // Each node's centre, measured down the rail. Offsets ignore transforms, so
+    // the entries' reveal animation can't skew this.
+    let nodeY: number[] = [];
+    const measure = () => {
+      nodeY = items.map((item) => {
+        const node = item.querySelector<HTMLElement>('.pf-tl-node');
+        return node ? item.offsetTop + node.offsetTop + node.offsetHeight / 2 - rail.offsetTop : item.offsetTop - rail.offsetTop;
+      });
+    };
+    const draw = (p: number) => {
+      const edge = p * rail.offsetHeight;
+      fill.style.transform = `scaleY(${p})`;
+      if (spark) {
+        spark.style.transform = `translateY(${edge}px)`;
+        spark.style.opacity = p > 0 && p < 1 ? '1' : '0';
+      }
+      items.forEach((item, i) => item.classList.toggle('is-lit', p > 0 && edge >= (nodeY[i] ?? 0) - 1));
+    };
+    tl.classList.add('pf-tl--live');
+    measure();
+    const st = ScrollTrigger.create({
+      trigger: rail, start: `top ${LINE}`, end: `bottom ${LINE}`,
+      onUpdate: (self) => draw(self.progress),
+      onRefresh: (self) => { measure(); draw(self.progress); },
+    });
+    draw(st.progress);
+    return () => {
+      st.kill();
+      tl.classList.remove('pf-tl--live');
+      fill.style.transform = '';
+      if (spark) { spark.style.transform = ''; spark.style.opacity = ''; }
+      items.forEach((item) => item.classList.remove('is-lit'));
+    };
+  });
+}
+
 /* Projects — mira's "Who benefits" treatment: pin the stage and cross-fade
    the active card + orbit node as you scrub through the trio. */
 function setupProjectsStage() {
@@ -846,7 +911,7 @@ function setupRecogStage() {
 function setupSceneTransitions() {
   if (prefersReduced()) return;
   const sections = gsap.utils.toArray<HTMLElement>(
-    '.pf-work, .pf-proj-section, .pf-principles-section, .pf-recog-section, .pf-contact'
+    '.pf-work, .pf-career-section, .pf-proj-section, .pf-principles-section, .pf-recog-section, .pf-contact'
   );
   sections.forEach((section) => {
     const cut = document.createElement('span');
@@ -923,6 +988,7 @@ export function initPortfolioMotion() {
   setupHeroParallax();
   setupSphereStage();
   setupHorizontalWork();
+  setupCareer();
   setupProjectsStage();
   setupRecogStage();
   setupSceneTransitions();

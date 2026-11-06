@@ -155,11 +155,17 @@ html:not(.pf-js) .pf-smoke-poster img { opacity: 1; }
 .pf-ping-1 { left: 5%; top: 30%; animation-delay: 0s; }
 .pf-ping-2 { left: 93%; top: 60%; animation-delay: 2.6s; }
 .pf-ping-3 { left: 7%; top: 84%; animation-delay: 5s; }
-/* Phones have no margin to spare: sit half off-screen and expand less. */
-@media (max-width: 820px) {
+/* Below 1440px the margins narrow: expand less and sit half off-screen. At
+   1200px and under, where text runs to a 22-28px gutter, sit far enough out
+   that even the visible part of the ring stays in that gutter. */
+@media (max-width: 1439px) {
   .pf-ping { animation-name: pf-ping-sm; }
   .pf-ping-1, .pf-ping-3 { left: -3%; }
   .pf-ping-2 { left: 97%; }
+}
+@media (max-width: 1200px) {
+  .pf-ping-1, .pf-ping-3 { left: -28px; }
+  .pf-ping-2 { left: calc(100% + 6px); }
 }
 
 /* Drifting gold motes */
@@ -550,6 +556,119 @@ body.pf-loading { overflow: hidden; }
 .pf-badge-now i { width: 6px; height: 6px; border-radius: 50%; background: var(--pf-status); box-shadow: 0 0 8px var(--pf-status); }
 .pf-proj-year { font-family: var(--pf-mono); font-size: 11.5px; letter-spacing: 0.04em; color: var(--pf-ink-3); }
 
+/* ===== Career timeline — newest first. A gold rail draws down through the
+   roles as you scroll and each node lights as the line reaches it (setupCareer).
+   Without JS, or with reduced motion, the rail is fully drawn and every node lit. ===== */
+.pf-career-section {
+  --tl-when: 200px;   /* date column */
+  --tl-node: 64px;    /* rail column */
+  --tl-node-y: 17px;  /* node centre: the middle of the heading's first line */
+}
+.pf-tl { position: relative; }
+/* A 40px band centred on the line, so the fade-out mask (which clips to the
+   element's box) leaves room for the fill's glow and the spark. */
+.pf-tl-rail {
+  position: absolute; top: var(--tl-node-y); bottom: 0; pointer-events: none;
+  left: calc(var(--tl-when) + var(--tl-node) / 2); width: 40px; margin-left: -20px;
+  /* Fades out below the last entry, rather than ending in a hard stop. */
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 110px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 110px), transparent);
+}
+.pf-tl-rail::before, .pf-tl-rail-fill { position: absolute; top: 0; bottom: 0; left: 50%; width: 1px; margin-left: -0.5px; }
+.pf-tl-rail::before { content: ''; background: var(--pf-line); }
+.pf-tl-rail-fill {
+  transform-origin: 50% 0;
+  background: linear-gradient(180deg, #f5dfa4, var(--pf-gold-solid) 30%, #a9842f);
+  box-shadow: 0 0 10px rgba(212, 181, 106, 0.45);
+}
+.pf-tl-spark {
+  position: absolute; top: 0; left: 50%; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px;
+  border-radius: 50%; background: #fdf0c8; box-shadow: 0 0 14px 3px rgba(212, 181, 106, 0.75);
+  opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+}
+.pf-tl-list { list-style: none; margin: 0; padding: 0; }
+/* Direct children are placed by area, so the markup can lead with the heading
+   while the dates sit in their own column on the left. */
+.pf-tl-item {
+  position: relative; display: grid;
+  grid-template-columns: var(--tl-when) var(--tl-node) minmax(0, 1fr);
+  grid-template-areas:
+    "when node org"
+    "when node role"
+    "when node honor"
+    "when node summary"
+    "when node points";
+  grid-template-rows: auto auto auto auto 1fr;
+  padding-bottom: 64px;
+}
+.pf-tl-item:last-child { padding-bottom: 0; }
+.pf-tl-org { grid-area: org; font-family: var(--pf-serif); font-weight: 400; font-size: 31px; line-height: 1.1; letter-spacing: -0.012em; margin: 0; }
+.pf-tl-role { grid-area: role; margin: 8px 0 0; font-size: 15.5px; line-height: 1.55; color: var(--pf-ink); }
+.pf-tl-honor {
+  grid-area: honor; justify-self: start; display: inline-flex; align-items: center; gap: 8px; margin: 12px 0 0;
+  font-family: var(--pf-mono); font-size: 11.5px; line-height: 1.5; letter-spacing: 0.08em; text-transform: uppercase; color: var(--pf-gold-solid);
+}
+.pf-tl-when {
+  grid-area: when; align-self: start; margin: 0; padding: 9px 28px 0 0; text-align: right;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+  font-family: var(--pf-mono); font-size: 12.5px; line-height: 1.5; letter-spacing: 0.04em;
+}
+.pf-tl-range { color: var(--pf-ink); white-space: nowrap; }
+.pf-tl-place { color: var(--pf-ink-3); }
+.pf-tl-when .pf-badge { margin-top: 8px; }
+.pf-tl-summary { grid-area: summary; margin: 14px 0 0; font-size: 16px; line-height: 1.65; color: var(--pf-ink-2); max-width: 60ch; }
+.pf-tl-points { grid-area: points; list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 10px; max-width: 64ch; }
+.pf-tl-points li { position: relative; padding-left: 24px; font-size: 15.5px; line-height: 1.62; color: var(--pf-ink-2); }
+.pf-tl-points li::before { content: ''; position: absolute; left: 2px; top: 0.8em; width: 11px; height: 1px; background: var(--pf-gold-solid); }
+.pf-tl strong { font-weight: 500; color: var(--pf-ink); }
+.pf-tl-node {
+  grid-area: node; justify-self: center; align-self: start; position: relative; z-index: 1;
+  width: 13px; height: 13px; margin-top: calc(var(--tl-node-y) - 6.5px); border-radius: 50%;
+  background: var(--pf-gold-solid); border: 1px solid #f5dfa4;
+  box-shadow: 0 0 0 5px var(--pf-bg), 0 0 16px 2px rgba(212, 181, 106, 0.55);
+  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.pf-tl-item--edu .pf-tl-node { background: var(--pf-bg); border-color: var(--pf-gold-solid); }
+/* The current role keeps a slow ping going once the line has reached it. */
+.pf-tl-item--now .pf-tl-node::after {
+  content: ''; position: absolute; inset: -1px; border-radius: 50%;
+  border: 1px solid rgba(212, 181, 106, 0.75); animation: pf-tl-ping 2.8s ease-out infinite;
+}
+@keyframes pf-tl-ping { 0% { transform: scale(1); opacity: 0.9; } 75%, 100% { transform: scale(2.9); opacity: 0; } }
+/* Not yet reached by the line (only while setupCareer is driving it). */
+.pf-tl--live .pf-tl-item:not(.is-lit) .pf-tl-node {
+  background: var(--pf-bg); border-color: var(--pf-line-2);
+  box-shadow: 0 0 0 5px var(--pf-bg); transform: scale(0.8);
+}
+.pf-tl--live .pf-tl-item:not(.is-lit) .pf-tl-node::after { animation: none; opacity: 0; }
+/* Doubled class: .pf-cs-link's own margins come later in the file. */
+.pf-tl-resume.pf-cs-link { margin: 56px 0 0 calc(var(--tl-when) + var(--tl-node)); }
+
+@media (min-width: 821px) and (max-width: 1040px) {
+  .pf-career-section { --tl-when: 184px; --tl-node: 52px; }
+  .pf-tl-when { padding-right: 22px; }
+}
+@media (max-width: 820px) {
+  /* Rail on the left edge; the dates become a small line above each heading. */
+  .pf-career-section { --tl-when: 0px; --tl-node: 34px; --tl-node-y: 9px; }
+  .pf-tl-item {
+    grid-template-columns: var(--tl-node) minmax(0, 1fr);
+    grid-template-areas: "node when" "node org" "node role" "node honor" "node summary" "node points";
+    grid-template-rows: auto auto auto auto auto 1fr;
+    padding-bottom: 52px;
+  }
+  .pf-tl-when { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 0; margin-bottom: 10px; text-align: left; font-size: 12px; }
+  .pf-tl-when .pf-badge { margin-top: 0; }
+  .pf-tl-org { font-size: 27px; }
+  .pf-tl-summary { font-size: 15.5px; }
+  .pf-tl-points li { font-size: 15px; }
+  .pf-tl-resume.pf-cs-link { margin: 44px 0 0 var(--tl-node); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pf-tl-item--now .pf-tl-node::after { animation: none; opacity: 0; }
+  .pf-tl-spark { display: none; }
+}
+
 /* ===== Projects — orbiting trio (mira "Who benefits" layout) ===== */
 .pf-proj-section { position: relative; }
 .pf-proj-pin { position: relative; min-height: 100vh; display: flex; flex-direction: column; padding: 96px 0 64px; }
@@ -772,15 +891,15 @@ body.pf-loading { overflow: hidden; }
 .pf-contact-ctas { display: flex; flex-wrap: wrap; gap: 14px; }
 .pf-availability { display: flex; align-items: center; gap: 10px; font-family: var(--pf-mono); font-size: 12px; letter-spacing: 0.03em; color: var(--pf-ink-3); margin: 24px 0 0; }
 .pf-availability .d { width: 7px; height: 7px; border-radius: 50%; background: var(--pf-status); box-shadow: 0 0 10px var(--pf-status); flex-shrink: 0; }
-.pf-hiring-card {
+.pf-now-card {
   display: flex; flex-direction: column; gap: 8px;
   padding: 22px 24px; margin-bottom: 22px; border-radius: 18px;
   border: 1px solid var(--pf-gold); background: linear-gradient(180deg, rgba(212, 181, 106, 0.08), transparent 60%), var(--pf-bg-card);
   box-shadow: 0 0 50px -24px rgba(212, 181, 106, 0.35);
 }
-.pf-hiring-card .pf-badge { align-self: flex-start; }
-.pf-hiring-card strong { font-family: var(--pf-serif); font-size: 19px; font-weight: 400; }
-.pf-hiring-card span:not(.pf-badge):not(.pf-badge i) { font-size: 13.5px; color: var(--pf-ink-2); line-height: 1.5; }
+.pf-now-card .pf-badge { align-self: flex-start; }
+.pf-now-card strong { font-family: var(--pf-serif); font-size: 19px; font-weight: 400; }
+.pf-now-card span:not(.pf-badge):not(.pf-badge i) { font-size: 13.5px; color: var(--pf-ink-2); line-height: 1.5; }
 .pf-contact-rows { display: flex; flex-direction: column; gap: 0; }
 .pf-contact-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--pf-line); font-family: var(--pf-mono); font-size: 13.5px; }
 .pf-contact-row span { color: var(--pf-ink-3); }

@@ -22,13 +22,13 @@ const WIDTH = 1200;
 const HEIGHT = 630;
 
 const COPY = {
-  status: 'Open to senior product roles',
+  status: 'Product Manager at Saleshandy',
   name: 'Hitesh Agrawal',
   // The hero headline, with the accent word in gold italic.
   lineBefore: 'I help turn fuzzy ideas into',
   accent: 'shipped',
   lineAfter: 'product.',
-  role: 'Product manager · 0→1 to 280M-user scale',
+  role: 'From 0→1 products to 280M-user scale',
   url: 'blackhook.in/hitesh',
 };
 

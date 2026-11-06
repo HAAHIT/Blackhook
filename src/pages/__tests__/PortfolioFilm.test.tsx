@@ -63,6 +63,36 @@ vi.mock('@/data/portfolio', () => ({
       metrics: [{ label: 'Users', value: '1M' }],
     },
   ],
+  EXPERIENCE: [
+    {
+      org: 'Now Co',
+      role: 'Product Manager',
+      start: '2026-08',
+      place: 'Ahmedabad, IN',
+      summary: 'Current role summary.',
+      points: ['Grew **10+ accounts** back', 'Second point'],
+    },
+    {
+      org: 'Past Co',
+      role: 'Co-Founder',
+      start: '2024-12',
+      end: '2026-07',
+      place: 'Dhule, IN',
+      honor: 'Star Performer Award',
+      summary: 'Past role summary.',
+      points: ['One point'],
+    },
+    {
+      org: 'Some University',
+      role: 'B.E.',
+      start: '2018-08',
+      end: '2022-05',
+      place: 'Pune, IN',
+      summary: 'CGPA **9.23 / 10**',
+      points: [],
+      kind: 'education',
+    },
+  ],
   PRINCIPLES: [{ title: 'Principle 1', desc: 'Desc 1' }],
   RECOGNITION: [{ value: 'Award', label: 'Best PM', detail: 'Some detail' }],
 }));
@@ -417,5 +447,71 @@ describe('PortfolioFilm — event listener cleanup', () => {
     const removeEvents = removeSpy.mock.calls.map(([ev]) => ev);
     expect(removeEvents).toContain('keydown');
     expect(removeEvents).toContain('resize');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Tests: career timeline
+// ---------------------------------------------------------------------------
+
+describe('PortfolioFilm — career timeline', () => {
+  const items = () => Array.from(document.querySelectorAll<HTMLLIElement>('#career .pf-tl-item'));
+
+  it('lists every entry, newest first, as an ordered list', () => {
+    renderComponent();
+    expect(document.querySelector('#career ol.pf-tl-list')).toBeInTheDocument();
+    expect(items().map((li) => li.querySelector('h3')?.textContent)).toEqual(['Now Co', 'Past Co', 'Some University']);
+  });
+
+  it('leads each entry with its heading, so heading navigation reads the dates after it', () => {
+    renderComponent();
+    items().forEach((li) => expect(li.firstElementChild?.tagName).toBe('H3'));
+  });
+
+  it('writes dates as month and year, with machine-readable values', () => {
+    renderComponent();
+    const [now, past] = items();
+    expect(now!.querySelector('.pf-tl-range')?.textContent).toBe('Aug 2026 – Now');
+    expect(past!.querySelector('.pf-tl-range')?.textContent).toBe('Dec 2024 – Jul 2026');
+    expect(Array.from(past!.querySelectorAll('time')).map((t) => t.getAttribute('datetime'))).toEqual(['2024-12', '2026-07']);
+  });
+
+  it('marks only the entry without an end date as the current role', () => {
+    renderComponent();
+    const [now, past, edu] = items();
+    expect(now).toHaveClass('pf-tl-item--now');
+    expect(now!.textContent).toContain('Current role');
+    expect(past).not.toHaveClass('pf-tl-item--now');
+    expect(past!.textContent).not.toContain('Current role');
+    expect(edu).toHaveClass('pf-tl-item--edu');
+  });
+
+  it('sets **marked** figures in <strong> and drops the asterisks', () => {
+    renderComponent();
+    const [now, , edu] = items();
+    expect(now!.querySelector('.pf-tl-points strong')?.textContent).toBe('10+ accounts');
+    expect(edu!.querySelector('.pf-tl-summary strong')?.textContent).toBe('9.23 / 10');
+    expect(document.querySelector('#career')!.textContent).not.toContain('**');
+  });
+
+  it('shows an honour only where there is one, and no empty list for entries without points', () => {
+    renderComponent();
+    const [now, past, edu] = items();
+    expect(past!.querySelector('.pf-tl-honor')?.textContent).toContain('Star Performer Award');
+    expect(now!.querySelector('.pf-tl-honor')).toBeNull();
+    expect(edu!.querySelector('.pf-tl-points')).toBeNull();
+  });
+
+  it('keeps the rail and nodes out of the accessibility tree', () => {
+    renderComponent();
+    expect(document.querySelector('.pf-tl-rail')).toHaveAttribute('aria-hidden', 'true');
+    items().forEach((li) => expect(li.querySelector('.pf-tl-node')).toHaveAttribute('aria-hidden', 'true'));
+  });
+
+  it('is reachable from both navs and links to the full résumé', () => {
+    renderComponent();
+    expect(document.querySelector('.pf-nav-links a[href="#career"]')).toBeInTheDocument();
+    expect(getMobileNav().querySelector('a[href="#career"]')).toBeInTheDocument();
+    expect(document.querySelector('#career a.pf-tl-resume')).toHaveAttribute('href', '/Hitesh-Agrawal-Resume.pdf');
   });
 });
