@@ -970,29 +970,36 @@ function setupNav() {
   });
 }
 
+/* One feature failing (an API an older browser lacks, say) must not take the
+   rest down with it. An error thrown out of initPortfolioMotion would reach
+   React's effect, and with no error boundary React unmounts the whole page. */
+function run(setup: () => void) {
+  try { setup(); } catch (err) { console.error('[portfolio motion]', err); }
+}
+
 export function initPortfolioMotion() {
-  // Tells the inline boot script in hitesh.html the app is running, so its
-  // fallback (show the content as is) stands down.
+  // Marks the app as running, for the record. The boot script in hitesh.html
+  // watches for pf-ready, so a start that fails part-way still gets shown.
   document.documentElement.classList.add('pf-booted');
-  setupLenis();
-  setupCursor();
-  setupNav();
-  setupWebGL();
-  setupProgress();
-  setupReveals();
-  setupCounters();
-  setupCardTilt();
-  setupSpotlight();
-  setupMagnetic();
-  setupWordmark();
-  setupHeroParallax();
-  setupSphereStage();
-  setupHorizontalWork();
-  setupCareer();
-  setupProjectsStage();
-  setupRecogStage();
-  setupSceneTransitions();
-  setupHeadingParallax();
+  run(setupLenis);
+  run(setupCursor);
+  run(setupNav);
+  run(setupWebGL);
+  run(setupProgress);
+  run(setupReveals);
+  run(setupCounters);
+  run(setupCardTilt);
+  run(setupSpotlight);
+  run(setupMagnetic);
+  run(setupWordmark);
+  run(setupHeroParallax);
+  run(setupSphereStage);
+  run(setupHorizontalWork);
+  run(setupCareer);
+  run(setupProjectsStage);
+  run(setupRecogStage);
+  run(setupSceneTransitions);
+  run(setupHeadingParallax);
   const target = hashTarget();
   const skipWelcome = !!target || introSeen();
   // Until the visitor scrolls on their own, keep a section link's target in
@@ -1002,26 +1009,26 @@ export function initPortfolioMotion() {
   const cancelJump = () => { pendingJump = null; };
   ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach((ev) =>
     window.addEventListener(ev, cancelJump, { once: true, passive: true }));
-  setupPreloader(skipWelcome, () => {
+  run(() => setupPreloader(skipWelcome, () => {
     // Re-measure against the now-unlocked layout so reveals + pins fire
     // correctly, then explicitly kick any in-view counters and force-reveal
     // anything already scrolled past (deep-link / scroll restoration).
-    ScrollTrigger.refresh();
-    kickVisibleCounters();
-    kickPassedReveals();
+    run(() => { ScrollTrigger.refresh(); kickVisibleCounters(); kickPassedReveals(); });
     // Arm the hero hidden *now* (it's still behind the loader/intro), then
     // play it only when the intro curtain lifts — so the entrance doubles as
     // the title-sequence reveal with no flash of the final hero beforehand.
     // If the intro is skipped (seen before, section link, reduced motion),
     // setupIntro fires the play callback immediately.
-    const playHero = setupHeroEntrance();
-    setupIntro(skipWelcome, playHero);
+    let playHero = () => {};
+    run(() => { playHero = setupHeroEntrance(); });
+    run(() => setupIntro(skipWelcome, playHero));
     // Entrance armed: let the prerendered content show (see .pf-ready).
     document.documentElement.classList.add('pf-ready');
     // A link to a section lands on it. The page renders after the browser has
     // already tried to jump to the anchor, so jump here, once pins are measured.
-    if (pendingJump) jumpTo(pendingJump);
-  });
+    const jump = pendingJump;
+    if (jump) run(() => jumpTo(jump));
+  }));
 
   // Pinned/horizontal sections depend on final layout — re-measure once
   // images and webfonts have settled.

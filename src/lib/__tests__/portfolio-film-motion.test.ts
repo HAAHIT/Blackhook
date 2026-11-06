@@ -433,6 +433,15 @@ describe('lazy WebGL mounts vs teardown', () => {
 // ---------------------------------------------------------------------------
 
 describe('welcome (loader + intro) is a first-visit thing', () => {
+  // Each test starts a motion instance (a Lenis rAF loop and window
+  // listeners); stop it, since resetModules leaves it unreachable afterwards.
+  let destroyMotion: (() => void) | undefined;
+  const start = async () => {
+    const m = await import('../portfolio-film-motion');
+    destroyMotion = m.destroyPortfolioMotion;
+    m.initPortfolioMotion();
+  };
+
   beforeEach(() => {
     vi.resetModules();
     document.body.innerHTML = `
@@ -448,15 +457,17 @@ describe('welcome (loader + intro) is a first-visit thing', () => {
   });
 
   afterEach(() => {
+    destroyMotion?.();
+    destroyMotion = undefined;
     vi.restoreAllMocks();
     teardownDom();
     localStorage.clear();
     history.replaceState(null, '', '/hitesh');
+    document.documentElement.className = '';
   });
 
   it('shows the loader and intro on a first visit', async () => {
-    const { initPortfolioMotion } = await import('../portfolio-film-motion');
-    initPortfolioMotion();
+    await start();
     await Promise.resolve();
     expect(document.querySelector('.pf-loader')).not.toBeNull();
     expect(document.querySelector('.pf-intro')).not.toBeNull();
@@ -464,24 +475,31 @@ describe('welcome (loader + intro) is a first-visit thing', () => {
 
   it('skips both for a visitor who has seen the intro', async () => {
     localStorage.setItem('pf-intro-seen', '1');
-    const { initPortfolioMotion } = await import('../portfolio-film-motion');
-    initPortfolioMotion();
+    await start();
     expect(document.querySelector('.pf-loader')).toBeNull();
     expect(document.querySelector('.pf-intro')).toBeNull();
   });
 
   it('skips both when arriving on a link to a section', async () => {
     history.replaceState(null, '', '/hitesh#contact');
-    const { initPortfolioMotion } = await import('../portfolio-film-motion');
-    initPortfolioMotion();
+    await start();
     expect(document.querySelector('.pf-loader')).toBeNull();
     expect(document.querySelector('.pf-intro')).toBeNull();
   });
 
   it('still shows them for a hash that matches no section', async () => {
     history.replaceState(null, '', '/hitesh#nope');
-    const { initPortfolioMotion } = await import('../portfolio-film-motion');
-    initPortfolioMotion();
+    await start();
     expect(document.querySelector('.pf-loader')).not.toBeNull();
+  });
+
+  it('still shows the page when one setup step throws', async () => {
+    localStorage.setItem('pf-intro-seen', '1');
+    // The touch probe runs in several setup steps; make it blow up.
+    installMatchMedia((q) => { if (q.includes('pointer: coarse')) throw new Error('boom'); return false; });
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await expect(start()).resolves.toBeUndefined();
+    expect(document.documentElement.classList.contains('pf-ready')).toBe(true);
+    expect(logged).toHaveBeenCalled();
   });
 });

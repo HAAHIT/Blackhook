@@ -48,8 +48,8 @@
       // Before first paint. The page arrives prerendered: mark JS as on so the
       // content waits for the motion system to arm its entrance (instead of
       // showing, then hiding to animate in), and skip the welcome loader for
-      // return visits and #section links. If the app hasn't started within
-      // 6s, show the content as it is.
+      // return visits and #section links. If the content still isn't showing
+      // after 6s (the app is slow, or failed part-way), show it as it is.
       (function () {
         var d = document.documentElement;
         d.classList.add('pf-js');
@@ -57,7 +57,7 @@
           if (location.hash.length > 1 || localStorage.getItem('pf-intro-seen') === '1') d.classList.add('pf-skip-welcome');
         } catch (e) {}
         setTimeout(function () {
-          if (!d.classList.contains('pf-booted')) d.classList.add('pf-ready', 'pf-skip-welcome');
+          if (!d.classList.contains('pf-ready')) d.classList.add('pf-ready', 'pf-skip-welcome');
         }, 6000);
       })();
     </script>

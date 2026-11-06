@@ -16,6 +16,7 @@ const { render } = await import(pathToFileURL(resolve(root, '.ssr/portfolio-film
 const html = await readFile(page, 'utf8');
 if (!html.includes(marker)) throw new Error(`prerender: ${marker} not found in dist/hitesh.html`);
 const app = render();
-await writeFile(page, html.replace(marker, `<div id="root">${app}</div>`));
+// A replacer function, so `$&`-style sequences in the markup are inserted as is.
+await writeFile(page, html.replace(marker, () => `<div id="root">${app}</div>`));
 await rm(resolve(root, '.ssr'), { recursive: true, force: true });
 console.log(`prerender: dist/hitesh.html now carries ${(app.length / 1024).toFixed(1)} KB of rendered markup`);
