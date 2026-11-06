@@ -148,9 +148,17 @@ main, .pf-footer, .pf-wordmark { position: relative; z-index: 1; }
   opacity: 0;
   animation: pf-ping 7.5s ease-out infinite;
 }
-.pf-ping-1 { left: 16%; top: 38%; animation-delay: 0s; }
-.pf-ping-2 { left: 72%; top: 64%; animation-delay: 2.6s; }
-.pf-ping-3 { left: 40%; top: 82%; animation-delay: 5s; }
+/* Pings live in the side margins: the layer is fixed and content scrolls
+   over it, so anywhere central they would eventually cross text. */
+.pf-ping-1 { left: 5%; top: 30%; animation-delay: 0s; }
+.pf-ping-2 { left: 93%; top: 60%; animation-delay: 2.6s; }
+.pf-ping-3 { left: 7%; top: 84%; animation-delay: 5s; }
+/* Phones have no margin to spare: sit half off-screen and expand less. */
+@media (max-width: 820px) {
+  .pf-ping { animation-name: pf-ping-sm; }
+  .pf-ping-1, .pf-ping-3 { left: -3%; }
+  .pf-ping-2 { left: 97%; }
+}
 
 /* Drifting gold motes */
 .pf-mote { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: rgba(212, 181, 106, 0.55); box-shadow: 0 0 8px rgba(212, 181, 106, 0.6); opacity: 0; animation: pf-mote-rise linear infinite; }
@@ -171,6 +179,12 @@ main, .pf-footer, .pf-wordmark { position: relative; z-index: 1; }
   10%  { opacity: 0.9; }
   70%  { transform: scale(7); opacity: 0; }
   100% { transform: scale(7); opacity: 0; }
+}
+@keyframes pf-ping-sm {
+  0%   { transform: scale(0.4); opacity: 0; }
+  10%  { opacity: 0.9; }
+  70%  { transform: scale(4); opacity: 0; }
+  100% { transform: scale(4); opacity: 0; }
 }
 @keyframes pf-mote-rise {
   0%   { transform: translateY(102vh) translateX(0);   opacity: 0; }
