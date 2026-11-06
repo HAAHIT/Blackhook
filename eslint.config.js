@@ -11,7 +11,10 @@ export default [
     files: ['**/*.{ts,tsx}'],
     languageOptions: {
       parser: tsParser,
-      parserOptions: { ecmaVersion: 2020, sourceType: 'module' },
+      // `lib` mirrors tsconfig.app.json so type-only DOM names (RenderingContext,
+      // etc.) resolve instead of tripping no-undef. no-undef stays on because the
+      // tests and vitest.config.ts aren't type-checked by `tsc -b`.
+      parserOptions: { ecmaVersion: 2020, sourceType: 'module', lib: ['es2020', 'dom', 'dom.iterable'] },
       globals: { ...globals.browser, ...globals.es2020 },
     },
     plugins: {
@@ -28,7 +31,7 @@ export default [
     },
   },
   {
-    files: ['vite.config.ts'],
+    files: ['vite.config.ts', 'vitest.config.ts'],
     languageOptions: {
       globals: { ...globals.node },
     },

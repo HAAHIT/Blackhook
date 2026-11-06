@@ -52,6 +52,7 @@ class SphereManager {
   private camera: PerspectiveCamera | null = null;
   private points: Points | null = null;
   private shells: Mesh[] = [];
+  private shellOpacity: number[] = [];
   private container: HTMLElement | null = null;
   private raf: number | null = null;
   private start = 0;
@@ -67,14 +68,20 @@ class SphereManager {
   private px = 0;
   private py = 0;
   private count = 0;
+  private lastFrame = 0;
+  private cssW = 0;
+  private cssH = 0;
   private onResize: (() => void) | null = null;
   private onVis: (() => void) | null = null;
   private onMove: ((e: MouseEvent) => void) | null = null;
 
   mount(el: HTMLElement) {
+    // A second mount (e.g. React StrictMode re-running effects) replaces the first.
+    if (this.renderer) this.destroy();
     this.container = el;
 
-    const renderer = new WebGLRenderer({ antialias: false, alpha: true, powerPreference: 'low-power' });
+    // Software rendering (no GPU) is refused; the page just goes without the sphere.
+    const renderer = new WebGLRenderer({ antialias: false, alpha: true, powerPreference: 'low-power', failIfMajorPerformanceCaveat: true });
     renderer.setPixelRatio(1);
     el.appendChild(renderer.domElement);
 
@@ -82,7 +89,11 @@ class SphereManager {
     const camera = new PerspectiveCamera(42, 1, 0.1, 10);
     camera.position.z = 3.4;
 
-    const count = window.innerWidth < 768 ? 1200 : 2400;
+    // The sphere spans ~88% of the screen's shorter side. Scale the dust with
+    // that area (2400 points at a typical laptop's ~820px) so it has the same
+    // density everywhere, instead of crowding a phone-sized sphere.
+    const minSide = Math.min(el.clientWidth || window.innerWidth, el.clientHeight || window.innerHeight);
+    const count = Math.round(2400 * Math.min(1, Math.max(0.15, (minSide / 820) ** 2)));
     const radius = 1.15;
     this.count = count;
 
@@ -121,6 +132,7 @@ class SphereManager {
       [radius * 0.42, 3, 0.06],
       [radius * 1.06, 2, 0.04],
     ];
+    this.shellOpacity = shellDefs.map(([, , opacity]) => opacity);
     const shells = shellDefs.map(([r, detail, opacity]) => {
       const mesh = new Mesh(
         new IcosahedronGeometry(r, detail),
@@ -137,13 +149,32 @@ class SphereManager {
     this.shells = shells;
     this.start = performance.now();
 
+    // Unchanged sizes are skipped: mobile toolbars fire resize while scrolling,
+    // and resizing a canvas clears it.
     const resize = () => {
       if (!this.container || !this.renderer || !this.camera) return;
       const w = this.container.clientWidth;
       const h = this.container.clientHeight;
+      if (!w || !h || (w === this.cssW && h === this.cssH)) return;
+      this.cssW = w;
+      this.cssH = h;
+      // The vertical fov frames the sphere on landscape screens; on portrait
+      // ones zoom out so it fills the same share of the width instead of
+      // overflowing the sides.
+      const zoom = Math.min(1, w / h);
+      // Zoom doesn't reach point size (it attenuates with screen height) or line
+      // width, so scale those to keep desktop proportions, and render the smaller
+      // sphere at a matching resolution so it's no softer. Landscape stays at 1x.
+      const ratio = Math.min(window.devicePixelRatio || 1, 2, 1 / zoom);
+      this.renderer.setPixelRatio(ratio);
       this.renderer.setSize(w, h, false);
       this.camera.aspect = w / h;
+      this.camera.zoom = zoom;
       this.camera.updateProjectionMatrix();
+      if (this.points) (this.points.material as PointsMaterial).size = 0.02 * zoom;
+      this.shells.forEach((m, i) => {
+        (m.material as MeshBasicMaterial).opacity = this.shellOpacity[i]! * Math.min(1, zoom * ratio);
+      });
     };
     this.onResize = resize;
     resize();
@@ -163,19 +194,25 @@ class SphereManager {
     this.play();
   }
 
-  private tick = () => {
+  private tick = (now: number) => {
     if (!this.renderer || !this.scene || !this.camera || !this.points) return;
     this.raf = requestAnimationFrame(this.tick);
-    const t = (performance.now() - this.start) / 1000;
+    const t = (now - this.start) / 1000;
+    // Damping is tuned per 60Hz frame; scale it by frame time so morphs and
+    // parallax move at the same speed on 60, 90 and 120Hz screens.
+    const frames = this.lastFrame ? Math.min(now - this.lastFrame, 100) / (1000 / 60) : 1;
+    this.lastFrame = now;
+    const k = 1 - Math.pow(1 - 0.05, frames);
+    const kp = 1 - Math.pow(1 - 0.04, frames);
 
     // Ease the morph controls toward the active state's targets (damped).
     const target = stateTargets(this.state);
-    this.wave += (target.wave - this.wave) * 0.05;
-    this.turb += (target.turb - this.turb) * 0.05;
-    this.scale += (target.scale - this.scale) * 0.05;
+    this.wave += (target.wave - this.wave) * k;
+    this.turb += (target.turb - this.turb) * k;
+    this.scale += (target.scale - this.scale) * k;
     // Damp pointer parallax.
-    this.px += (this.mx - this.px) * 0.04;
-    this.py += (this.my - this.py) * 0.04;
+    this.px += (this.mx - this.px) * kp;
+    this.py += (this.my - this.py) * kp;
 
     const geom = this.points.geometry;
     const pos = geom.attributes.position.array as Float32Array;
@@ -217,7 +254,11 @@ class SphereManager {
     this.renderer.render(this.scene, this.camera);
   };
 
-  private play() { if (this.raf === null) this.tick(); }
+  private play() {
+    if (this.raf !== null || !this.renderer) return;
+    this.lastFrame = 0;
+    this.raf = requestAnimationFrame(this.tick);
+  }
   private stop() { if (this.raf !== null) { cancelAnimationFrame(this.raf); this.raf = null; } }
 
   /** Discrete morph state (0..4) — each section sets one as it scrolls in. */
@@ -242,6 +283,9 @@ class SphereManager {
     this.camera = null;
     this.points = null;
     this.container = null;
+    this.lastFrame = 0;
+    this.cssW = 0;
+    this.cssH = 0;
     this.onResize = null;
     this.onVis = null;
     this.onMove = null;

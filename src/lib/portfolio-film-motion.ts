@@ -82,31 +82,53 @@ let lenis: Lenis | null = null;
 let lenisRaf: number | null = null;
 let backdrop: { destroy: () => void } | null = null;
 let pageSphere: { setMorphState: (n: number) => void; setProgress: (n: number) => void; destroy: () => void } | null = null;
+// Bumped on teardown, so a lazy three.js import that resolves after the page
+// has gone doesn't start a renderer nobody will ever destroy.
+let lifecycle = 0;
 let counters: { el: HTMLElement; run: () => void }[] = [];
 const isTouch = () => window.matchMedia('(pointer: coarse)').matches;
 const prefersReduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* Probe for a usable WebGL context once, before constructing any three.js
-   renderer. Without this, three.js logs a barrage of context-creation errors
-   to the console on machines/browsers where WebGL is unavailable or disabled,
-   even though we already fall back to the CSS layers. */
-let webglOk: boolean | null = null;
-const hasWebGL = () => {
-  if (webglOk !== null) return webglOk;
-  try {
-    const canvas = document.createElement('canvas');
-    webglOk = !!(canvas.getContext('webgl2') || canvas.getContext('webgl'));
-  } catch {
-    webglOk = false;
-  }
-  return webglOk;
+/* Probe for a usable, hardware-accelerated WebGL context once, before
+   constructing any three.js renderer. Without this, three.js logs a barrage of
+   context-creation errors to the console where WebGL is unavailable or
+   disabled, even though we already fall back to the CSS layers. Software
+   rendering (GPU blocklisted, hardware acceleration off) counts as unavailable:
+   the shaders would crawl there and drag the whole page down with them. The
+   probe context is released straight away so it doesn't hold a GPU slot. */
+let webglSupport: { webgl2: boolean; any: boolean } | null = null;
+const probeWebGL = () => {
+  if (webglSupport) return webglSupport;
+  const opts = { failIfMajorPerformanceCaveat: true };
+  const tryContext = (type: 'webgl2' | 'webgl') => {
+    try {
+      const gl = document.createElement('canvas').getContext(type, opts) as WebGLRenderingContext | null;
+      if (!gl) return false;
+      if (typeof gl.getExtension === 'function') gl.getExtension('WEBGL_lose_context')?.loseContext();
+      return true;
+    } catch {
+      return false;
+    }
+  };
+  const webgl2 = tryContext('webgl2');
+  webglSupport = { webgl2, any: webgl2 || tryContext('webgl') };
+  return webglSupport;
 };
+const hasWebGL = () => probeWebGL().any;
+const hasWebGL2 = () => probeWebGL().webgl2;
+// The visitor asked the browser to save data: skip the three.js download.
+const saveData = () => !!(navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData;
 
 function setupLenis() {
   lenis = new Lenis({
     duration: 1.2,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     smoothWheel: true,
+    // Route in-page links (#career etc.) through Lenis. Otherwise a link
+    // clicked while a wheel or trackpad glide is still running jumps to the
+    // section, and the rest of the glide then carries the page on past it.
+    // With reduced motion the jump stays instant, as the browser's own was.
+    anchors: prefersReduced() ? { immediate: true } : true,
   });
   lenis.on('scroll', () => ScrollTrigger.update());
   const tick = (t: number) => { lenis!.raf(t); lenisRaf = requestAnimationFrame(tick); };
@@ -114,7 +136,11 @@ function setupLenis() {
 }
 
 function splitWords(el: HTMLElement): HTMLElement[] {
-  if (!el || el.dataset['split'] === '1') return [];
+  if (!el) return [];
+  // Already split by an earlier start of the motion system (a remount, or
+  // React's dev-mode double effect): hand back the same words so they are
+  // animated again, rather than left hidden by the first start's set().
+  if (el.dataset['split'] === '1') return Array.from(el.querySelectorAll<HTMLElement>('.pf-word-i'));
   el.dataset['split'] = '1';
   const tmp = document.createElement('div');
   tmp.innerHTML = el.innerHTML;
@@ -161,9 +187,13 @@ function setupCursor() {
   window.addEventListener('pointerup', () => el.classList.remove('press'));
 
   // The ring trails the cursor; in label/disc modes it settles faster so
-  // the text feels "attached" rather than lagging behind.
-  const tick = () => {
-    const ease = el.classList.contains('label') ? 0.22 : 0.14;
+  // the text feels "attached" rather than lagging behind. The per-frame ease is
+  // scaled by frame time so the trail feels the same at 60Hz and 120Hz.
+  let last = 0;
+  const tick = (now: number) => {
+    const frames = last ? Math.min(now - last, 100) / (1000 / 60) : 1;
+    last = now;
+    const ease = 1 - Math.pow(1 - (el.classList.contains('label') ? 0.22 : 0.14), frames);
     rx += (tx - rx) * ease; ry += (ty - ry) * ease;
     if (ring) ring.style.transform = `translate3d(${rx}px,${ry}px,0) translate(-50%,-50%)`;
     requestAnimationFrame(tick);
@@ -220,26 +250,56 @@ function setupMagnetic() {
   });
 }
 
-/* WebGL hero backdrop — desktop, motion-on, sized-up screens only.
-   Everything else keeps the CSS aurora fallback (see .pf-webgl::before). */
+/* Smoke backdrop — one look on every device, served at the best tier it can run:
+     · live    WebGL2 on a hardware GPU (desktop, tablet or phone): the animated
+               field, which sizes itself and steps its resolution down if the
+               device can't keep up (see portfolio-webgl.ts)
+     · drift   no usable WebGL2, Save-Data on, or the live field gave up: the
+               field's first frame as a poster, slowly drifting
+     · still   reduced motion: the same poster, motionless
+   The poster is in the markup from the first paint, so every tier starts on the
+   same smoke and the live canvas fades in over it without a visible change. */
 function setupWebGL() {
   const el = document.querySelector<HTMLElement>('.pf-webgl');
   if (!el) return;
-  if (isTouch() || prefersReduced() || window.innerWidth < 760 || !hasWebGL()) return;
-  // Lazy-load three.js only on capable desktops, after first paint.
+
+  // The hero's scroll fade dims whichever tier is showing, identically.
+  const dim = el.querySelector<HTMLElement>('.pf-smoke-dim');
+  if (dim) {
+    ScrollTrigger.create({
+      trigger: '.pf-hero', start: 'top top', end: 'bottom top',
+      onUpdate: (self) => { dim.style.opacity = String(self.progress * 0.55); },
+    });
+  }
+
+  if (prefersReduced()) return;
+  const live = lifecycle;
+  const drift = () => { if (live === lifecycle) el.dataset['smoke'] = 'drift'; };
+  if (saveData() || !hasWebGL2()) { drift(); return; }
+  // Lazy-load three.js after first paint; the poster covers the wait.
   import('./portfolio-webgl').then(({ Backdrop }) => {
+    if (live !== lifecycle) return;
     try {
       Backdrop.mount(el);
     } catch {
+      drift();
       return;
     }
     backdrop = Backdrop;
-    requestAnimationFrame(() => el.classList.add('on'));
-    ScrollTrigger.create({
-      trigger: '.pf-hero', start: 'top top', end: 'bottom top',
-      onUpdate: (self) => Backdrop.setScroll(self.progress),
-    });
-  }).catch(() => { /* WebGL unavailable — CSS aurora fallback stays */ });
+  }).catch(drift);
+}
+
+function jumpTo(el: HTMLElement) {
+  // Respect scroll-margin-top (set where the floating nav would cover a section).
+  const margin = parseFloat(getComputedStyle(el).scrollMarginTop) || 0;
+  const y = el.getBoundingClientRect().top + window.scrollY - margin;
+  // Lenis caches the page height and clamps to it; pin spacers added by the
+  // last refresh would otherwise leave later sections out of reach.
+  lenis?.resize();
+  if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
+  else window.scrollTo(0, y);
+  ScrollTrigger.update();
+  kickPassedReveals();
 }
 
 function setupProgress() {
@@ -251,11 +311,43 @@ function setupProgress() {
   });
 }
 
-/* Intro preloader — counts to 100, then curtains up and hands off to
-   the hero entrance. On reduced-motion it's removed instantly. */
-function setupPreloader(done: () => void) {
+/* Who is arriving decides how much ceremony they get. The loader and intro
+   picker are a first-visit welcome: someone coming back, or following a link
+   to a section (#work), goes straight to the content. */
+const INTRO_SEEN_KEY = 'pf-intro-seen';
+const introSeen = () => {
+  try { return localStorage.getItem(INTRO_SEEN_KEY) === '1'; } catch { return false; }
+};
+const markIntroSeen = () => {
+  try { localStorage.setItem(INTRO_SEEN_KEY, '1'); } catch { /* private mode: show it again next time */ }
+};
+// The section a #hash link points at, if it exists on the page.
+const hashTarget = (): HTMLElement | null => {
+  const id = location.hash.slice(1);
+  if (!id) return null;
+  try { return document.getElementById(decodeURIComponent(id)); } catch { return null; }
+};
+
+/* Resolves once the webfonts are in (or after `cap` ms), so the curtain never
+   lifts onto fallback type. The Google Fonts stylesheet loads non-blocking, so
+   wait for it before asking for the faces it declares. */
+function webfontsReady(cap: number): Promise<void> {
+  const css = document.querySelector<HTMLLinkElement>('link[rel="stylesheet"][href*="fonts.googleapis.com"]');
+  const cssReady = !css || css.media !== 'print'
+    ? Promise.resolve()
+    : new Promise<void>((resolve) => css.addEventListener('load', () => resolve(), { once: true }));
+  const faces = cssReady
+    .then(() => Promise.all(['1em "Instrument Serif"', '1em "Geist"', '1em "Geist Mono"'].map((f) => document.fonts?.load(f))))
+    .then(() => undefined, () => undefined);
+  return Promise.race([faces, new Promise<void>((resolve) => setTimeout(resolve, cap))]);
+}
+
+/* Intro preloader — counts up while the webfonts arrive (never longer than it
+   takes, capped at 1.5s), then curtains up and hands off to the intro. Skipped
+   for return visits, section links and reduced motion. */
+function setupPreloader(skip: boolean, done: () => void) {
   const loader = document.querySelector<HTMLElement>('.pf-loader');
-  if (!loader || prefersReduced()) {
+  if (!loader || skip || prefersReduced()) {
     loader?.remove();
     done();
     return;
@@ -267,31 +359,34 @@ function setupPreloader(done: () => void) {
   document.body.classList.add('pf-loading');
 
   const counter = { v: 0 };
-  const tl = gsap.timeline();
-  tl.to(counter, {
-    v: 100, duration: 1.15, ease: 'power2.inOut',
+  const count = gsap.to(counter, {
+    v: 100, duration: 0.7, ease: 'power2.inOut',
     onUpdate: () => {
       if (num) num.textContent = String(Math.round(counter.v));
       if (bar) bar.style.transform = `scaleX(${counter.v / 100})`;
     },
   });
-  tl.to('.pf-loader-inner', { y: -24, opacity: 0, duration: 0.5, ease: 'power2.in' }, '+=0.12');
-  tl.to(loader, {
-    yPercent: -100, duration: 0.95, ease: 'expo.inOut',
-    onComplete: () => loader.remove(),
-  }, '<0.05');
-  tl.add(() => {
-    document.body.classList.remove('pf-loading');
-    lenis?.start();
-    done();
-  }, '<0.18');
+  Promise.all([webfontsReady(1500), count.then()]).then(() => {
+    const tl = gsap.timeline();
+    tl.to('.pf-loader-inner', { y: -24, opacity: 0, duration: 0.4, ease: 'power2.in' });
+    tl.to(loader, {
+      yPercent: -100, duration: 0.8, ease: 'expo.inOut',
+      onComplete: () => loader.remove(),
+    }, '<0.05');
+    tl.add(() => {
+      document.body.classList.remove('pf-loading');
+      lenis?.start();
+      done();
+    }, '<0.15');
+  });
 }
 
 /* Intent picker — a one-off "what brings you here" step shown right after
    the loader curtain lifts. A brief bio orients first-time visitors, then
-   their choice jumps straight to the relevant section. Reduced-motion and
-   no-element cases skip it instantly, same contract as the preloader. */
-function setupIntro(done: () => void) {
+   their choice jumps straight to the relevant section. Shown once: return
+   visits, section links, reduced motion and no-element cases skip it
+   instantly, same contract as the preloader. */
+function setupIntro(skip: boolean, done: () => void) {
   // Announces a calm moment (no scripted entrance/transition tween running)
   // for deferred main-thread work such as the session recorder's snapshot.
   let settledFired = false;
@@ -302,7 +397,7 @@ function setupIntro(done: () => void) {
   };
 
   const intro = document.querySelector<HTMLElement>('.pf-intro');
-  if (!intro || prefersReduced()) {
+  if (!intro || skip || prefersReduced()) {
     intro?.remove();
     done();
     settled();
@@ -336,6 +431,7 @@ function setupIntro(done: () => void) {
   const dismiss = (targetSelector: string | null) => {
     if (dismissing) return;
     dismissing = true;
+    markIntroSeen();
 
     const tl = gsap.timeline({
       onComplete: () => {
@@ -389,9 +485,11 @@ function setupIntro(done: () => void) {
     if (touchY - (e.touches[0]?.clientY ?? 0) > 8 && atBottom()) dismiss(null);
   }, { passive: true });
 
-  // Keyboard access: move focus into the dialog so the choices are reachable,
-  // and let Escape skip straight through like the "just exploring" path.
-  intro.querySelector<HTMLButtonElement>('[data-pf-intro="work"]')?.focus();
+  // Keyboard access: move focus into the dialog so the choices are one Tab
+  // away, and let Escape skip straight through like the "just exploring" path.
+  // Focusing the dialog itself (not the first card) avoids painting a focus
+  // ring on load and, on phones, scrolling the name bar out of view.
+  intro.focus({ preventScroll: true });
   intro.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') { dismiss(null); return; }
     // Trap Tab within the overlay so focus can't slip to the (now inert) page
@@ -404,7 +502,7 @@ function setupIntro(done: () => void) {
       const first = focusable[0]!;
       const last = focusable[focusable.length - 1]!;
       const active = document.activeElement;
-      if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); }
+      if (e.shiftKey && (active === first || active === intro)) { e.preventDefault(); last.focus(); }
       else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
     }
   });
@@ -447,10 +545,13 @@ function setupHeroEntrance(): () => void {
 function setupReveals() {
   reveals = [];
   revealed = new WeakSet();
+  // Reduced motion: content is simply there. (The .pf-reveal CSS override only
+  // freezes elements carrying that class, not split words, tags or rows.)
+  if (prefersReduced()) return;
 
   // Big serif headings keep the masked word-rise (our most premium move),
   // now timed on mira's cine curve with a faint blur clearing per word.
-  document.querySelectorAll<HTMLElement>('.pf-section-head h2, .pf-work-head h2, .pf-contact h2').forEach((h) => {
+  document.querySelectorAll<HTMLElement>('.pf-section-head h2, .pf-work-head h2, .pf-recog-heading, .pf-contact h2').forEach((h) => {
     const words = splitWords(h);
     gsap.set(words, { yPercent: 115, opacity: 0, filter: 'blur(5px)' });
     const play = makeReveal(h, () => gsap.to(words, { yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 1.0, ease: EASE_CINE, stagger: 0.05 }));
@@ -462,10 +563,13 @@ function setupReveals() {
     revealLift(el, { y: 16, blur: 6, duration: 0.85, start: 'top 90%' });
   });
 
-  // Experience rows — gentle flip so the timeline feels like turning pages.
-  document.querySelectorAll<HTMLElement>('.pf-xp').forEach((el) => {
-    revealLift(el, { y: 34, rotateX: 12, blur: 8, duration: 1.0 });
+  // Career timeline: each entry's lines rise in turn. The node stays put on the
+  // rail (setupCareer lights it), so only the text moves.
+  document.querySelectorAll<HTMLElement>('.pf-tl-item').forEach((item) => {
+    revealLift(Array.from(item.querySelectorAll<HTMLElement>(':scope > :not(.pf-tl-node)')),
+      { y: 22, blur: 6, duration: 0.9, stagger: 0.06, start: 'top 86%' });
   });
+  revealLift(document.querySelector<HTMLElement>('.pf-tl-resume'), { y: 16, blur: 6, duration: 0.85 });
 
   // Card surfaces get the full mira fingerprint: rise + hard 3D flip +
   // scale-up + blur-to-sharp, landing on a spring overshoot.
@@ -545,25 +649,36 @@ function setupWordmark() {
 }
 
 /* Hero copy drifts up and dims as you scroll into the film. Copy column
-   only — the portrait keeps its own hover transform untouched. */
+   only — the portrait keeps its own hover transform untouched. Follows the
+   desktop layout (tablets included) rather than the input type: on the stacked
+   phone layout the hero is taller than the screen, and the CTAs would dim while
+   still being read. */
 function setupHeroParallax() {
-  if (prefersReduced() || isTouch()) return;
   const copy = document.querySelector<HTMLElement>('.pf-hero-copy');
   if (!copy) return;
-  gsap.to(copy, {
-    yPercent: -16, opacity: 0.15, ease: 'none',
-    scrollTrigger: { trigger: '.pf-hero', start: 'top top', end: 'bottom top', scrub: true },
+  const mm = gsap.matchMedia();
+  mm.add('(min-width: 821px) and (prefers-reduced-motion: no-preference)', () => {
+    const tween = gsap.to(copy, {
+      yPercent: -16, opacity: 0.15, ease: 'none',
+      scrollTrigger: { trigger: '.pf-hero', start: 'top top', end: 'bottom top', scrub: true },
+    });
+    return () => { tween.scrollTrigger?.kill(); tween.kill(); };
   });
 }
 
 /* One persistent gold particle sphere lives in a fixed stage behind all
    content and morphs as you scroll the site (mira-style): each major section
    sets a discrete morph state, and the sphere eases between forms (calm →
-   rippling → turbulent → swollen). Skipped on touch / reduced-motion / no-WebGL. */
+   rippling → turbulent → swollen). Runs on any device with hardware WebGL —
+   it's a few thousand points, cheap even on phones. Skipped on reduced motion,
+   where the stage is hidden, without WebGL, and with Save-Data (it's the only
+   other thing that would pull in three.js). */
 function setupSphereStage() {
   const el = document.querySelector<HTMLElement>('.pf-sphere-stage');
-  if (!el || isTouch() || prefersReduced() || !hasWebGL()) return;
+  if (!el || prefersReduced() || saveData() || !hasWebGL()) return;
+  const live = lifecycle;
   import('./portfolio-sphere').then(({ PortfolioSphere }) => {
+    if (live !== lifecycle) return;
     try { PortfolioSphere.mount(el); } catch { return; }
     pageSphere = PortfolioSphere;
     setupSphereMorph();
@@ -576,6 +691,7 @@ function setupSphereMorph() {
   const stages: Array<[string, number]> = [
     ['#top', 0],          // hero — calm, faint wave
     ['#work', 1],         // selected work — rippling
+    ['#career', 2],       // career — turbulent
     ['#projects', 2],     // building — turbulent
     ['#skills', 3],       // skills — swollen scatter
     ['#principles', 3],   // principles — swollen scatter
@@ -654,16 +770,88 @@ function setupHorizontalWork() {
       }
     });
 
+    // Keyboard focus moving into a panel that is off to the side: scroll to
+    // that panel's point in the pin and show its content. (.pf-work clips its
+    // overflow, so the browser can't scroll the track sideways itself, which
+    // used to blank the section and leave focus on an invisible link.)
+    const panels = gsap.utils.toArray<HTMLElement>('.pf-wpanel');
+    const onFocusIn = (e: FocusEvent) => {
+      const panel = (e.target as HTMLElement).closest<HTMLElement>('.pf-wpanel');
+      if (!panel) return;
+      const y = st.start + (panels.indexOf(panel) / Math.max(1, panels.length - 1)) * (st.end - st.start);
+      lenis?.resize();
+      if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
+      else window.scrollTo(0, y);
+      ScrollTrigger.update();
+      st.getTween()?.progress(1); // skip the scrub lag so the panel is there now
+      const body = panel.querySelector<HTMLElement>('.pf-wpanel-body');
+      if (body) gsap.to(body, { opacity: 1, y: 0, rotateX: 0, filter: 'blur(0px)', duration: 0.35, ease: EASE_CINE, overwrite: true });
+    };
+    section.addEventListener('focusin', onFocusIn);
+    cleanups.push(() => section.removeEventListener('focusin', onFocusIn));
+
     return () => { cleanups.forEach((c) => c()); st.kill(); tween.kill(); };
   });
 
-  mm.add('(max-width: 820px)', () => {
+  mm.add('(max-width: 820px) and (prefers-reduced-motion: no-preference)', () => {
     const panels = gsap.utils.toArray<HTMLElement>('.pf-wpanel');
     panels.forEach((p) => {
       gsap.set(p, { y: 36, opacity: 0 });
       ScrollTrigger.create({ trigger: p, start: 'top 86%', once: true,
         onEnter: () => gsap.to(p, { y: 0, opacity: 1, duration: 0.8, ease: 'expo.out' }) });
     });
+  });
+}
+
+/* Career timeline — the gold rail draws down with the scroll and each node
+   lights as the line reaches it, so the path fills in as you read it. The
+   line's leading edge rides a fixed point on screen (LINE), and the lit state
+   is worked out from the same progress, so the two never drift apart. Reduced
+   motion skips all of it: the CSS default is the finished state. */
+function setupCareer() {
+  const tl = document.querySelector<HTMLElement>('.pf-tl');
+  const rail = tl?.querySelector<HTMLElement>('.pf-tl-rail');
+  const fill = tl?.querySelector<HTMLElement>('.pf-tl-rail-fill');
+  const spark = tl?.querySelector<HTMLElement>('.pf-tl-spark');
+  const items = gsap.utils.toArray<HTMLElement>('.pf-tl-item');
+  if (!tl || !rail || !fill || !items.length) return;
+
+  const mm = gsap.matchMedia();
+  mm.add('(prefers-reduced-motion: no-preference)', () => {
+    const LINE = '62%';
+    // Each node's centre, measured down the rail. Offsets ignore transforms, so
+    // the entries' reveal animation can't skew this.
+    let nodeY: number[] = [];
+    const measure = () => {
+      nodeY = items.map((item) => {
+        const node = item.querySelector<HTMLElement>('.pf-tl-node');
+        return node ? item.offsetTop + node.offsetTop + node.offsetHeight / 2 - rail.offsetTop : item.offsetTop - rail.offsetTop;
+      });
+    };
+    const draw = (p: number) => {
+      const edge = p * rail.offsetHeight;
+      fill.style.transform = `scaleY(${p})`;
+      if (spark) {
+        spark.style.transform = `translateY(${edge}px)`;
+        spark.style.opacity = p > 0 && p < 1 ? '1' : '0';
+      }
+      items.forEach((item, i) => item.classList.toggle('is-lit', p > 0 && edge >= (nodeY[i] ?? 0) - 1));
+    };
+    tl.classList.add('pf-tl--live');
+    measure();
+    const st = ScrollTrigger.create({
+      trigger: rail, start: `top ${LINE}`, end: `bottom ${LINE}`,
+      onUpdate: (self) => draw(self.progress),
+      onRefresh: (self) => { measure(); draw(self.progress); },
+    });
+    draw(st.progress);
+    return () => {
+      st.kill();
+      tl.classList.remove('pf-tl--live');
+      fill.style.transform = '';
+      if (spark) { spark.style.transform = ''; spark.style.opacity = ''; }
+      items.forEach((item) => item.classList.remove('is-lit'));
+    };
   });
 }
 
@@ -723,7 +911,7 @@ function setupRecogStage() {
 function setupSceneTransitions() {
   if (prefersReduced()) return;
   const sections = gsap.utils.toArray<HTMLElement>(
-    '.pf-work, .pf-proj-section, .pf-principles-section, .pf-recog-section, .pf-contact'
+    '.pf-work, .pf-career-section, .pf-proj-section, .pf-principles-section, .pf-recog-section, .pf-contact'
   );
   sections.forEach((section) => {
     const cut = document.createElement('span');
@@ -765,7 +953,7 @@ function setupHeadingParallax() {
 function setupNav() {
   const nav = document.querySelector<HTMLElement>('.pf-nav');
   if (!nav) return;
-  gsap.from(nav, { y: -40, opacity: 0, duration: 1.0, delay: 0.05, ease: 'expo.out' });
+  if (!prefersReduced()) gsap.from(nav, { y: -40, opacity: 0, duration: 1.0, delay: 0.05, ease: 'expo.out' });
   ScrollTrigger.create({ start: 'top -40', end: 'max',
     onUpdate: (self) => nav.classList.toggle('scrolled', self.scroll() > 40) });
 
@@ -782,48 +970,75 @@ function setupNav() {
   });
 }
 
+/* One feature failing (an API an older browser lacks, say) must not take the
+   rest down with it. An error thrown out of initPortfolioMotion would reach
+   React's effect, and with no error boundary React unmounts the whole page. */
+function run(setup: () => void) {
+  try { setup(); } catch (err) { console.error('[portfolio motion]', err); }
+}
+
 export function initPortfolioMotion() {
-  setupLenis();
-  setupCursor();
-  setupNav();
-  setupWebGL();
-  setupProgress();
-  setupReveals();
-  setupCounters();
-  setupCardTilt();
-  setupSpotlight();
-  setupMagnetic();
-  setupWordmark();
-  setupHeroParallax();
-  setupSphereStage();
-  setupHorizontalWork();
-  setupProjectsStage();
-  setupRecogStage();
-  setupSceneTransitions();
-  setupHeadingParallax();
-  setupPreloader(() => {
+  // Marks the app as running, for the record. The boot script in hitesh.html
+  // watches for pf-ready, so a start that fails part-way still gets shown.
+  document.documentElement.classList.add('pf-booted');
+  run(setupLenis);
+  run(setupCursor);
+  run(setupNav);
+  run(setupWebGL);
+  run(setupProgress);
+  run(setupReveals);
+  run(setupCounters);
+  run(setupCardTilt);
+  run(setupSpotlight);
+  run(setupMagnetic);
+  run(setupWordmark);
+  run(setupHeroParallax);
+  run(setupSphereStage);
+  run(setupHorizontalWork);
+  run(setupCareer);
+  run(setupProjectsStage);
+  run(setupRecogStage);
+  run(setupSceneTransitions);
+  run(setupHeadingParallax);
+  const target = hashTarget();
+  const skipWelcome = !!target || introSeen();
+  // Until the visitor scrolls on their own, keep a section link's target in
+  // place, including through the late re-measures at the end. Declared before
+  // setupPreloader, which calls back synchronously when the intro is skipped.
+  let pendingJump = target;
+  const cancelJump = () => { pendingJump = null; };
+  ['wheel', 'touchstart', 'keydown', 'pointerdown'].forEach((ev) =>
+    window.addEventListener(ev, cancelJump, { once: true, passive: true }));
+  run(() => setupPreloader(skipWelcome, () => {
     // Re-measure against the now-unlocked layout so reveals + pins fire
     // correctly, then explicitly kick any in-view counters and force-reveal
     // anything already scrolled past (deep-link / scroll restoration).
-    ScrollTrigger.refresh();
-    kickVisibleCounters();
-    kickPassedReveals();
+    run(() => { ScrollTrigger.refresh(); kickVisibleCounters(); kickPassedReveals(); });
     // Arm the hero hidden *now* (it's still behind the loader/intro), then
     // play it only when the intro curtain lifts — so the entrance doubles as
     // the title-sequence reveal with no flash of the final hero beforehand.
-    // If the intro is absent (reduced motion / already dismissed), setupIntro
-    // fires the play callback immediately.
-    const playHero = setupHeroEntrance();
-    setupIntro(playHero);
-  });
+    // If the intro is skipped (seen before, section link, reduced motion),
+    // setupIntro fires the play callback immediately.
+    let playHero = () => {};
+    run(() => { playHero = setupHeroEntrance(); });
+    run(() => setupIntro(skipWelcome, playHero));
+    // Entrance armed: let the prerendered content show (see .pf-ready).
+    document.documentElement.classList.add('pf-ready');
+    // A link to a section lands on it. The page renders after the browser has
+    // already tried to jump to the anchor, so jump here, once pins are measured.
+    const jump = pendingJump;
+    if (jump) run(() => jumpTo(jump));
+  }));
 
   // Pinned/horizontal sections depend on final layout — re-measure once
   // images and webfonts have settled.
-  window.addEventListener('load', () => ScrollTrigger.refresh());
-  document.fonts?.ready.then(() => ScrollTrigger.refresh());
+  const remeasure = () => { ScrollTrigger.refresh(); if (pendingJump) jumpTo(pendingJump); };
+  window.addEventListener('load', remeasure);
+  document.fonts?.ready.then(remeasure);
 }
 
 export function destroyPortfolioMotion() {
+  lifecycle++;
   if (lenisRaf !== null) { cancelAnimationFrame(lenisRaf); lenisRaf = null; }
   lenis?.destroy(); lenis = null;
   if (backdrop) { backdrop.destroy(); backdrop = null; }

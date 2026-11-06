@@ -31,10 +31,12 @@ vi.mock('gsap', () => {
     t.set = function () { return t; };
     return t;
   }
+  // Real tweens are thenable; the loader awaits one.
+  function to() { return { then: (resolve?: () => void) => Promise.resolve().then(resolve) }; }
   const stub = {
     registerPlugin: noop,
     set: noop,
-    to: noop,
+    to,
     from: noop,
     fromTo: noop,
     timeline,
@@ -71,6 +73,7 @@ vi.mock('lenis', () => {
   MockLenis.prototype.stop = function () {};
   MockLenis.prototype.start = function () {};
   MockLenis.prototype.scrollTo = function () {};
+  MockLenis.prototype.resize = function () {};
   MockLenis.prototype.raf = function () {};
   return { default: MockLenis };
 });
@@ -370,5 +373,133 @@ describe('destroyPortfolioMotion', () => {
     );
     initPortfolioMotion();
     expect(() => destroyPortfolioMotion()).not.toThrow();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Lazy three.js mounts vs teardown
+// ---------------------------------------------------------------------------
+
+describe('lazy WebGL mounts vs teardown', () => {
+  // Stops the instance a test started, so its rAF loop doesn't outlive the test.
+  let destroyMotion: (() => void) | undefined;
+
+  beforeEach(() => {
+    vi.resetModules();
+    setupMinimalDom();
+    setViewportWidth(1200);
+    installMatchMedia();
+    mockCanvasGetContext({});
+  });
+
+  afterEach(() => {
+    destroyMotion?.();
+    destroyMotion = undefined;
+    vi.restoreAllMocks();
+    teardownDom();
+  });
+
+  it('mounts the smoke backdrop and the sphere once their imports resolve', async () => {
+    const { Backdrop } = await import('../portfolio-webgl');
+    const { PortfolioSphere } = await import('../portfolio-sphere');
+    const smoke = vi.spyOn(Backdrop, 'mount');
+    const sphere = vi.spyOn(PortfolioSphere, 'mount');
+    const { initPortfolioMotion, destroyPortfolioMotion } = await import('../portfolio-film-motion');
+    destroyMotion = destroyPortfolioMotion;
+    initPortfolioMotion();
+    await vi.waitFor(() => {
+      expect(smoke).toHaveBeenCalledTimes(1);
+      expect(sphere).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('starts neither renderer when the page is torn down before the imports resolve', async () => {
+    const { Backdrop } = await import('../portfolio-webgl');
+    const { PortfolioSphere } = await import('../portfolio-sphere');
+    const smoke = vi.spyOn(Backdrop, 'mount');
+    const sphere = vi.spyOn(PortfolioSphere, 'mount');
+    const { initPortfolioMotion, destroyPortfolioMotion } = await import('../portfolio-film-motion');
+    initPortfolioMotion();
+    destroyPortfolioMotion();
+    // Well past when the imports resolve (the test above sees mounts within this).
+    await new Promise((r) => setTimeout(r, 50));
+    expect(smoke).not.toHaveBeenCalled();
+    expect(sphere).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// First-visit welcome: loader + intro picker
+// ---------------------------------------------------------------------------
+
+describe('welcome (loader + intro) is a first-visit thing', () => {
+  // Each test starts a motion instance (a Lenis rAF loop and window
+  // listeners); stop it, since resetModules leaves it unreachable afterwards.
+  let destroyMotion: (() => void) | undefined;
+  const start = async () => {
+    const m = await import('../portfolio-film-motion');
+    destroyMotion = m.destroyPortfolioMotion;
+    m.initPortfolioMotion();
+  };
+
+  beforeEach(() => {
+    vi.resetModules();
+    document.body.innerHTML = `
+      <div class="pf-loader"><div class="pf-loader-inner"></div></div>
+      <div class="pf-intro"></div>
+      <section id="contact"></section>
+    `;
+    setViewportWidth(1200);
+    installMatchMedia();
+    mockCanvasGetContext(null, null);
+    localStorage.clear();
+    history.replaceState(null, '', '/hitesh');
+  });
+
+  afterEach(() => {
+    destroyMotion?.();
+    destroyMotion = undefined;
+    vi.restoreAllMocks();
+    teardownDom();
+    localStorage.clear();
+    history.replaceState(null, '', '/hitesh');
+    document.documentElement.className = '';
+  });
+
+  it('shows the loader and intro on a first visit', async () => {
+    await start();
+    await Promise.resolve();
+    expect(document.querySelector('.pf-loader')).not.toBeNull();
+    expect(document.querySelector('.pf-intro')).not.toBeNull();
+  });
+
+  it('skips both for a visitor who has seen the intro', async () => {
+    localStorage.setItem('pf-intro-seen', '1');
+    await start();
+    expect(document.querySelector('.pf-loader')).toBeNull();
+    expect(document.querySelector('.pf-intro')).toBeNull();
+  });
+
+  it('skips both when arriving on a link to a section', async () => {
+    history.replaceState(null, '', '/hitesh#contact');
+    await start();
+    expect(document.querySelector('.pf-loader')).toBeNull();
+    expect(document.querySelector('.pf-intro')).toBeNull();
+  });
+
+  it('still shows them for a hash that matches no section', async () => {
+    history.replaceState(null, '', '/hitesh#nope');
+    await start();
+    expect(document.querySelector('.pf-loader')).not.toBeNull();
+  });
+
+  it('still shows the page when one setup step throws', async () => {
+    localStorage.setItem('pf-intro-seen', '1');
+    // The touch probe runs in several setup steps; make it blow up.
+    installMatchMedia((q) => { if (q.includes('pointer: coarse')) throw new Error('boom'); return false; });
+    const logged = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await expect(start()).resolves.toBeUndefined();
+    expect(document.documentElement.classList.contains('pf-ready')).toBe(true);
+    expect(logged).toHaveBeenCalled();
   });
 });

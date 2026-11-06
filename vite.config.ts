@@ -12,7 +12,6 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         hitesh: resolve(__dirname, 'hitesh.html'),
-        'hitesh-v2': resolve(__dirname, 'hitesh-v2.html'),
       },
     },
   },

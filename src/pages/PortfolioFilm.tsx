@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ArrowOut, ArrowRight, GithubMark, BrainIcon, DatabaseIcon, ReceiptIcon, CheckIcon } from '@/icons';
-import { PROJECTS, CASE_STUDIES, PRINCIPLES, RECOGNITION } from '@/data/portfolio';
+import { PROJECTS, CASE_STUDIES, EXPERIENCE, PRINCIPLES, RECOGNITION } from '@/data/portfolio';
 import { initPortfolioMotion, destroyPortfolioMotion } from '@/lib/portfolio-film-motion';
 
 const EMAIL = 'agrawalhitesh4444@gmail.com';
@@ -23,6 +23,19 @@ const featuredProjects = FEATURED_NAMES
   .map((n) => PROJECTS.find((p) => p.name === n))
   .filter((p): p is typeof PROJECTS[number] => Boolean(p));
 const PROJECT_ICONS = [BrainIcon, DatabaseIcon, ReceiptIcon];
+
+// 'YYYY-MM' → 'Aug 2026'. Fixed month names rather than toLocaleDateString,
+// so the build-time render and the browser always produce the same text.
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const formatMonth = (ym: string) => {
+  const [year, month] = ym.split('-');
+  return `${MONTHS[Number(month) - 1] ?? ''} ${year}`;
+};
+
+// Sets the **marked** figures in a line of copy bright, like the résumé's bold.
+function Marked({ text }: { text: string }) {
+  return <>{text.split('**').map((part, i) => (i % 2 ? <strong key={i}>{part}</strong> : part))}</>;
+}
 
 export function PortfolioFilm() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -61,7 +74,7 @@ export function PortfolioFilm() {
         <div className="pf-loader-bar"><span /></div>
       </div>
 
-      <div className="pf-intro pf-intro--coherent" role="dialog" aria-modal="true" aria-label="Welcome" data-lenis-prevent>
+      <div className="pf-intro pf-intro--coherent" role="dialog" aria-modal="true" aria-label="Welcome" tabIndex={-1} data-lenis-prevent>
         <div className="pf-intro-ambient" aria-hidden="true">
           <span className="pf-halo"><span className="pf-halo-core" /></span>
           <span className="pf-ping pf-ping-1" />
@@ -70,7 +83,7 @@ export function PortfolioFilm() {
         <div className="pf-intro-inner">
           <div className="pf-intro-topbar">
             <span className="pf-intro-name">Hitesh Agrawal</span>
-            <span className="pf-intro-status"><span className="d" /> Open to senior product roles</span>
+            <span className="pf-intro-status"><span className="d" /> Open to conversations</span>
           </div>
 
           <div className="pf-intro-lead">
@@ -98,7 +111,7 @@ export function PortfolioFilm() {
             <button type="button" className="pf-intro-opt pf-intro-opt--featured" data-pf-intro="work">
               <div className="pf-intro-opt-head">
                 <span className="pf-intro-opt-num">01</span>
-                <span className="pf-intro-opt-tag">Most visited</span>
+                <span className="pf-intro-opt-tag">Start here</span>
               </div>
               <div className="pf-intro-opt-art" aria-hidden="true">
                 <svg width="160" height="100" viewBox="0 0 160 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -173,9 +186,22 @@ export function PortfolioFilm() {
       </div>
 
       <div className="pf-progress" aria-hidden="true"><span /></div>
-      <div className="pf-sphere-stage" aria-hidden="true" />
 
       <div className="pf-webgl" aria-hidden="true">
+        {/* The smoke field's first frame: what every device shows until (and
+            unless) the live WebGL field fades in over it. */}
+        <picture className="pf-smoke-poster">
+          <source srcSet="/smoke-poster.avif" type="image/avif" />
+          <img
+            src="/smoke-poster.webp"
+            alt=""
+            decoding="async"
+            onLoad={(e) => e.currentTarget.classList.add('is-loaded')}
+            // A prerendered image can finish loading before hydration attaches onLoad.
+            ref={(img) => { if (img?.complete && img.naturalWidth) img.classList.add('is-loaded'); }}
+          />
+        </picture>
+        <div className="pf-smoke-dim" />
         {/* Ambient living layer — mira-style slow halo, radar pings and
             drifting motes. Pure CSS, sits behind all content, gold-tinted. */}
         <div className="pf-ambient">
@@ -188,12 +214,15 @@ export function PortfolioFilm() {
           ))}
         </div>
       </div>
+      {/* After the smoke: the sphere glows over the backdrop, under the content. */}
+      <div className="pf-sphere-stage" aria-hidden="true" />
 
       <header className="pf-nav" data-menu-open={menuOpen ? 'true' : undefined}>
         <div className="pf-nav-inner">
           <a href="#top" className="pf-logo">Hitesh Agrawal<b>.</b></a>
           <nav className="pf-nav-links">
             <a href="#work">Work</a>
+            <a href="#career">Career</a>
             <a href="#projects">Building</a>
             <a href="#contact">Contact</a>
           </nav>
@@ -211,6 +240,7 @@ export function PortfolioFilm() {
         </div>
         <nav id="pf-mobile-menu" className="pf-nav-mobile" aria-label="Sections" hidden={!menuOpen}>
           <a href="#work" onClick={() => setMenuOpen(false)}>Work</a>
+          <a href="#career" onClick={() => setMenuOpen(false)}>Career</a>
           <a href="#projects" onClick={() => setMenuOpen(false)}>Building</a>
           <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
           <a href={`mailto:${EMAIL}`} onClick={() => setMenuOpen(false)}>Email</a>
@@ -225,15 +255,15 @@ export function PortfolioFilm() {
               <div className="pf-hero-copy">
                 <div className="pf-eyebrow pf-reveal">
                   <span className="dot" />
-                  Open to senior product roles — worldwide
+                  Product Manager at Saleshandy
                 </div>
                 <h1 className="pf-reveal">
                   I help turn fuzzy ideas into <em>shipped</em> product.
                 </h1>
                 <p className="pf-hero-sub pf-reveal">
-                  Product manager, 0→1 to 280M-user scale. At Jio I helped onboard
-                  280M+ customers with zero downtime. On my own since: sold a B2B
-                  product before building it, and took a services business to profit
+                  From 0→1 products to 280M-user scale. At Jio I helped onboard
+                  280M+ customers with zero downtime. Then, on my own, I sold a B2B
+                  product before building it and took a services business to profit
                   in one quarter.
                 </p>
                 <div className="pf-hero-ctas pf-reveal">
@@ -267,22 +297,29 @@ export function PortfolioFilm() {
                 <article key={cs.title} className="pf-wpanel">
                   <span className="pf-wpanel-num">{String(i + 1).padStart(2, '0')}</span>
                   <div className="pf-wpanel-body">
-                    <div className="pf-wpanel-kicker">{cs.kicker}</div>
-                    <h3 className="pf-wpanel-title">{cs.title} <em>{cs.accent}</em></h3>
-                    <p className="pf-wpanel-sub">{cs.subtitle}</p>
-                    <div className="pf-wpanel-metrics">
-                      {cs.metrics.map((m) => (
-                        <div key={m.label} className="pf-wpanel-metric">
-                          <strong>{m.value}</strong>
-                          <span>{m.label}</span>
-                        </div>
-                      ))}
-                      {cs.link && (
-                        <a href={cs.link.href} target="_blank" rel="noopener noreferrer" className="pf-cs-link" data-cursor="Open">
-                          {cs.link.label} <ArrowOut size={11} />
-                        </a>
-                      )}
+                    <div className="pf-wpanel-lead">
+                      <div className="pf-wpanel-kicker">{cs.kicker}</div>
+                      <h3 className="pf-wpanel-title">{cs.title} <em>{cs.accent}</em></h3>
+                      <div className="pf-wpanel-metrics">
+                        {cs.metrics.map((m) => (
+                          <div key={m.label} className="pf-wpanel-metric">
+                            <strong>{m.value}</strong>
+                            <span>{m.label}</span>
+                          </div>
+                        ))}
+                        {cs.link && (
+                          <a href={cs.link.href} target="_blank" rel="noopener noreferrer" className="pf-cs-link" data-cursor="Open">
+                            {cs.link.label} <ArrowOut size={11} />
+                          </a>
+                        )}
+                      </div>
                     </div>
+                    {/* How the result was reached — what hiring managers read a case study for. */}
+                    <dl className="pf-wpanel-story">
+                      <div><dt>Challenge</dt><dd>{cs.challenge}</dd></div>
+                      <div><dt>Approach</dt><dd>{cs.approach}</dd></div>
+                      <div><dt>Outcome</dt><dd>{cs.outcome}</dd></div>
+                    </dl>
                   </div>
                 </article>
               ))}
@@ -292,6 +329,57 @@ export function PortfolioFilm() {
                 <span key={cs.title} className="pf-work-dot" data-active={i === 0 ? 'true' : undefined} />
               ))}
             </div>
+          </div>
+        </section>
+
+        <section className="pf-section pf-career-section" id="career">
+          <div className="pf-section-vlabel" aria-hidden="true"><span>Career</span></div>
+          <div className="pf-wrap">
+            <div className="pf-section-head pf-reveal">
+              <div className="pf-section-tag">Career</div>
+              <h2>Where I&apos;ve <em>been</em></h2>
+              <p>Enterprise scale at Jio, two ventures of my own, and now B2B SaaS at Saleshandy.</p>
+            </div>
+            <div className="pf-tl">
+              {/* Drawn in gold as you scroll (setupCareer); fully drawn without JS or motion. */}
+              <div className="pf-tl-rail" aria-hidden="true">
+                <span className="pf-tl-rail-fill" />
+                <span className="pf-tl-spark" />
+              </div>
+              <ol className="pf-tl-list">
+                {EXPERIENCE.map((x) => (
+                  <li
+                    key={x.org}
+                    className={`pf-tl-item${x.end ? '' : ' pf-tl-item--now'}${x.kind === 'education' ? ' pf-tl-item--edu' : ''}`}
+                  >
+                    {/* Heading first in the markup, so heading-by-heading navigation
+                        lands on the organisation and then reads its dates. */}
+                    <h3 className="pf-tl-org">{x.org}</h3>
+                    <p className="pf-tl-role">{x.role}</p>
+                    {x.honor && <p className="pf-tl-honor"><span aria-hidden="true">★</span> {x.honor}</p>}
+                    <p className="pf-tl-when">
+                      <span className="pf-tl-range">
+                        <time dateTime={x.start}>{formatMonth(x.start)}</time>
+                        {' – '}
+                        {x.end ? <time dateTime={x.end}>{formatMonth(x.end)}</time> : 'Now'}
+                      </span>
+                      <span className="pf-tl-place">{x.place}</span>
+                      {!x.end && <span className="pf-badge pf-badge-now"><i />Current role</span>}
+                    </p>
+                    <p className="pf-tl-summary"><Marked text={x.summary} /></p>
+                    {x.points.length > 0 && (
+                      <ul className="pf-tl-points">
+                        {x.points.map((pt) => <li key={pt}><Marked text={pt} /></li>)}
+                      </ul>
+                    )}
+                    <span className="pf-tl-node" aria-hidden="true" />
+                  </li>
+                ))}
+              </ol>
+            </div>
+            <a href={RESUME} target="_blank" rel="noopener noreferrer" className="pf-cs-link pf-tl-resume" data-cursor="Open">
+              Full résumé (PDF) <ArrowOut size={11} />
+            </a>
           </div>
         </section>
 
@@ -412,12 +500,12 @@ export function PortfolioFilm() {
         </section>
 
         <section className="pf-contact" id="contact">
-          <div className="pf-section-vlabel" aria-hidden="true"><span>Hiring</span></div>
+          <div className="pf-section-vlabel" aria-hidden="true"><span>Contact</span></div>
           <div className="pf-wrap">
             <div className="pf-contact-grid">
               <div className="pf-reveal">
                 <div className="pf-section-tag">Contact</div>
-                <h2>Hiring for a senior <em>product seat?</em></h2>
+                <h2>Let&apos;s talk <em>product.</em></h2>
                 <div className="pf-contact-ctas">
                   <a href={`mailto:${EMAIL}`} className="pf-btn pf-btn-primary pf-magnetic" data-cursor="Email me">
                     Email me <ArrowRight size={13} />
@@ -428,20 +516,20 @@ export function PortfolioFilm() {
                 </div>
                 <p className="pf-availability">
                   <span className="d" />
-                  Remote or relocation · IST (UTC+5:30), overlap-flexible
+                  Open to conversations · IST (UTC+5:30)
                 </p>
               </div>
               <div className="pf-reveal">
-                <div className="pf-hiring-card">
-                  <span className="pf-badge pf-badge-now"><i />Open to offers</span>
-                  <strong>Product Manager</strong>
-                  <span>0→1, growth, or platform — bring the ambiguous problem</span>
+                <div className="pf-now-card">
+                  <span className="pf-badge pf-badge-now"><i />Currently</span>
+                  <strong>Product Manager at Saleshandy</strong>
+                  <span>B2B sales-engagement SaaS · Ahmedabad</span>
                 </div>
                 <div className="pf-contact-rows">
                   <div className="pf-contact-row"><span>Email</span><a href={`mailto:${EMAIL}`}>{EMAIL}</a></div>
                   <div className="pf-contact-row"><span>LinkedIn</span><a href={LINKEDIN} target="_blank" rel="noopener noreferrer">hitesh-agrawal</a></div>
                   <div className="pf-contact-row"><span>Résumé</span><a href={RESUME} target="_blank" rel="noopener noreferrer">Hitesh-Agrawal-Resume.pdf</a></div>
-                  <div className="pf-contact-row"><span>Based in</span><span className="pf-contact-loc">Dhule · Mumbai, IN</span></div>
+                  <div className="pf-contact-row"><span>Based in</span><span className="pf-contact-loc">Ahmedabad, IN</span></div>
                 </div>
               </div>
             </div>
@@ -469,7 +557,7 @@ export function PortfolioFilm() {
       <footer className="pf-footer">
         <div className="pf-footer-inner">
           <span>Hitesh Agrawal · © 2026</span>
-          <span className="pf-footer-status"><span className="d" /> Open to senior product roles</span>
+          <span className="pf-footer-status"><span className="d" /> Open to conversations</span>
           <a href="/" className="pf-footer-back">BlackHook Studio <ArrowOut size={11} /></a>
         </div>
       </footer>
